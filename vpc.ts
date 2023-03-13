@@ -4,7 +4,6 @@ import { ComputeSubnetwork } from "@cdktf/provider-google/lib/compute-subnetwork
 import { ComputeFirewall } from "@cdktf/provider-google/lib/compute-firewall"
 
 type VpcNetworkOptions = {
-  name: string
   ipCidrRange: string
   ports: Array<string>
 }
@@ -17,16 +16,17 @@ class VpcNetwork extends Construct {
     super(scope, name)
     this.network = new ComputeNetwork(this, "vpc-network", {
       autoCreateSubnetworks: false,
-      name: `${option.name}-vpc-network`,
+      name: `${name}-vpc-network`,
     })
     this.subnetwork = new ComputeSubnetwork(this, "vpc-subnetwork", {
-      name: `${option.name}-vpc-subnetwork`,
+      name: `${name}-vpc-subnetwork`,
       ipCidrRange: option.ipCidrRange,
       network: this.network.id,
     })
     this.firewall = new ComputeFirewall(this, "allow-ssh", {
-      name: `${option.name}-allow-ssh`,
+      name: `${name}-allow-ssh`,
       network: this.network.id,
+      sourceRanges: ["0.0.0.0/0"],
       allow: [{ protocol: "tcp", ports: option.ports }],
     })
   }
