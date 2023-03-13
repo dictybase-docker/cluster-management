@@ -1,16 +1,6 @@
-// Copyright (c) HashiCorp, Inc
-// SPDX-License-Identifier: MPL-2.0
-import { Construct } from "constructs";
-import { App, TerraformStack } from "cdktf";
+import { App } from "cdktf"
+import VmInstanceStack from "./instance"
 
-class MyStack extends TerraformStack {
-  constructor(scope: Construct, id: string) {
-    super(scope, id);
-
-    // define resources here
-  }
-}
-
-const app = new App();
-new MyStack(app, "cluster-automation-cdktf");
-app.synth();
+const app = new App()
+new VmInstanceStack(app, "k0s-cluster-cdktf")
+app.synth()
