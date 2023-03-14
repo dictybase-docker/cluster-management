@@ -1,89 +1,42 @@
-// Copyright (c) HashiCorp, Inc
-// SPDX-License-Identifier: MPL-2.0
-import "cdktf/lib/testing/adapters/jest"; // Load types for expect matchers
-// import { Testing } from "cdktf";
+import "cdktf/lib/testing/adapters/jest" // Load types for expect matchers
+import { Testing, App } from "cdktf"
+import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
+import { ComputeNetwork } from "@cdktf/provider-google/lib/compute-network"
+import { ComputeSubnetwork } from "@cdktf/provider-google/lib/compute-subnetwork"
+import { ComputeFirewall } from "@cdktf/provider-google/lib/compute-firewall"
+import VmInstanceStack from "../instance"
 
-describe("My CDKTF Application", () => {
-  // The tests below are example tests, you can find more information at
-  // https://cdk.tf/testing
-  it.todo("should be tested");
-
-  // // All Unit tests test the synthesised terraform code, it does not create real-world resources
-  // describe("Unit testing using assertions", () => {
-  //   it("should contain a resource", () => {
-  //     // import { Image,Container } from "./.gen/providers/docker"
-  //     expect(
-  //       Testing.synthScope((scope) => {
-  //         new MyApplicationsAbstraction(scope, "my-app", {});
-  //       })
-  //     ).toHaveResource(Container);
-
-  //     expect(
-  //       Testing.synthScope((scope) => {
-  //         new MyApplicationsAbstraction(scope, "my-app", {});
-  //       })
-  //     ).toHaveResourceWithProperties(Image, { name: "ubuntu:latest" });
-  //   });
-  // });
-
-  // describe("Unit testing using snapshots", () => {
-  //   it("Tests the snapshot", () => {
-  //     const app = Testing.app();
-  //     const stack = new TerraformStack(app, "test");
-
-  //     new TestProvider(stack, "provider", {
-  //       accessKey: "1",
-  //     });
-
-  //     new TestResource(stack, "test", {
-  //       name: "my-resource",
-  //     });
-
-  //     expect(Testing.synth(stack)).toMatchSnapshot();
-  //   });
-
-  //   it("Tests a combination of resources", () => {
-  //     expect(
-  //       Testing.synthScope((stack) => {
-  //         new TestDataSource(stack, "test-data-source", {
-  //           name: "foo",
-  //         });
-
-  //         new TestResource(stack, "test-resource", {
-  //           name: "bar",
-  //         });
-  //       })
-  //     ).toMatchInlineSnapshot();
-  //   });
-  // });
-
-  // describe("Checking validity", () => {
-  //   it("check if the produced terraform configuration is valid", () => {
-  //     const app = Testing.app();
-  //     const stack = new TerraformStack(app, "test");
-
-  //     new TestDataSource(stack, "test-data-source", {
-  //       name: "foo",
-  //     });
-
-  //     new TestResource(stack, "test-resource", {
-  //       name: "bar",
-  //     });
-  //     expect(Testing.fullSynth(app)).toBeValidTerraform();
-  //   });
-
-  //   it("check if this can be planned", () => {
-  //     const app = Testing.app();
-  //     const stack = new TerraformStack(app, "test");
-
-  //     new TestDataSource(stack, "test-data-source", {
-  //       name: "foo",
-  //     });
-
-  //     new TestResource(stack, "test-resource", {
-  //       name: "bar",
-  //     });
-  //     expect(Testing.fullSynth(app)).toPlanSuccessfully();
-  //   });
-  // });
-});
+describe("VmInstanceStack Application", () => {
+  let stack: VmInstanceStack
+  let app: App
+  beforeAll(() => {
+    app = Testing.app()
+    stack = new VmInstanceStack(app, "test-instance")
+  })
+  test("check if it has google provider", () => {
+    expect(Testing.synth(stack)).toHaveProvider(GoogleProvider)
+  })
+  test("check if it has compute network", () => {
+    expect(Testing.synth(stack)).toHaveResource(ComputeNetwork)
+    expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeNetwork, {
+      name: "test-instance-vpc-network",
+    })
+    expect(Testing.synth(stack)).toHaveResource(ComputeFirewall)
+  })
+  test("check if it has compute subnetwork", () => {
+    expect(Testing.synth(stack)).toHaveResource(ComputeSubnetwork)
+    expect(Testing.synth(stack)).toHaveResourceWithProperties(
+      ComputeSubnetwork,
+      { name: "test-instance-vpc-subnetwork" },
+    )
+  })
+  test("check if it has compute firewall", () => {
+    expect(Testing.synth(stack)).toHaveResource(ComputeFirewall)
+    expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeFirewall, {
+      name: "test-instance-allow-ssh",
+    })
+  })
+  test("check if the produced terraform configuration is valid", () => {
+    expect(Testing.fullSynth(stack)).toBeValidTerraform()
+  })
+})

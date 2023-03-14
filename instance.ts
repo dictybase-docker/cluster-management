@@ -16,8 +16,7 @@ class VmInstanceStack extends TerraformStack {
     })
     const ports = new cdktf.TerraformVariable(this, "ports", {
       description: "ports that will be opened in the network",
-      type: "array",
-      nullable: false,
+      default: ["8955"],
     })
     const region = new cdktf.TerraformVariable(this, "region", {
       default: "us-central1",
@@ -27,7 +26,7 @@ class VmInstanceStack extends TerraformStack {
       default: "us-central1-c",
       description: "gcp zone name within a region",
     })
-    const ipCidrRange = new cdktf.TerraformVariable(this, "ipCidrRange", {
+    const ipCidrRange = new cdktf.TerraformVariable(this, "ip-cidr-range", {
       default: "10.8.0.0/21",
       description:
         "The IP range in cidr notation for vpc subnet that will be assigned to nodes",
