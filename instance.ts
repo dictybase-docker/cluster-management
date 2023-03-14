@@ -16,6 +16,7 @@ class VmInstanceStack extends TerraformStack {
     })
     const ports = new cdktf.TerraformVariable(this, "ports", {
       description: "ports that will be opened in the network",
+      type: "list(string)",
       default: ["8955"],
     })
     const region = new cdktf.TerraformVariable(this, "region", {
