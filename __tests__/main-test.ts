@@ -4,6 +4,8 @@ import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
 import { ComputeNetwork } from "@cdktf/provider-google/lib/compute-network"
 import { ComputeSubnetwork } from "@cdktf/provider-google/lib/compute-subnetwork"
 import { ComputeFirewall } from "@cdktf/provider-google/lib/compute-firewall"
+import { ComputeDisk } from "@cdktf/provider-google/lib/compute-disk"
+import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 import { K8Stack } from "../k8s"
 
 describe("VmInstanceStack Application", () => {
@@ -34,6 +36,22 @@ describe("VmInstanceStack Application", () => {
     expect(Testing.synth(stack)).toHaveResource(ComputeFirewall)
     expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeFirewall, {
       name: "test-instance-allow-ssh",
+    })
+  })
+  test("check if it has compute disk", () => {
+    expect(Testing.synth(stack)).toHaveResource(ComputeDisk)
+    expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeDisk, {
+      type: "pd-ssd",
+      name: "k8-disk",
+      image: "rocky-linux-8-optimized-gcp-v20230306",
+    })
+  })
+  test("check if it has compute instance", () => {
+    expect(Testing.synth(stack)).toHaveResource(ComputeInstance)
+    expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeInstance, {
+      scheduling: {
+        provisioning_model: "STANDARD",
+      },
     })
   })
   test("check if the produced terraform configuration is valid", () => {
