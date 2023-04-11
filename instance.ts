@@ -14,7 +14,7 @@ type VmInstanceProperties = {
 class VmInstance extends Construct {
   public readonly vmInstance: ComputeInstance
   constructor(scope: Construct, id: string, properties: VmInstanceProperties) {
-    super(scope, id)
+    super(scope, `${id}-vminstance`)
     const { name, machine, disk, network } = properties
     this.vmInstance = new ComputeInstance(this, "instance", {
       name: name.value,
