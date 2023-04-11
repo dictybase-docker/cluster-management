@@ -19,7 +19,7 @@
 		"upgrade:next": "yarn upgrade cdktf@next cdktf-cli@next"
 	},
 	"engines": {
-		"node": ">=14.0"
+		"node": ">=18.0"
 	},
 	"dependencies": {
 		"@cdktf/provider-google": "5.0.8",
