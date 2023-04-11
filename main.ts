@@ -1,6 +1,6 @@
 import { App } from "cdktf"
-import VmInstanceStack from "./instance"
+import { K8Stack } from "./k8s"
 
 const app = new App()
-new VmInstanceStack(app, "k0s-cluster-cdktf")
+new K8Stack(app, "k0s-cluster-cdktf")
 app.synth()
