@@ -10,63 +10,27 @@ import { VmInstance } from "./instance"
 class K8Stack extends TerraformStack {
   constructor(scope: Construct, id: string) {
     super(scope, id)
-    const projectId = new TerraformVariable(this, "project_id", {
-      description: "gcp project id",
-      type: "string",
-      nullable: false,
-    })
-    const ports = new TerraformVariable(this, "ports", {
-      description: "ports that will be opened in the network",
-      type: "list(string)",
-      default: ["8955"],
-    })
-    const region = new TerraformVariable(this, "region", {
-      default: "us-central1",
-      description: "gcp region",
-    })
-    const zone = new TerraformVariable(this, "zone", {
-      default: "us-central1-c",
-      description: "gcp zone name within a region",
-    })
-    const ipCidrRange = new TerraformVariable(this, "ip-cidr-range", {
-      default: "10.8.0.0/21",
-      description:
-        "The IP range in cidr notation for vpc subnet that will be assigned to nodes",
-    })
-    const instanceName = new TerraformVariable(this, "instance", {
-      type: "string",
-      default: "k8-master",
-      description: "name of the instance",
-    })
-    const machineType = new TerraformVariable(this, "machine-tyoe", {
-      type: "string",
-      default: "custom-2-2048",
-      description: "The machine type to create",
-    })
-    const bootDiskSize = new TerraformVariable(this, "disk-size", {
-      type: "number",
-      default: 30,
-      description: "size of the boot disk in GB",
-    })
+    const variables = this.#define_variables()
     new GoogleProvider(this, "google", {
-      credentials: this._read_credentials("credentials.json"),
-      project: projectId.value,
-      region: region.value,
-      zone: zone.value,
+      credentials: this.#read_credentials("credentials.json"),
+      project: variables.get("projectId").value,
+      region: variables.get("region").value,
+      zone: variables.get("zone").value,
     })
     const vpcNetwork = new VpcNetwork(this, id, {
-      ports: ports.value,
-      ipCidrRange: ipCidrRange.value,
+      ports: variables.get("ports").value,
+      ipCidrRange: variables.get("ipCidrRange").value,
     })
     new VmInstance(this, id, {
-      name: instanceName,
-      machine: machineType,
-      disk: new K8Disk(this, id, { size: bootDiskSize.value }).disk,
+      name: variables.get("instanceName"),
+      machine: variables.get("machineType"),
+      disk: new K8Disk(this, id, { size: variables.get("bootDiskSize").value })
+        .disk,
       network: vpcNetwork.network,
     })
   }
 
-  _read_credentials(name: string) {
+  #read_credentials(name: string) {
     let cred_path: string = ""
     const default_path = path.join(process.cwd(), name)
     if (fs.existsSync(default_path)) {
@@ -78,6 +42,74 @@ class K8Stack extends TerraformStack {
       }
     }
     return fs.readFileSync(cred_path).toString()
+  }
+
+  #define_variables() {
+    const variables = new Map()
+    variables
+      .set(
+        "projectId",
+        new TerraformVariable(this, "project_id", {
+          description: "gcp project id",
+          type: "string",
+          nullable: false,
+        }),
+      )
+      .set(
+        "ports",
+        new TerraformVariable(this, "ports", {
+          description: "ports that will be opened in the network",
+          type: "list(string)",
+          default: ["8955"],
+        }),
+      )
+      .set(
+        "region",
+        new TerraformVariable(this, "region", {
+          default: "us-central1",
+          description: "gcp region",
+        }),
+      )
+      .set(
+        "zone",
+        new TerraformVariable(this, "zone", {
+          default: "us-central1-c",
+          description: "gcp zone name within a region",
+        }),
+      )
+      .set(
+        "ipCidrRange ",
+        new TerraformVariable(this, "ip-cidr-range", {
+          default: "10.8.0.0/21",
+          description:
+            "The IP range in cidr notation for vpc subnet that will be assigned to nodes",
+        }),
+      )
+      .set(
+        "instanceName",
+        new TerraformVariable(this, "instance", {
+          type: "string",
+          default: "k8-master",
+          description: "name of the instance",
+        }),
+      )
+      .set(
+        "machineType",
+        new TerraformVariable(this, "machine-tyoe", {
+          type: "string",
+          default: "custom-2-2048",
+          description: "The machine type to create",
+        }),
+      )
+      .set(
+        "bootDiskSize",
+        new TerraformVariable(this, "disk-size", {
+          type: "number",
+          default: 30,
+          description: "size of the boot disk in GB",
+        }),
+      )
+    return variables
   }
 }
 
