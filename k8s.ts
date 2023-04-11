@@ -1,4 +1,4 @@
-import { TerraformStack, TerraformVariable } from "cdktf"
+import { TerraformStack, TerraformVariable, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import * as path from "path"
 import * as fs from "fs"
@@ -16,6 +16,10 @@ class K8Stack extends TerraformStack {
       project: variables.get("projectId").value,
       region: variables.get("region").value,
       zone: variables.get("zone").value,
+    })
+    new GcsBackend(this, {
+      bucket: variables.get("bucketName").value,
+      prefix: variables.get("bucketPrefix").value,
     })
     const vpcNetwork = new VpcNetwork(this, id, {
       ports: variables.get("ports").value,
@@ -107,6 +111,22 @@ class K8Stack extends TerraformStack {
           type: "number",
           default: 30,
           description: "size of the boot disk in GB",
+        }),
+      )
+      .set(
+        "bucketName",
+        new TerraformVariable(this, "bucket_name", {
+          description: `GCS bucket name where terraform remote state is stored.`,
+          type: "string",
+          default: "dicty-terraform-state",
+        }),
+      )
+      .set(
+        "bucketPrefix",
+        new TerraformVariable(this, "bucket_prefix", {
+          description: `GCS bucket folder prefix where terraform remote state is stored.`,
+          type: "string",
+          default: "k0s-cluster-cdktf",
         }),
       )
     return variables
