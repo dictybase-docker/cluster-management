@@ -78,7 +78,7 @@ class K8Stack extends TerraformStack {
         }),
       )
       .set(
-        "ipCidrRange ",
+        "ipCidrRange",
         new TerraformVariable(this, "ip-cidr-range", {
           default: "10.8.0.0/21",
           description:
