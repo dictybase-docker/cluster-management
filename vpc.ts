@@ -32,4 +32,4 @@ class VpcNetwork extends Construct {
   }
 }
 
-export default VpcNetwork
+export { VpcNetwork }
