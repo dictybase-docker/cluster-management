@@ -4,14 +4,14 @@ import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
 import { ComputeNetwork } from "@cdktf/provider-google/lib/compute-network"
 import { ComputeSubnetwork } from "@cdktf/provider-google/lib/compute-subnetwork"
 import { ComputeFirewall } from "@cdktf/provider-google/lib/compute-firewall"
-import VmInstanceStack from "../instance"
+import { K8Stack } from "../k8s"
 
 describe("VmInstanceStack Application", () => {
-  let stack: VmInstanceStack
+  let stack: K8Stack
   let app: App
   beforeAll(() => {
     app = Testing.app()
-    stack = new VmInstanceStack(app, "test-instance")
+    stack = new K8Stack(app, "test-instance")
   })
   test("check if it has google provider", () => {
     expect(Testing.synth(stack)).toHaveProvider(GoogleProvider)
