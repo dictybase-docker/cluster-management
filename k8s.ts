@@ -8,7 +8,7 @@ import { VpcNetwork } from "./vpc"
 import { VmInstance } from "./instance"
 
 class K8Stack extends TerraformStack {
-  constructor(scope: Construct, id: string) {
+  constructor(scope: Construct, id: string, is_remote?: boolean) {
     super(scope, id)
     const variables = this.#define_variables()
     new GoogleProvider(this, "google", {
@@ -17,10 +17,12 @@ class K8Stack extends TerraformStack {
       region: variables.get("region").value,
       zone: variables.get("zone").value,
     })
-    new GcsBackend(this, {
-      bucket: variables.get("bucketName").value,
-      prefix: variables.get("bucketPrefix").value,
-    })
+    if (is_remote) {
+      new GcsBackend(this, {
+        bucket: variables.get("bucketName").value,
+        prefix: variables.get("bucketPrefix").value,
+      })
+    }
     const vpcNetwork = new VpcNetwork(this, id, {
       ports: variables.get("ports").value,
       ipCidrRange: variables.get("ipCidrRange").value,
