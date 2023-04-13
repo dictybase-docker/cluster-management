@@ -28,10 +28,11 @@ class K8Stack extends TerraformStack {
       ipCidrRange: variables.get("ipCidrRange").value,
     })
     new VmInstance(this, id, {
-      name: variables.get("instanceName"),
-      machine: variables.get("machineType"),
-      disk: new K8Disk(this, id, { size: variables.get("bootDiskSize").value })
-        .disk,
+      name: variables.get("masterInstanceName"),
+      machine: variables.get("masterMachineType"),
+      disk: new K8Disk(this, id, {
+        size: variables.get("masterDiskSize").value,
+      }).disk,
       network: vpcNetwork.network,
     })
   }
@@ -92,27 +93,53 @@ class K8Stack extends TerraformStack {
         }),
       )
       .set(
-        "instanceName",
-        new TerraformVariable(this, "instance", {
+        "masterInstanceName",
+        new TerraformVariable(this, "master_instance", {
           type: "string",
           default: "k8-master",
-          description: "name of the instance",
+          description:
+            "name of the instance that will be used for kubernetes controller",
         }),
       )
       .set(
-        "machineType",
-        new TerraformVariable(this, "machine-tyoe", {
+        "masterMachineType",
+        new TerraformVariable(this, "master-machine-type", {
           type: "string",
           default: "custom-2-2048",
-          description: "The machine type to create",
+          description: "The machine type for kubernetes controller",
         }),
       )
       .set(
-        "bootDiskSize",
-        new TerraformVariable(this, "disk-size", {
+        "masterDiskSize",
+        new TerraformVariable(this, "master-disk-size", {
           type: "number",
           default: 30,
-          description: "size of the boot disk in GB",
+          description: "size of the boot disk of kubernetes master in GB",
+        }),
+      )
+      .set(
+        "nodeInstanceName",
+        new TerraformVariable(this, "node_instance", {
+          type: "string",
+          default: "k8-node",
+          description:
+            "name of the instance that will be used for kubernetes nodes",
+        }),
+      )
+      .set(
+        "nodeMachineType",
+        new TerraformVariable(this, "node-machine-type", {
+          type: "string",
+          default: "custom-2-4048",
+          description: "The machine type for kubernetes node",
+        }),
+      )
+      .set(
+        "nodeDiskSize",
+        new TerraformVariable(this, "node-disk-size", {
+          type: "number",
+          default: 50,
+          description: "size of the boot disk of kubernetes nodes in GB",
         }),
       )
       .set(
