@@ -7,6 +7,12 @@ import { K8Disk } from "./disk"
 import { VpcNetwork } from "./vpc"
 import { VmInstance } from "./instance"
 
+const times = (n: number, callback: () => void) => {
+  if (n <= 0) return
+  callback()
+  times(n - 1, callback)
+}
+
 class K8Stack extends TerraformStack {
   constructor(scope: Construct, id: string, is_remote?: boolean) {
     super(scope, id)
