@@ -13,17 +13,17 @@ class VpcNetwork extends Construct {
   public readonly subnetwork: ComputeSubnetwork
   public readonly firewall: ComputeFirewall
   constructor(scope: Construct, id: string, option: VpcNetworkOptions) {
-    super(scope, `${id}-vpc`)
-    this.network = new ComputeNetwork(this, "vpc-network", {
+    super(scope, id)
+    this.network = new ComputeNetwork(this, `${id}-network`, {
       autoCreateSubnetworks: false,
-      name: `${id}-vpc-network`,
+      name: `${id}-network`,
     })
-    this.subnetwork = new ComputeSubnetwork(this, "vpc-subnetwork", {
-      name: `${id}-vpc-subnetwork`,
+    this.subnetwork = new ComputeSubnetwork(this, `${id}-subnetwork`, {
+      name: `${id}-subnetwork`,
       ipCidrRange: option.ipCidrRange,
       network: this.network.id,
     })
-    this.firewall = new ComputeFirewall(this, "allow-ssh", {
+    this.firewall = new ComputeFirewall(this, `${id}-allow-ssh`, {
       name: `${id}-allow-ssh`,
       network: this.network.id,
       sourceRanges: ["0.0.0.0/0"],
