@@ -8,11 +8,6 @@ interface DiskProps {
   size: number
 
   /**
-   * The name of the disk.
-   */
-  name?: string
-
-  /**
    * The image to use for the disk.
    */
   image?: string
@@ -33,12 +28,12 @@ export class K8Disk extends Construct {
    * @param name The name of the construct.
    * @param props The properties of the construct.
    */
-  constructor(scope: Construct, name: string, props: DiskProps) {
-    super(scope, name)
+  constructor(scope: Construct, id: string, props: DiskProps) {
+    super(scope, id)
     // Define the resource for the persistent disk
-    this.disk = new ComputeDisk(this, "k8-disk", {
+    this.disk = new ComputeDisk(this, id, {
       image: props.image ?? "rocky-linux-8-optimized-gcp-v20230306",
-      name: props.name ?? "k8-disk",
+      name: id,
       type: "pd-ssd",
       size: props.size,
     })
