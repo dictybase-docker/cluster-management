@@ -35,14 +35,14 @@ describe("VmInstanceStack Application", () => {
   test("check if it has compute firewall", () => {
     expect(Testing.synth(stack)).toHaveResource(ComputeFirewall)
     expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeFirewall, {
-      name: "test-instance-allow-ssh",
+      name: "test-instance-vpc-allow-ssh",
     })
   })
-  test("check if it has compute disk", () => {
+  test("check if it has compute disk for master node", () => {
     expect(Testing.synth(stack)).toHaveResource(ComputeDisk)
     expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeDisk, {
       type: "pd-ssd",
-      name: "k8-disk",
+      name: "test-instance-disk-master",
       image: "rocky-linux-8-optimized-gcp-v20230306",
     })
   })
