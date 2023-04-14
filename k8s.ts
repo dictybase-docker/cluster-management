@@ -1,4 +1,9 @@
-import { TerraformStack, TerraformVariable, GcsBackend } from "cdktf"
+import {
+  TerraformStack,
+  TerraformVariable,
+  GcsBackend,
+  numberToTerraform,
+} from "cdktf"
 import { Construct } from "constructs"
 import * as path from "path"
 import * as fs from "fs"
@@ -11,6 +16,53 @@ const times = (n: number, callback: () => void) => {
   if (n <= 0) return
   callback()
   times(n - 1, callback)
+}
+
+const numberToText = (num: number): string => {
+  const ones = [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fourteen",
+    "fifteen",
+    "sixteen",
+    "seventeen",
+    "eighteen",
+    "nineteen",
+  ]
+  const tens = [
+    "twenty",
+    "thirty",
+    "forty",
+    "fifty",
+    "sixty",
+    "seventy",
+    "eighty",
+    "ninety",
+  ]
+  switch (true) {
+    case num === 0:
+      return "zero"
+    case num > 0 && num < 20:
+      return ones[num - 1]
+    case num > 20 && num < 100:
+      return tens[Math.floor(num / 10)].concat(
+        num % 10 !== 0 ? "" : ones[(num % 10) - 1],
+      )
+    default:
+      break
+  }
+  return "none"
 }
 
 class K8Stack extends TerraformStack {
@@ -29,18 +81,28 @@ class K8Stack extends TerraformStack {
         prefix: variables.get("bucketPrefix").value,
       })
     }
-    const vpcNetwork = new VpcNetwork(this, id, {
+    const vpcNetwork = new VpcNetwork(this, `${id}-vpc`, {
       ports: variables.get("ports").value,
       ipCidrRange: variables.get("ipCidrRange").value,
     })
-    new VmInstance(this, id, {
-      name: variables.get("masterInstanceName"),
+    const master = new VmInstance(this, `${id}-vm-master`, {
       machine: variables.get("masterMachineType"),
-      disk: new K8Disk(this, id, {
+      disk: new K8Disk(this, `${id}-disk-master`, {
         size: variables.get("masterDiskSize").value,
       }).disk,
       network: vpcNetwork.network,
     })
+    const nodes = [...Array(variables.get("numOfNodes").number).keys()].map(
+      (_, index) => {
+        new VmInstance(this, `${id}-vm-node-${numberToText(index)}`, {
+          machine: variables.get("nodeMachineType"),
+          network: vpcNetwork.network,
+          disk: new K8Disk(this, `${id}-disk-node-${numberToText(index)}`, {
+            size: variables.get("nodeDiskSize").value,
+          }).disk,
+        })
+      },
+    )
   }
 
   #read_credentials(name: string) {
@@ -146,6 +208,14 @@ class K8Stack extends TerraformStack {
           type: "number",
           default: 50,
           description: "size of the boot disk of kubernetes nodes in GB",
+        }),
+      )
+      .set(
+        "numOfNodes",
+        new TerraformVariable(this, "nodes", {
+          type: "number",
+          default: 3,
+          description: "number of VM instances for kubernetes nodes",
         }),
       )
       .set(
