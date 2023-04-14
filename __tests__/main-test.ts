@@ -46,9 +46,10 @@ describe("VmInstanceStack Application", () => {
       image: "rocky-linux-8-optimized-gcp-v20230306",
     })
   })
-  test("check if it has compute instance", () => {
+  test("check if it has compute instance for master node", () => {
     expect(Testing.synth(stack)).toHaveResource(ComputeInstance)
     expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeInstance, {
+      name: "test-instance-vm-master",
       scheduling: {
         provisioning_model: "STANDARD",
       },
