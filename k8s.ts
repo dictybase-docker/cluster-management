@@ -1,9 +1,4 @@
-import {
-  TerraformStack,
-  TerraformVariable,
-  GcsBackend,
-  numberToTerraform,
-} from "cdktf"
+import { TerraformStack, TerraformVariable, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import * as path from "path"
 import * as fs from "fs"
@@ -65,8 +60,13 @@ const numberToText = (num: number): string => {
   return "none"
 }
 
+type K8StackProperties = {
+  remote: boolean
+  nodes: number
+}
+
 class K8Stack extends TerraformStack {
-  constructor(scope: Construct, id: string, is_remote?: boolean) {
+  constructor(scope: Construct, id: string, options: K8StackProperties) {
     super(scope, id)
     const variables = this.#define_variables()
     new GoogleProvider(this, "google", {
@@ -75,7 +75,7 @@ class K8Stack extends TerraformStack {
       region: variables.get("region").value,
       zone: variables.get("zone").value,
     })
-    if (is_remote) {
+    if (options.remote) {
       new GcsBackend(this, {
         bucket: variables.get("bucketName").value,
         prefix: variables.get("bucketPrefix").value,
@@ -92,17 +92,18 @@ class K8Stack extends TerraformStack {
       }).disk,
       network: vpcNetwork.network,
     })
-    const nodes = [...Array(variables.get("numOfNodes").number).keys()].map(
-      (_, index) => {
-        new VmInstance(this, `${id}-vm-node-${numberToText(index)}`, {
+    // const numOfNodes = variables.get("numOfNodes").value as number
+    const nodes = [...Array(options.nodes).keys()]
+      .filter((num) => num !== 0)
+      .map((num) => {
+        new VmInstance(this, `${id}-vm-node-${numberToText(num)}`, {
           machine: variables.get("nodeMachineType"),
           network: vpcNetwork.network,
-          disk: new K8Disk(this, `${id}-disk-node-${numberToText(index)}`, {
+          disk: new K8Disk(this, `${id}-disk-node-${numberToText(num)}`, {
             size: variables.get("nodeDiskSize").value,
           }).disk,
         })
-      },
-    )
+      })
   }
 
   #read_credentials(name: string) {
@@ -208,14 +209,6 @@ class K8Stack extends TerraformStack {
           type: "number",
           default: 50,
           description: "size of the boot disk of kubernetes nodes in GB",
-        }),
-      )
-      .set(
-        "numOfNodes",
-        new TerraformVariable(this, "nodes", {
-          type: "number",
-          default: 3,
-          description: "number of VM instances for kubernetes nodes",
         }),
       )
       .set(

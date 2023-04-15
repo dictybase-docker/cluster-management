@@ -20,7 +20,5 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-"REMOTE" in process.env
-  ? new K8Stack(app, "k0s-cluster-cdktf", true)
-  : new K8Stack(app, "k0s-cluster-cdktf")
+new K8Stack(app, "k0s-cluster-cdktf", { remote: argv.r, nodes: argv.n })
 app.synth()
