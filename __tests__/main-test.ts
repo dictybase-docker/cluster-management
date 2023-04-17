@@ -13,7 +13,7 @@ describe("VmInstanceStack Application", () => {
   let app: App
   beforeAll(() => {
     app = Testing.app()
-    stack = new K8Stack(app, "test-instance")
+    stack = new K8Stack(app, "test-instance", { remote: false, nodes: 3 })
   })
   test("check if it has google provider", () => {
     expect(Testing.synth(stack)).toHaveProvider(GoogleProvider)
@@ -55,6 +55,21 @@ describe("VmInstanceStack Application", () => {
       },
     })
   })
+  test.each(["one", "two", "three"])(
+    "check if it has computer instance for workder node %s",
+    (node) => {
+      expect(Testing.synth(stack)).toHaveResourceWithProperties(
+        ComputeInstance,
+        {
+          name: `test-instance-vm-node-${node}`,
+          scheduling: {
+            provisioning_model: "STANDARD",
+          },
+        },
+      )
+    },
+  )
+
   test("check if the produced terraform configuration is valid", () => {
     expect(Testing.fullSynth(stack)).toBeValidTerraform()
   })
