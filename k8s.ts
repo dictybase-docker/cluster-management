@@ -1,6 +1,5 @@
 import { TerraformStack, TerraformVariable, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
-import * as path from "path"
 import * as fs from "fs"
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
 import { K8Disk } from "./disk"
