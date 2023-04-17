@@ -63,6 +63,7 @@ const numberToText = (num: number): string => {
 type K8StackProperties = {
   remote: boolean
   nodes: number
+  credentials: string
 }
 
 class K8Stack extends TerraformStack {
@@ -70,7 +71,7 @@ class K8Stack extends TerraformStack {
     super(scope, id)
     const variables = this.#define_variables()
     new GoogleProvider(this, "google", {
-      credentials: this.#read_credentials("credentials.json"),
+      credentials: fs.readFileSync(options.credentials).toString(),
       project: variables.get("projectId").value,
       region: variables.get("region").value,
       zone: variables.get("zone").value,
@@ -104,20 +105,6 @@ class K8Stack extends TerraformStack {
           }).disk,
         })
       })
-  }
-
-  #read_credentials(name: string) {
-    let cred_path: string = ""
-    const default_path = path.join(process.cwd(), name)
-    if (fs.existsSync(default_path)) {
-      cred_path = default_path
-    } else {
-      const path_from_env = process.env["TF_VAR_service_account_file"]
-      if (path_from_env) {
-        cred_path = path.join(process.cwd(), path_from_env)
-      }
-    }
-    return fs.readFileSync(cred_path).toString()
   }
 
   #define_variables() {
