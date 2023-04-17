@@ -93,7 +93,7 @@ class K8Stack extends TerraformStack {
       network: vpcNetwork.network,
     })
     // const numOfNodes = variables.get("numOfNodes").value as number
-    const nodes = [...Array(options.nodes).keys()]
+    const nodes = [...Array(options.nodes + 1).keys()]
       .filter((num) => num !== 0)
       .map((num) => {
         new VmInstance(this, `${id}-vm-node-${numberToText(num)}`, {
