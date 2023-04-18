@@ -10,7 +10,7 @@ const argv = yargs(process.argv.slice(2))
       default: "dicty-terraform-state",
       description: "GCS bucket name where terraform remote state is stored.",
     },
-    bf: {
+    bp: {
       alias: "bucket-prefix",
       type: "string",
       default: "k0s-cluster-cdktf",
@@ -43,5 +43,7 @@ new K8Stack(app, "k0s-cluster-cdktf", {
   remote: argv.r,
   nodes: argv.n,
   credentials: argv.c,
+  bucketName: argv.bn,
+  bucketPrefix: argv.bp,
 })
 app.synth()
