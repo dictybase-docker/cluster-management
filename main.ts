@@ -14,7 +14,7 @@ const argv = yargs(process.argv.slice(2))
       alias: "nodes",
       description: "number of VM instances for kubernetes nodes",
       type: "number",
-      default: 3,
+      default: 2,
     },
     c: {
       alias: "credentials",
