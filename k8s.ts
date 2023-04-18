@@ -98,6 +98,7 @@ class K8Stack extends TerraformStack {
         size: variables.get("masterDiskSize").value,
       }).disk,
       network: vpcNetwork.network,
+      subnetwork: vpcNetwork.subnetwork,
     })
     const nodes = [...Array(options.nodes + 1).keys()]
       .filter((num) => num !== 0)
@@ -106,6 +107,7 @@ class K8Stack extends TerraformStack {
           new VmInstance(this, `${id}-vm-node-${numberToText(num)}`, {
             machine: variables.get("nodeMachineType"),
             network: vpcNetwork.network,
+            subnetwork: vpcNetwork.subnetwork,
             disk: new K8Disk(this, `${id}-disk-node-${numberToText(num)}`, {
               size: variables.get("nodeDiskSize").value,
             }).disk,
