@@ -204,7 +204,7 @@ class K8Stack extends TerraformStack {
         "nodeMachineType",
         new TerraformVariable(this, "node-machine-type", {
           type: "string",
-          default: "custom-2-4048",
+          default: "custom-2-4096",
           description: "The machine type for kubernetes node",
         }),
       )
