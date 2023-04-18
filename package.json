@@ -23,7 +23,7 @@
 	},
 	"dependencies": {
 		"@cdktf/provider-google": "5.0.8",
-		"cdktf": "^0.15.5",
+		"cdktf": "next",
 		"constructs": "^10.1.276",
 		"yargs": "^17.7.1"
 	},
