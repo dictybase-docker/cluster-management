@@ -4,6 +4,19 @@ import yargs from "yargs/yargs"
 
 const argv = yargs(process.argv.slice(2))
   .options({
+    bn: {
+      alias: "bucket-name",
+      type: "string",
+      default: "dicty-terraform-state",
+      description: "GCS bucket name where terraform remote state is stored.",
+    },
+    bf: {
+      alias: "bucket-prefix",
+      type: "string",
+      default: "k0s-cluster-cdktf",
+      description:
+        "GCS bucket folder prefix where terraform remote state is stored.",
+    },
     r: {
       alias: "remote",
       type: "boolean",
