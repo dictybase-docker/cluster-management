@@ -68,6 +68,8 @@ type K8StackProperties = {
   remote: boolean
   nodes: number
   credentials: string
+  bucketName: string
+  bucketPrefix: string
 }
 
 class K8Stack extends TerraformStack {
@@ -76,8 +78,8 @@ class K8Stack extends TerraformStack {
     const variables = this.#define_variables()
     if (options.remote) {
       new GcsBackend(this, {
-        bucket: variables.get("bucketName").value,
-        prefix: variables.get("bucketPrefix").value,
+        bucket: options.bucketName,
+        prefix: options.bucketPrefix,
       })
     }
     new GoogleProvider(this, "google", {
