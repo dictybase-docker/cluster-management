@@ -1,4 +1,9 @@
-import { TerraformStack, TerraformVariable, GcsBackend } from "cdktf"
+import {
+  TerraformStack,
+  TerraformVariable,
+  GcsBackend,
+  TerraformOutput,
+} from "cdktf"
 import { Construct } from "constructs"
 import * as fs from "fs"
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
@@ -92,18 +97,27 @@ class K8Stack extends TerraformStack {
       }).disk,
       network: vpcNetwork.network,
     })
-    // const numOfNodes = variables.get("numOfNodes").value as number
     const nodes = [...Array(options.nodes + 1).keys()]
       .filter((num) => num !== 0)
-      .map((num) => {
-        new VmInstance(this, `${id}-vm-node-${numberToText(num)}`, {
-          machine: variables.get("nodeMachineType"),
-          network: vpcNetwork.network,
-          disk: new K8Disk(this, `${id}-disk-node-${numberToText(num)}`, {
-            size: variables.get("nodeDiskSize").value,
-          }).disk,
-        })
+      .map(
+        (num) =>
+          new VmInstance(this, `${id}-vm-node-${numberToText(num)}`, {
+            machine: variables.get("nodeMachineType"),
+            network: vpcNetwork.network,
+            disk: new K8Disk(this, `${id}-disk-node-${numberToText(num)}`, {
+              size: variables.get("nodeDiskSize").value,
+            }).disk,
+          }),
+      )
+    new TerraformOutput(this, "master-node-ip", {
+      value: master.vmInstance.networkInterface.get(0).accessConfig.get(0)
+        .natIp,
+    })
+    nodes.forEach((n, idx) => {
+      new TerraformOutput(this, `workder-node-ip-${numberToText(idx + 1)}`, {
+        value: n.vmInstance.networkInterface.get(0).accessConfig.get(0).natIp,
       })
+    })
   }
 
   #define_variables() {
