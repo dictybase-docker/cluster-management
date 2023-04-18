@@ -74,18 +74,18 @@ class K8Stack extends TerraformStack {
   constructor(scope: Construct, id: string, options: K8StackProperties) {
     super(scope, id)
     const variables = this.#define_variables()
-    new GoogleProvider(this, "google", {
-      credentials: fs.readFileSync(options.credentials).toString(),
-      project: variables.get("projectId").value,
-      region: variables.get("region").value,
-      zone: variables.get("zone").value,
-    })
     if (options.remote) {
       new GcsBackend(this, {
         bucket: variables.get("bucketName").value,
         prefix: variables.get("bucketPrefix").value,
       })
     }
+    new GoogleProvider(this, "google", {
+      credentials: fs.readFileSync(options.credentials).toString(),
+      project: variables.get("projectId").value,
+      region: variables.get("region").value,
+      zone: variables.get("zone").value,
+    })
     const vpcNetwork = new VpcNetwork(this, `${id}-vpc`, {
       ports: variables.get("ports").value,
       ipCidrRange: variables.get("ipCidrRange").value,
@@ -209,22 +209,6 @@ class K8Stack extends TerraformStack {
           type: "number",
           default: 50,
           description: "size of the boot disk of kubernetes nodes in GB",
-        }),
-      )
-      .set(
-        "bucketName",
-        new TerraformVariable(this, "bucket_name", {
-          description: `GCS bucket name where terraform remote state is stored.`,
-          type: "string",
-          default: "dicty-terraform-state",
-        }),
-      )
-      .set(
-        "bucketPrefix",
-        new TerraformVariable(this, "bucket_prefix", {
-          description: `GCS bucket folder prefix where terraform remote state is stored.`,
-          type: "string",
-          default: "k0s-cluster-cdktf",
         }),
       )
     return variables
