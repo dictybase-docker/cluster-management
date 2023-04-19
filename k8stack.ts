@@ -1,9 +1,4 @@
-import {
-  TerraformStack,
-  TerraformVariable,
-  GcsBackend,
-  TerraformOutput,
-} from "cdktf"
+import { TerraformStack, TerraformVariable, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import * as fs from "fs"
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
@@ -119,15 +114,6 @@ class K8Stack extends TerraformStack {
           }),
       )
     this.workers = workers.map((w) => w.vmInstance)
-    new TerraformOutput(this, "master-node-ip", {
-      value: master.vmInstance.networkInterface.get(0).accessConfig.get(0)
-        .natIp,
-    })
-    nodes.forEach((n, idx) => {
-      new TerraformOutput(this, `workder-node-${numberToText(idx + 1)}-ip`, {
-        value: n.vmInstance.networkInterface.get(0).accessConfig.get(0).natIp,
-      })
-    })
   }
 
   #define_variables() {
