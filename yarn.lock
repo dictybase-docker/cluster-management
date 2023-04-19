@@ -400,6 +400,11 @@
   resolved "https://registry.yarnpkg.com/@cdktf/provider-google/-/provider-google-6.0.0.tgz#f07d1a2cc80f4176fe8f19f2fbe383af8234b7c8"
   integrity sha512-pW9yhBqjuVNr0x+nNSogg3FIWeGI2uX00bnG5hP5HBMRVNIynUVz5OIg4yY6DAzBsH8WxAx5pZ9IjLl1emAQSw==
 
+"@cdktf/provider-local@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@cdktf/provider-local/-/provider-local-6.0.0.tgz#097bf148a6706cd55310b5ce231e95c8f0774b15"
+  integrity sha512-3qWpqNirtbv2w6qwaJUGZor0yK5mSFJHc6PE0lSiKghz6dclPhWFj4rMG6dmcvE2aqpY35T84fJja0+BgWijnw==
+
 "@esbuild-kit/cjs-loader@^2.4.2":
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/@esbuild-kit/cjs-loader/-/cjs-loader-2.4.2.tgz#cb4dde00fbf744a68c4f20162ea15a8242d0fa54"
