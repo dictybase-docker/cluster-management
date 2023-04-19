@@ -80,7 +80,7 @@ class K8Stack extends TerraformStack {
       new GcsBackend(this, {
         bucket: options.bucketName,
         prefix: options.bucketPrefix,
-        credentials: options.credentials,
+        credentials: fs.readFileSync(options.credentials).toString(),
       })
     }
     new GoogleProvider(this, "google", {
