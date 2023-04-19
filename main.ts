@@ -1,5 +1,5 @@
 import { App } from "cdktf"
-import { K8Stack } from "./k8s"
+import { K8Stack } from "./k8stack"
 import { argv } from "./command_options"
 
 const app = new App()
