@@ -10,6 +10,7 @@ import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
 import { K8Disk } from "./disk"
 import { VpcNetwork } from "./vpc"
 import { VmInstance } from "./instance"
+import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 
 const times = (n: number, callback: () => void) => {
   if (n <= 0) return
@@ -73,6 +74,8 @@ type K8StackProperties = {
 }
 
 class K8Stack extends TerraformStack {
+  public readonly master: ComputeInstance
+  public readonly workers: Array<ComputeInstance>
   constructor(scope: Construct, id: string, options: K8StackProperties) {
     super(scope, id)
     const variables = this.#define_variables()
@@ -101,7 +104,8 @@ class K8Stack extends TerraformStack {
       network: vpcNetwork.network,
       subnetwork: vpcNetwork.subnetwork,
     })
-    const nodes = [...Array(options.nodes + 1).keys()]
+    this.master = master.vmInstance
+    const workers = [...Array(options.nodes + 1).keys()]
       .filter((num) => num !== 0)
       .map(
         (num) =>
@@ -114,15 +118,14 @@ class K8Stack extends TerraformStack {
             }).disk,
           }),
       )
+    this.workers = workers.map((w) => w.vmInstance)
     new TerraformOutput(this, "master-node-ip", {
       value: master.vmInstance.networkInterface.get(0).accessConfig.get(0)
         .natIp,
-      sensitive: true,
     })
     nodes.forEach((n, idx) => {
       new TerraformOutput(this, `workder-node-${numberToText(idx + 1)}-ip`, {
         value: n.vmInstance.networkInterface.get(0).accessConfig.get(0).natIp,
-        sensitive: true,
       })
     })
   }
