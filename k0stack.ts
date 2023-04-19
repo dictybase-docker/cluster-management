@@ -6,6 +6,7 @@ import {
 } from "cdktf"
 import * as fs from "fs"
 import { Construct } from "constructs"
+import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
 
 type K0StackProperties = {
   remote: boolean
@@ -18,10 +19,10 @@ type K0StackProperties = {
 class K0Stack extends TerraformStack {
   constructor(scope: Construct, id: string, options: K0StackProperties) {
     super(scope, id)
-    new TerraformVariable(this, "project_id", {
-      description: "gcp project id",
-      type: "string",
-      nullable: false,
+    const variables = this.#define_variables()
+    new GoogleProvider(this, "google", {
+      credentials: fs.readFileSync(options.credentials).toString(),
+      project: variables.get("projectId").value,
       region: variables.get("region").value,
       zone: variables.get("zone").value,
     })
