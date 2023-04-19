@@ -1,43 +1,26 @@
-import {
-  TerraformStack,
-  GcsBackend,
-  TerraformVariable,
-  DataTerraformRemoteStateGcs,
-} from "cdktf"
-import * as fs from "fs"
+import { TerraformStack, TerraformVariable, TerraformOutput } from "cdktf"
 import { Construct } from "constructs"
-import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
+import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
+import { numberToText } from "./stack_utils"
 
 type K0StackProperties = {
-  remote: boolean
-  nodes: number
-  credentials: string
-  bucketName: string
-  bucketPrefix: string
+  master: ComputeInstance
+  workers: Array<ComputeInstance>
 }
 
 class K0Stack extends TerraformStack {
   constructor(scope: Construct, id: string, options: K0StackProperties) {
     super(scope, id)
-    const variables = this.#define_variables()
-    new GoogleProvider(this, "google", {
-      credentials: fs.readFileSync(options.credentials).toString(),
-      project: variables.get("projectId").value,
-      region: variables.get("region").value,
-      zone: variables.get("zone").value,
+    const { master, workers } = options
+    this.#define_variables()
+    new TerraformOutput(this, "master-node-ip", {
+      value: master.networkInterface.get(0).accessConfig.get(0).natIp,
     })
-    if (options.remote) {
-      new GcsBackend(this, {
-        bucket: options.bucketName,
-        prefix: options.bucketPrefix,
-        credentials: fs.readFileSync(options.credentials).toString(),
+    workers.forEach((w, idx) => {
+      new TerraformOutput(this, `workder-node-${numberToText(idx + 1)}-ip`, {
+        value: w.networkInterface.get(0).accessConfig.get(0).natIp,
       })
-      const state = new DataTerraformRemoteStateGcs(this, "gcs", {
-        bucket: options.bucketName,
-        prefix: options.bucketPrefix,
-      })
-      console.log(state.getString("master-node-ip"))
-    }
+    })
   }
   #define_variables() {
     const variables = new Map()
