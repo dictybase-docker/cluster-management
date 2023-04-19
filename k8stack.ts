@@ -6,59 +6,7 @@ import { K8Disk } from "./disk"
 import { VpcNetwork } from "./vpc"
 import { VmInstance } from "./instance"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
-
-const times = (n: number, callback: () => void) => {
-  if (n <= 0) return
-  callback()
-  times(n - 1, callback)
-}
-
-const numberToText = (num: number): string => {
-  const ones = [
-    "one",
-    "two",
-    "three",
-    "four",
-    "five",
-    "six",
-    "seven",
-    "eight",
-    "nine",
-    "ten",
-    "eleven",
-    "twelve",
-    "thirteen",
-    "fourteen",
-    "fifteen",
-    "sixteen",
-    "seventeen",
-    "eighteen",
-    "nineteen",
-  ]
-  const tens = [
-    "twenty",
-    "thirty",
-    "forty",
-    "fifty",
-    "sixty",
-    "seventy",
-    "eighty",
-    "ninety",
-  ]
-  switch (true) {
-    case num === 0:
-      return "zero"
-    case num > 0 && num < 20:
-      return ones[num - 1]
-    case num > 20 && num < 100:
-      return tens[Math.floor(num / 10)].concat(
-        num % 10 !== 0 ? "" : ones[(num % 10) - 1],
-      )
-    default:
-      break
-  }
-  return "none"
-}
+import { numberToText } from "./stack_utils"
 
 type K8StackProperties = {
   remote: boolean
