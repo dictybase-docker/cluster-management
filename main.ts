@@ -4,7 +4,7 @@ import { K0Stack } from "./k0stack"
 import { argv } from "./command_options"
 
 const app = new App()
-new K8Stack(app, "k0s-vm-cdktf", {
+const stack = new K8Stack(app, "k0s-vm-cdktf", {
   remote: argv.r,
   nodes: argv.n,
   credentials: argv.c,
@@ -12,11 +12,8 @@ new K8Stack(app, "k0s-vm-cdktf", {
   bucketPrefix: argv.bp,
 })
 new K0Stack(app, "k0s-cluster-cdktf", {
-  remote: argv.r,
-  nodes: argv.n,
-  credentials: argv.c,
-  bucketName: argv.bn,
-  bucketPrefix: argv.bp,
+  master: stack.master,
+  workers: stack.workers,
 })
 
 app.synth()
