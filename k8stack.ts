@@ -80,6 +80,7 @@ class K8Stack extends TerraformStack {
       new GcsBackend(this, {
         bucket: options.bucketName,
         prefix: options.bucketPrefix,
+        credentials: options.credentials,
       })
     }
     new GoogleProvider(this, "google", {
