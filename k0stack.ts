@@ -22,6 +22,8 @@ class K0Stack extends TerraformStack {
       description: "gcp project id",
       type: "string",
       nullable: false,
+      region: variables.get("region").value,
+      zone: variables.get("zone").value,
     })
     if (options.remote) {
       new GcsBackend(this, {
@@ -35,6 +37,33 @@ class K0Stack extends TerraformStack {
       })
       console.log(state.getString("master-node-ip"))
     }
+  }
+  #define_variables() {
+    const variables = new Map()
+    variables
+      .set(
+        "projectId",
+        new TerraformVariable(this, "project_id", {
+          description: "gcp project id",
+          type: "string",
+          nullable: false,
+        }),
+      )
+      .set(
+        "region",
+        new TerraformVariable(this, "region", {
+          default: "us-central1",
+          description: "gcp region",
+        }),
+      )
+      .set(
+        "zone",
+        new TerraformVariable(this, "zone", {
+          default: "us-central1-c",
+          description: "gcp zone name within a region",
+        }),
+      )
+    return variables
   }
 }
 
