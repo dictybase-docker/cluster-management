@@ -39,16 +39,15 @@ class K8Stack extends TerraformStack {
       ports: variables.get("ports").value,
       ipCidrRange: variables.get("ipCidrRange").value,
     })
-    const master = new VmInstance(this, `${id}-vm-master`, {
+    this.master = new VmInstance(this, `${id}-vm-master`, {
       machine: variables.get("masterMachineType"),
       disk: new K8Disk(this, `${id}-disk-master`, {
         size: variables.get("masterDiskSize").value,
       }).disk,
       network: vpcNetwork.network,
       subnetwork: vpcNetwork.subnetwork,
-    })
-    this.master = master.vmInstance
-    const workers = [...Array(options.nodes + 1).keys()]
+    }).vmInstance
+    this.workers = [...Array(options.nodes + 1).keys()]
       .filter((num) => num !== 0)
       .map(
         (num) =>
@@ -61,7 +60,7 @@ class K8Stack extends TerraformStack {
             }).disk,
           }),
       )
-    this.workers = workers.map((w) => w.vmInstance)
+      .map((w) => w.vmInstance)
   }
 
   #define_variables() {
