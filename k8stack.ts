@@ -113,13 +113,14 @@ class K8Stack extends TerraformStack {
             }).disk,
           }),
       )
-    new TerraformOutput(this, "master-node", {
-      value: master.vmInstance,
+    new TerraformOutput(this, "master-node-ip", {
+      value: master.vmInstance.networkInterface.get(0).accessConfig.get(0)
+        .natIp,
       sensitive: true,
     })
     nodes.forEach((n, idx) => {
-      new TerraformOutput(this, `workder-node-${numberToText(idx + 1)}`, {
-        value: n.vmInstance,
+      new TerraformOutput(this, `workder-node-${numberToText(idx + 1)}-ip`, {
+        value: n.vmInstance.networkInterface.get(0).accessConfig.get(0).natIp,
         sensitive: true,
       })
     })
