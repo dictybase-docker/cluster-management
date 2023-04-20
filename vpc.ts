@@ -28,6 +28,9 @@ class VpcNetwork extends Construct {
       network: this.network.id,
       sourceRanges: ["0.0.0.0/0"],
       allow: [{ protocol: "tcp", ports: option.ports }],
+      logConfig: {
+        metadata: "INCLUDE_ALL_METADATA",
+      },
     })
   }
 }
