@@ -11,6 +11,7 @@ type VmInstanceProperties = {
   disk: ComputeDisk
   network: ComputeNetwork
   subnetwork: ComputeSubnetwork
+  sshKey: string
 }
 
 class VmInstance extends Construct {
@@ -18,7 +19,7 @@ class VmInstance extends Construct {
   public readonly staticIPaddress: ComputeAddress
   constructor(scope: Construct, id: string, properties: VmInstanceProperties) {
     super(scope, id)
-    const { machine, disk, network, subnetwork } = properties
+    const { machine, disk, network, subnetwork, sshKey } = properties
     this.staticIPaddress = new ComputeAddress(this, `${id}-static-ip-address`, {
       name: `${id}-static-ip-address`,
     })
@@ -38,6 +39,9 @@ class VmInstance extends Construct {
       allowStoppingForUpdate: true,
       scheduling: {
         provisioningModel: "STANDARD",
+      },
+      metadata: {
+        "ssh-keys": sshKey,
       },
     })
   }
