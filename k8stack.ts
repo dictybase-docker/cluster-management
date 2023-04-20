@@ -14,6 +14,7 @@ type K8StackProperties = {
   credentials: string
   bucketName: string
   bucketPrefix: string
+  sshKeyFile: string
 }
 
 class K8Stack extends TerraformStack {
@@ -155,6 +156,12 @@ class K8Stack extends TerraformStack {
         }),
       )
     return variables
+  }
+
+  #read_key_file(file: string) {
+    const content = fs.readFileSync(file).toString().trimEnd()
+    const user = content.split(" ").at(-1) as string
+    return user.concat(":").concat(content)
   }
 }
 
