@@ -42,6 +42,7 @@ class VmInstance extends Construct {
       },
       metadata: {
         "ssh-keys": sshKey,
+        "enable-os-config": "TRUE",
       },
     })
   }
