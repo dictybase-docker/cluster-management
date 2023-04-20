@@ -10,3 +10,4 @@ tsconfig.tsbuildinfo
 credentials.json
 !jest.config.js
 !setup.js
+k8sVM*
