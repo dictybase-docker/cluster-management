@@ -40,6 +40,7 @@ class K8Stack extends TerraformStack {
       ports: variables.get("ports").value,
       ipCidrRange: variables.get("ipCidrRange").value,
     })
+    const sshKey = this.#read_key_file(options.sshKeyFile)
     this.master = new VmInstance(this, `${id}-vm-master`, {
       machine: variables.get("masterMachineType"),
       disk: new K8Disk(this, `${id}-disk-master`, {
@@ -47,6 +48,7 @@ class K8Stack extends TerraformStack {
       }).disk,
       network: vpcNetwork.network,
       subnetwork: vpcNetwork.subnetwork,
+      sshKey: sshKey,
     }).vmInstance
     this.workers = [...Array(options.nodes + 1).keys()]
       .filter((num) => num !== 0)
@@ -56,6 +58,7 @@ class K8Stack extends TerraformStack {
             machine: variables.get("nodeMachineType"),
             network: vpcNetwork.network,
             subnetwork: vpcNetwork.subnetwork,
+            sshKey: sshKey,
             disk: new K8Disk(this, `${id}-disk-node-${numberToText(num)}`, {
               size: variables.get("nodeDiskSize").value,
             }).disk,
