@@ -33,6 +33,13 @@ const argv = yargs(process.argv.slice(2))
       type: "string",
       default: "credentials.json",
     },
+    sk: {
+      alias: "ssh-key",
+      description:
+        "public ssh key file that will be injected in the vm for login",
+      type: "string",
+      default: "k8sVM.pub",
+    },
   })
   .parseSync()
 
