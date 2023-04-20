@@ -27,7 +27,7 @@ class VpcNetwork extends Construct {
       name: `${id}-allow-ssh`,
       network: this.network.id,
       sourceRanges: ["0.0.0.0/0"],
-      allow: [{ protocol: "tcp", ports: option.ports }],
+      allow: [{ protocol: "tcp", ports: ["22"] }],
       logConfig: {
         metadata: "INCLUDE_ALL_METADATA",
       },
