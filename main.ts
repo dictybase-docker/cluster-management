@@ -10,6 +10,7 @@ const stack = new K8Stack(app, "k0s-vm-cdktf", {
   credentials: argv.c,
   bucketName: argv.bn,
   bucketPrefix: argv.bp,
+  sshKeyFile: argv.sk,
 })
 new K0Stack(app, "k0s-cluster-cdktf", {
   master: stack.master,
