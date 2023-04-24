@@ -20,6 +20,9 @@ describe("VmInstanceStack Application", () => {
       sshKeyFile: "test_cred.json",
       bucketName: "django",
       bucketPrefix: "chain",
+      project: "django",
+      zone: "chain-zone",
+      region: "chain-region",
     })
   })
   test("check if it has google provider", () => {
