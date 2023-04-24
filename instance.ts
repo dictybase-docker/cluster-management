@@ -1,5 +1,4 @@
 import { Construct } from "constructs"
-import { TerraformVariable } from "cdktf"
 import { ComputeDisk } from "@cdktf/provider-google/lib/compute-disk"
 import { ComputeNetwork } from "@cdktf/provider-google/lib/compute-network"
 import { ComputeSubnetwork } from "@cdktf/provider-google/lib/compute-subnetwork"
@@ -7,7 +6,7 @@ import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 import { ComputeAddress } from "@cdktf/provider-google/lib/compute-address"
 
 type VmInstanceProperties = {
-  machine: TerraformVariable
+  machine: string
   disk: ComputeDisk
   network: ComputeNetwork
   subnetwork: ComputeSubnetwork
@@ -25,7 +24,7 @@ class VmInstance extends Construct {
     })
     this.vmInstance = new ComputeInstance(this, id, {
       name: id,
-      machineType: machine.value,
+      machineType: machine,
       bootDisk: {
         source: disk.id,
       },
