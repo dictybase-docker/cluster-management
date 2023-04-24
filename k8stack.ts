@@ -20,10 +20,8 @@ type K8StackProperties = {
   zone: string
   ports: Array<string>
   ipCidrRange: string
-  masterInstanceName: string
   masterMachineType: string
   masterDiskSize: number
-  nodeInstanceName: string
   nodeMachineType: string
   nodeDiskSize: number
 }
