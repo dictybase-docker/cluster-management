@@ -100,6 +100,17 @@ describe("VmInstanceStack Application", () => {
       })
     },
   )
+  test.each(["one", "two", "three"])(
+    "check if it has compute address for worker node %s",
+    (node) => {
+      expect(Testing.synth(stack)).toHaveResourceWithProperties(
+        ComputeAddress,
+        {
+          name: `test-instance-vm-node-${node}-static-ip-address`,
+        },
+      )
+    },
+  )
   test("check if it has compute address", () => {
     expect(Testing.synth(stack)).toHaveResource(ComputeAddress)
   })
