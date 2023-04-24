@@ -2,6 +2,30 @@ import yargs from "yargs/yargs"
 
 const argv = yargs(process.argv.slice(2))
   .options({
+    pi: {
+      alias: "project-id",
+      type: "string",
+      demandOption: true,
+      description: "the google cloud project id",
+    },
+    rg: {
+      alias: "region",
+      type: "string",
+      description: "the google cloud region",
+      default: "us-central1",
+    },
+    z: {
+      alias: "zone",
+      type: "string",
+      description: "the google cloud zone",
+      default: "us-central1-c",
+    },
+    lb: {
+      alias: "log-bucket",
+      description: "name of logging bucket",
+      type: "string",
+      default: "dicty-log-journal",
+    },
     bn: {
       alias: "bucket-name",
       type: "string",
