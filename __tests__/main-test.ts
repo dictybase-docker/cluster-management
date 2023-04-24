@@ -111,8 +111,10 @@ describe("VmInstanceStack Application", () => {
       )
     },
   )
-  test("check if it has compute address", () => {
-    expect(Testing.synth(stack)).toHaveResource(ComputeAddress)
+  test("check if it has compute address for master node", () => {
+    expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeAddress, {
+      name: "test-instance-vm-master-static-ip-address",
+    })
   })
   test("check if the produced terraform configuration is valid", () => {
     expect(Testing.fullSynth(stack)).toBeValidTerraform()
