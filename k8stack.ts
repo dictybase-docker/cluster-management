@@ -18,6 +18,14 @@ type K8StackProperties = {
   project: string
   region: string
   zone: string
+  ports: Array<string>
+  ipCidrRange: string
+  masterInstanceName: string
+  masterMachineType: string
+  masterDiskSize: number
+  nodeInstanceName: string
+  nodeMachineType: string
+  nodeDiskSize: number
 }
 
 class K8Stack extends TerraformStack {
