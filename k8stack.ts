@@ -15,6 +15,9 @@ type K8StackProperties = {
   bucketName: string
   bucketPrefix: string
   sshKeyFile: string
+  project: string
+  region: string
+  zone: string
 }
 
 class K8Stack extends TerraformStack {
@@ -22,6 +25,7 @@ class K8Stack extends TerraformStack {
   public readonly workers: Array<ComputeInstance>
   constructor(scope: Construct, id: string, options: K8StackProperties) {
     super(scope, id)
+    const { project, region, zone } = options
     const variables = this.#define_variables()
     if (options.remote) {
       new GcsBackend(this, {
@@ -32,9 +36,9 @@ class K8Stack extends TerraformStack {
     }
     new GoogleProvider(this, "google", {
       credentials: fs.readFileSync(options.credentials).toString(),
-      project: variables.get("projectId").value,
-      region: variables.get("region").value,
-      zone: variables.get("zone").value,
+      project: project,
+      region: region,
+      zone: zone,
     })
     const vpcNetwork = new VpcNetwork(this, `${id}-vpc`, {
       ports: variables.get("ports").value,
@@ -71,33 +75,11 @@ class K8Stack extends TerraformStack {
     const variables = new Map()
     variables
       .set(
-        "projectId",
-        new TerraformVariable(this, "project_id", {
-          description: "gcp project id",
-          type: "string",
-          nullable: false,
-        }),
-      )
-      .set(
         "ports",
         new TerraformVariable(this, "ports", {
           description: "ports that will be opened in the network",
           type: "list(string)",
           default: ["8955"],
-        }),
-      )
-      .set(
-        "region",
-        new TerraformVariable(this, "region", {
-          default: "us-central1",
-          description: "gcp region",
-        }),
-      )
-      .set(
-        "zone",
-        new TerraformVariable(this, "zone", {
-          default: "us-central1-c",
-          description: "gcp zone name within a region",
         }),
       )
       .set(
