@@ -50,7 +50,7 @@
 			"<rootDir>/test-environment.ts"
 		],
 		"setupFilesAfterEnv": [
-			"<rootDir>/setup-jest-cdktf.js"
+			"<rootDir>/src/setup_test.ts"
 		]
 	}
 }
