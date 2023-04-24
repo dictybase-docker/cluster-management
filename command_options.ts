@@ -64,6 +64,43 @@ const argv = yargs(process.argv.slice(2))
       type: "string",
       default: "k8sVM.pub",
     },
+    p: {
+      alias: "ports",
+      type: "array",
+      description: "ports that will be opened in the network",
+      default: ["8955"],
+    },
+    ip: {
+      alias: "ip-cidr-range",
+      type: "string",
+      default: "10.8.0.0/21",
+      description:
+        "The IP range in cidr notation for vpc subnet that will be assigned to nodes",
+    },
+    mm: {
+      alias: "master-machine-type",
+      type: "string",
+      default: "custom-2-2048",
+      description: "The machine type for kubernetes controller",
+    },
+    md: {
+      alias: "master-disk-size",
+      type: "number",
+      default: 30,
+      description: "size of the boot disk of kubernetes master in GB",
+    },
+    nt: {
+      alias: "node-machine-type",
+      type: "string",
+      default: "custom-2-4096",
+      description: "The machine type for kubernetes node",
+    },
+    nd: {
+      alias: "node-disk-size",
+      type: "number",
+      default: 50,
+      description: "size of the boot disk of kubernetes nodes in GB",
+    },
   })
   .parseSync()
 
