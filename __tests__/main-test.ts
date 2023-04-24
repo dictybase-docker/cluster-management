@@ -63,6 +63,7 @@ describe("VmInstanceStack Application", () => {
       type: "pd-ssd",
       name: "test-instance-disk-master",
       image: "rocky-linux-8-optimized-gcp-v20230306",
+      size: 10,
     })
   })
   test("check if it has compute instance for master node", () => {
@@ -86,6 +87,17 @@ describe("VmInstanceStack Application", () => {
           },
         },
       )
+    },
+  )
+  test.each(["one", "two", "three"])(
+    "check if it has computer disk for worker node %s",
+    (node) => {
+      expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeDisk, {
+        type: "pd-ssd",
+        name: `test-instance-disk-node-${node}`,
+        image: "rocky-linux-8-optimized-gcp-v20230306",
+        size: 20,
+      })
     },
   )
   test("check if it has compute address", () => {
