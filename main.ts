@@ -11,6 +11,9 @@ const stack = new K8Stack(app, "k0s-vm-cdktf", {
   bucketName: argv.bn,
   bucketPrefix: argv.bp,
   sshKeyFile: argv.sk,
+  project: argv.pi,
+  region: argv.rg,
+  zone: argv.z,
 })
 new K0Stack(app, "k0s-cluster-cdktf", {
   master: stack.master,
