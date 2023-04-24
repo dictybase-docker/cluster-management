@@ -6,14 +6,21 @@ import { ComputeSubnetwork } from "@cdktf/provider-google/lib/compute-subnetwork
 import { ComputeFirewall } from "@cdktf/provider-google/lib/compute-firewall"
 import { ComputeDisk } from "@cdktf/provider-google/lib/compute-disk"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
-import { K8Stack } from "../k8s"
+import { K8Stack } from "../k8stack"
 
 describe("VmInstanceStack Application", () => {
   let stack: K8Stack
   let app: App
   beforeAll(() => {
     app = Testing.app()
-    stack = new K8Stack(app, "test-instance", { remote: false, nodes: 3 })
+    stack = new K8Stack(app, "test-instance", {
+      remote: false,
+      nodes: 3,
+      credentials: "test_cred.json",
+      sshKeyFile: "test_cred.json",
+      bucketName: "django",
+      bucketPrefix: "chain",
+    })
   })
   test("check if it has google provider", () => {
     expect(Testing.synth(stack)).toHaveProvider(GoogleProvider)
