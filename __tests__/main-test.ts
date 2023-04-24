@@ -6,6 +6,7 @@ import { ComputeSubnetwork } from "@cdktf/provider-google/lib/compute-subnetwork
 import { ComputeFirewall } from "@cdktf/provider-google/lib/compute-firewall"
 import { ComputeDisk } from "@cdktf/provider-google/lib/compute-disk"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
+import { ComputeAddress } from "@cdktf/provider-google/lib/compute-address"
 import { K8Stack } from "../k8stack"
 
 describe("VmInstanceStack Application", () => {
@@ -23,6 +24,14 @@ describe("VmInstanceStack Application", () => {
       project: "django",
       zone: "chain-zone",
       region: "chain-region",
+      ports: ["89"],
+      ipCidrRange: "10.0.1.0/28",
+      masterInstanceName: "castle",
+      masterMachineType: "2-2033",
+      masterDiskSize: 10,
+      nodeInstanceName: "villa",
+      nodeMachineType: "4-4011",
+      nodeDiskSize: 20,
     })
   })
   test("check if it has google provider", () => {
@@ -66,7 +75,7 @@ describe("VmInstanceStack Application", () => {
     })
   })
   test.each(["one", "two", "three"])(
-    "check if it has computer instance for workder node %s",
+    "check if it has computer instance for worker node %s",
     (node) => {
       expect(Testing.synth(stack)).toHaveResourceWithProperties(
         ComputeInstance,
@@ -79,7 +88,9 @@ describe("VmInstanceStack Application", () => {
       )
     },
   )
-
+  test("check if it has compute address", () => {
+    expect(Testing.synth(stack)).toHaveResource(ComputeAddress)
+  })
   test("check if the produced terraform configuration is valid", () => {
     expect(Testing.fullSynth(stack)).toBeValidTerraform()
   })
