@@ -46,9 +46,6 @@
 				"@swc/jest"
 			]
 		},
-		"setupFiles": [
-			"<rootDir>/test-environment.ts"
-		],
 		"setupFilesAfterEnv": [
 			"<rootDir>/src/setup_test.ts"
 		]
