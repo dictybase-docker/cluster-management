@@ -15,6 +15,7 @@
 		"watch": "tsc -w",
 		"test": "jest",
 		"test:watch": "jest --watch",
+		"test:coverage": "jest --coverage",
 		"upgrade": "yarn upgrade cdktf@latest cdktf-cli@latest",
 		"upgrade:next": "yarn upgrade cdktf@next cdktf-cli@next"
 	},
