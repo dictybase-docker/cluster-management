@@ -23,7 +23,7 @@
 		"node": ">=18.0"
 	},
 	"dependencies": {
-		"@cdktf/provider-google": "6.x",
+		"@cdktf/provider-google": "7.x",
 		"@cdktf/provider-local": "^6.0.0",
 		"cdktf": "0.16.x",
 		"cdktf-cli": "0.16.x",
