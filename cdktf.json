@@ -1,6 +1,6 @@
 {
   "language": "typescript",
-  "app": "yarn tsx main.ts",
+  "app": "yarn tsx src/main.ts",
   "projectId": "fc15f5d4-e40a-4104-b857-386aa139fa22",
   "sendCrashReports": "false",
   "terraformProviders": [],
