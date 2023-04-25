@@ -14,6 +14,12 @@ const stack = new K8Stack(app, "k0s-vm-cdktf", {
   project: argv.pi,
   region: argv.rg,
   zone: argv.z,
+  ports: argv.p as Array<string>,
+  ipCidrRange: argv.ip,
+  masterMachineType: argv.mm,
+  masterDiskSize: argv.md,
+  nodeMachineType: argv.nt,
+  nodeDiskSize: argv.nd,
 })
 new K0Stack(app, "k0s-cluster-cdktf", {
   master: stack.master,
