@@ -20,18 +20,20 @@ const getOnes = () => [
   "nineteen",
 ]
 
+const getTens = () => [
+  "twenty",
+  "thirty",
+  "forty",
+  "fifty",
+  "sixty",
+  "seventy",
+  "eighty",
+  "ninety",
+]
+
 const numberToText = (num: number): string => {
   const ones = getOnes()
-  const tens = [
-    "twenty",
-    "thirty",
-    "forty",
-    "fifty",
-    "sixty",
-    "seventy",
-    "eighty",
-    "ninety",
-  ]
+  const tens = getTens()
   switch (true) {
     case num === 0:
       return "zero"
