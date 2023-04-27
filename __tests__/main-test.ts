@@ -7,7 +7,7 @@ import { ComputeFirewall } from "@cdktf/provider-google/lib/compute-firewall"
 import { ComputeDisk } from "@cdktf/provider-google/lib/compute-disk"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 import { ComputeAddress } from "@cdktf/provider-google/lib/compute-address"
-import { K8Stack } from "../k8stack"
+import { K8Stack } from "../src/k8stack"
 
 describe("VmInstanceStack Application", () => {
   let stack: K8Stack
