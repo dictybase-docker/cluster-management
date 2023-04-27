@@ -78,7 +78,7 @@ const createHostNodes = (properties: Array<HostNodeProperties>) => {
  */
 const createK0sNode = (version: string) => {
   const k0s = new YAMLMap()
-  k0s.set("k0s", new Pair("version", version))
+  k0s.set("k0s", new Pair("version", version.concat("+k0s.0")))
   k0s.set("k0s", new Pair("dynamicConfig", true))
   return k0s
 }
