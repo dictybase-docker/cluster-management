@@ -4,7 +4,7 @@ import { K0Stack } from "./k0stack"
 import { argv } from "./command_options"
 
 const app = new App()
-const stack = new K8Stack(app, "k0s-vm-cdktf", {
+const stack = new K8Stack(app, "vm-instance", {
   remote: argv.r,
   nodes: argv.n,
   credentials: argv.c,
@@ -21,7 +21,7 @@ const stack = new K8Stack(app, "k0s-vm-cdktf", {
   nodeMachineType: argv.nt,
   nodeDiskSize: argv.nd,
 })
-new K0Stack(app, "k0s-cluster-cdktf", {
+new K0Stack(app, "k0s-cluster", {
   master: stack.master,
   workers: stack.workers,
 })
