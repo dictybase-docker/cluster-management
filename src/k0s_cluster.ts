@@ -78,8 +78,8 @@ const createHostNodes = (properties: Array<HostNodeProperties>) => {
  */
 const createK0sNode = (version: string) => {
   const k0s = new YAMLMap()
-  k0s.set("k0s", new Pair("version", version.concat("+k0s.0")))
-  k0s.set("k0s", new Pair("dynamicConfig", true))
+  k0s.add(new Pair("version", version.concat("+k0s.0")))
+  k0s.add(new Pair("dynamicConfig", true))
   return k0s
 }
 
@@ -95,10 +95,10 @@ const createClusterYml = ({
   spec.add(new Pair("hosts", createHostNodes(hosts)))
   spec.add(new Pair("k0s", createK0sNode(version)))
   const doc = new Document()
-  doc.createPair("apiVersion", "k0sctl.k0sproject.io/v1beta1")
-  doc.createPair("kind", "Cluster")
-  doc.createPair("metadata", new Pair("name", name))
-  doc.createPair("spec", spec)
+  doc.add(new Pair("apiVersion", "k0sctl.k0sproject.io/v1beta1"))
+  doc.add(new Pair("kind", "Cluster"))
+  doc.set("metadata", new Pair("name", name))
+  doc.add(new Pair("spec", spec))
   return doc.toString()
 }
 
