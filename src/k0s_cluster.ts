@@ -40,30 +40,23 @@ type CreateClusterYmlProperties = {
 }
 
 /**
- * Create a role node
- */
-const createRoleNode = (role: string) => {
-  return new Pair("role", role)
-}
-
-/**
  * Create a ssh node
  */
-const createSshNode = ({
+const createSshWithRoleNode = ({
   address,
   user,
   port,
   keyPath,
   role,
 }: SshNodeProperties) => {
+  const sshWithRole = new YAMLMap()
+  sshWithRole.set("role", role)
   const sshProps = new YAMLMap()
   sshProps.set("address", address)
   sshProps.set("user", user)
   sshProps.set("port", port ?? 22)
   sshProps.set("keyPath", keyPath)
-  const sshWithRole = new YAMLMap()
   sshWithRole.set("ssh", sshProps)
-  sshWithRole.set("role", role)
   return sshWithRole
 }
 
@@ -73,7 +66,7 @@ const createSshNode = ({
 const createHostNodes = (properties: Array<HostNodeProperties>) => {
   const nodes = new YAMLSeq()
   properties.forEach((prop) => {
-    nodes.add(createSshNode(prop))
+    nodes.add(createSshWithRoleNode(prop))
   })
   return nodes
 }
@@ -107,4 +100,4 @@ const createClusterYml = ({
   return doc.toString()
 }
 
-export { createClusterYml }
+export { createClusterYml, type HostNodeProperties }
