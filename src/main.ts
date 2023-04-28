@@ -24,6 +24,7 @@ const stack = new K8Stack(app, "vm-instance", {
 new K0Stack(app, "k0s-cluster", {
   master: stack.master,
   workers: stack.workers,
+  sshKeyFile: argv.sk,
 })
 
 app.synth()
