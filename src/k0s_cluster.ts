@@ -12,6 +12,7 @@ type SshNodeProperties = {
   user: string
   port?: number
   keyPath: string
+  role: string
 }
 
 /**
@@ -48,13 +49,22 @@ const createRoleNode = (role: string) => {
 /**
  * Create a ssh node
  */
-const createSshNode = ({ address, user, port, keyPath }: SshNodeProperties) => {
-  const ssh = new YAMLMap()
-  ssh.set("ssh", new Pair("address", address))
-  ssh.set("ssh", new Pair("user", user))
-  ssh.set("ssh", new Pair("port", port ?? 22))
-  ssh.set("ssh", new Pair("keyPath", keyPath))
-  return ssh
+const createSshNode = ({
+  address,
+  user,
+  port,
+  keyPath,
+  role,
+}: SshNodeProperties) => {
+  const sshProps = new YAMLMap()
+  sshProps.set("address", address)
+  sshProps.set("user", user)
+  sshProps.set("port", port ?? 22)
+  sshProps.set("keyPath", keyPath)
+  const sshWithRole = new YAMLMap()
+  sshWithRole.set("ssh", sshProps)
+  sshWithRole.set("role", role)
+  return sshWithRole
 }
 
 /**
@@ -62,11 +72,8 @@ const createSshNode = ({ address, user, port, keyPath }: SshNodeProperties) => {
  */
 const createHostNodes = (properties: Array<HostNodeProperties>) => {
   const nodes = new YAMLSeq()
-  properties.forEach(({ address, port, user, keyPath, role }) => {
-    nodes.add({
-      ...createRoleNode(role),
-      ...createSshNode({ address, port, user, keyPath }),
-    })
+  properties.forEach((prop) => {
+    nodes.add(createSshNode(prop))
   })
   return nodes
 }
