@@ -1,0 +1,21 @@
+apiVersion: k0sctl.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: dictybase-shared-cluster
+spec:
+  hosts:
+    - role: controller
+      ssh:
+        address: 10.0.0.1
+        user: root
+        port: 22
+        keyPath: /Users/sba964/.ssh/id_rsa
+    - ssh:
+        address: 10.0.0.2
+        user: root
+        port: 22
+        keyPath: /Users/sba964/.ssh/id_rsa
+      role: worker
+  k0s:
+    version: 1.26.0+k0s.0
+    dynamicConfig: true
