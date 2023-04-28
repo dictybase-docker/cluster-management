@@ -25,6 +25,7 @@ new K0Stack(app, "k0s-cluster", {
   master: stack.master,
   workers: stack.workers,
   sshKeyFile: argv.sk,
+  version: argv.kv,
 })
 
 app.synth()
