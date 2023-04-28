@@ -101,6 +101,12 @@ const argv = yargs(process.argv.slice(2))
       default: 50,
       description: "size of the boot disk of kubernetes nodes in GB",
     },
+    ver: {
+      alias: "version",
+      type: "string",
+      demandOption: true,
+      description: "kubernetes cluster version",
+    },
   })
   .parseSync()
 
