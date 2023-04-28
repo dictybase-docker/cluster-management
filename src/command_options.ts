@@ -107,6 +107,18 @@ const argv = yargs(process.argv.slice(2))
       demandOption: true,
       description: "kubernetes cluster version",
     },
+    u: {
+      alias: "user",
+      type: "string",
+      default: "newman",
+      description: "ssh login user",
+    },
+    o: {
+      alias: "output",
+      type: "string",
+      default: "./k0s_cluster_config.yml",
+      description: "output yml file for writing the cluster configuration",
+    },
   })
   .parseSync()
 
