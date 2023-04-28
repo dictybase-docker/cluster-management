@@ -1,9 +1,8 @@
 {
-	"name": "cluster-automation-k0s",
+	"name": "cluster-management",
 	"version": "1.0.0",
-	"main": "main.js",
-	"types": "main.ts",
-	"license": "MPL-2.0",
+	"main": "src/main.ts",
+	"types": "src/main.ts",
 	"private": true,
 	"scripts": {
 		"get": "cdktf get",
