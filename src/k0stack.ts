@@ -6,6 +6,7 @@ import { numberToText } from "./stack_utils"
 type K0StackProperties = {
   master: ComputeInstance
   workers: Array<ComputeInstance>
+  sshKeyFile: string
 }
 
 class K0Stack extends TerraformStack {
