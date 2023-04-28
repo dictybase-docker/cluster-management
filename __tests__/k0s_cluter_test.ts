@@ -1,34 +1,11 @@
-import { createClusterYml, HostNodeProperties } from "../src/k0s_cluster"
+import { createClusterYml } from "../src/k0s_cluster"
 import { parseDocument, Document, isSeq, isMap } from "yaml"
+import { hosts } from "./cluster_data"
 
 describe("createClusterYml", () => {
   let yamlObj: Document
   let actualYaml: string
-  let hosts: Array<HostNodeProperties>
   beforeEach(() => {
-    hosts = [
-      {
-        address: "10.0.0.1",
-        user: "root",
-        port: 22,
-        keyPath: "~/.ssh/id_rsa",
-        role: "controller",
-      },
-      {
-        address: "10.0.0.2",
-        user: "root",
-        port: 22,
-        keyPath: "~/.ssh/id_rsa",
-        role: "worker",
-      },
-      {
-        address: "10.0.0.3",
-        user: "root",
-        port: 22,
-        keyPath: "~/.ssh/id_rsa",
-        role: "worker",
-      },
-    ]
     actualYaml = createClusterYml({
       version: "1.23.4",
       hosts,
