@@ -42,9 +42,7 @@ type CreateClusterYmlProperties = {
  * Create a role node
  */
 const createRoleNode = (role: string) => {
-  const rn = new YAMLMap()
-  rn.set("role", role)
-  return rn
+  return new Pair("role", role)
 }
 
 /**
@@ -78,8 +76,8 @@ const createHostNodes = (properties: Array<HostNodeProperties>) => {
  */
 const createK0sNode = (version: string) => {
   const k0s = new YAMLMap()
-  k0s.add(new Pair("version", version.concat("+k0s.0")))
-  k0s.add(new Pair("dynamicConfig", true))
+  k0s.set("version", version.concat("+k0s.0"))
+  k0s.set("dynamicConfig", true)
   return k0s
 }
 
@@ -92,13 +90,13 @@ const createClusterYml = ({
   hosts,
 }: CreateClusterYmlProperties) => {
   const spec = new YAMLMap()
-  spec.add(new Pair("hosts", createHostNodes(hosts)))
-  spec.add(new Pair("k0s", createK0sNode(version)))
+  spec.set("hosts", createHostNodes(hosts))
+  spec.set("k0s", createK0sNode(version))
   const doc = new Document()
-  doc.add(new Pair("apiVersion", "k0sctl.k0sproject.io/v1beta1"))
-  doc.add(new Pair("kind", "Cluster"))
+  doc.set("apiVersion", "k0sctl.k0sproject.io/v1beta1")
+  doc.set("kind", "Cluster")
   doc.set("metadata", new Pair("name", name))
-  doc.add(new Pair("spec", spec))
+  doc.set("spec", spec)
   return doc.toString()
 }
 
