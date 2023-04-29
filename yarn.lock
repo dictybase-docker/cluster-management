@@ -396,9 +396,9 @@
     jsii-srcmak "^0.1.867"
 
 "@cdktf/provider-google@7.x":
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/@cdktf/provider-google/-/provider-google-7.0.2.tgz#b50378c6106856932cf13c0b0cece3f4d02a28ca"
-  integrity sha512-7mIDoKLjRJf6i5NzpgkLUfr1x+ujC4XXoFZc7ygh5v4YaI7tTunWlfJ4lf7oYjorCXuQaFVhh+S0KdRnoEfOzg==
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/@cdktf/provider-google/-/provider-google-7.0.3.tgz#e88603c902bbe2e2180bf4bc42a72df0ca04992f"
+  integrity sha512-3a7U/N2WDmZoiGMopyVwFysq9NU9xleTKrllqB9/LOv8fy7Eud2zNQer/mk1IU2ezN5MTJVl5Er+1C3YgXtLaA==
 
 "@cdktf/provider-local@^6.0.0":
   version "6.0.0"
