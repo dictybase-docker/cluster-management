@@ -28,7 +28,7 @@
 		"cdktf": "0.16.x",
 		"cdktf-cli": "0.16.x",
 		"constructs": "^10.2.6",
-		"yargs": "^17.7.1"
+		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
 		"@swc/core": "^1.3.55",
