@@ -27,7 +27,7 @@
 		"@cdktf/provider-local": "^6.0.0",
 		"cdktf": "0.16.x",
 		"cdktf-cli": "0.16.x",
-		"constructs": "^10.2.6",
+		"constructs": "^10.2.10",
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
