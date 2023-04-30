@@ -26,10 +26,8 @@ describe("VmInstanceStack Application", () => {
       region: "chain-region",
       ports: ["89"],
       ipCidrRange: "10.0.1.0/28",
-      masterInstanceName: "castle",
       masterMachineType: "2-2033",
       masterDiskSize: 10,
-      nodeInstanceName: "villa",
       nodeMachineType: "4-4011",
       nodeDiskSize: 20,
     })
