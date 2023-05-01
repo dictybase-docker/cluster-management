@@ -42,4 +42,20 @@ describe("createClusterYml", () => {
       }
     }
   })
+  test("it should have install flags for cloud provider", () => {
+    const hosts = yamlObj.getIn(["spec", "hosts"])
+    if (isSeq(hosts)) {
+      hosts.items.slice(1).forEach((h) => {
+        if (isMap(h)) {
+          const flags = h.get("installFlags")
+          if (isSeq(flags)) {
+            expect(flags.get(0)).toBe("--enable-cloud-provider")
+            expect(flags.get(1)).toBe(
+              "--kubelet-extra-args='--cloud-provider=external'",
+            )
+          }
+        }
+      })
+    }
+  })
 })
