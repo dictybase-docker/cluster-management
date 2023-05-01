@@ -37,7 +37,7 @@ type CreateClusterYmlProperties = {
   name?: string
   version: string
   hosts: Array<HostNodeProperties>
-  enableCloudProvider: boolean
+  enableCloudProvider?: boolean
 }
 
 /**
