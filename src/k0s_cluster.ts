@@ -37,6 +37,7 @@ type CreateClusterYmlProperties = {
   name?: string
   version: string
   hosts: Array<HostNodeProperties>
+  enableCloudProvider: boolean
 }
 
 /**
@@ -63,7 +64,10 @@ const createSshWithRoleNode = ({
 /**
  * Create a list of host nodes
  */
-const createHostNodes = (properties: Array<HostNodeProperties>) => {
+const createHostNodes = (
+  properties: Array<HostNodeProperties>,
+  enableCloudProvider: boolean,
+) => {
   const nodes = new YAMLSeq()
   properties.forEach((prop) => {
     nodes.add(createSshWithRoleNode(prop))
@@ -86,11 +90,12 @@ const createK0sNode = (version: string) => {
  */
 const createClusterYml = ({
   name = "dictybase-shared-cluster",
+  enableCloudProvider = true,
   version,
   hosts,
 }: CreateClusterYmlProperties) => {
   const spec = new YAMLMap()
-  spec.set("hosts", createHostNodes(hosts))
+  spec.set("hosts", createHostNodes(hosts, enableCloudProvider))
   spec.set("k0s", createK0sNode(version))
   const doc = new Document()
   doc.set("apiVersion", "k0sctl.k0sproject.io/v1beta1")
