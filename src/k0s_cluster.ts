@@ -61,6 +61,15 @@ const createSshWithRoleNode = ({
   return sshWithRole
 }
 
+const addCloudProvider = () => {
+  const cloudFlags = new YAMLSeq()
+  cloudFlags.add("--enable-cloud-provider")
+  cloudFlags.add("--kubelet-extra-args='--cloud-provider=external'")
+  const installFlagNode = new YAMLMap()
+  installFlagNode.set("installFlags", cloudFlags)
+  return installFlagNode
+}
+
 /**
  * Create a list of host nodes
  */
@@ -71,6 +80,9 @@ const createHostNodes = (
   const nodes = new YAMLSeq()
   properties.forEach((prop) => {
     nodes.add(createSshWithRoleNode(prop))
+    if (enableCloudProvider && prop.role === "worker") {
+      nodes.add(addCloudProvider())
+    }
   })
   return nodes
 }
