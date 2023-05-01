@@ -41,7 +41,7 @@ class VpcNetwork extends Construct {
         name: `${id}-allow-inbound-http-ssh`,
         network: this.network.id,
         sourceRanges: ["0.0.0.0/0"],
-        allow: [{ protocol: "tcp", ports: ["80", "443", "22"] }],
+        allow: [{ protocol: "tcp", ports: ["80", "443", "22", "6443"] }],
         direction: "INGRESS",
         logConfig: {
           metadata: "INCLUDE_ALL_METADATA",
@@ -58,7 +58,18 @@ class VpcNetwork extends Construct {
         allow: [
           {
             protocol: "tcp",
-            ports: ["2380", "6443", "179", "10250", "9443", "8132"],
+            ports: [
+              "2379",
+              "2380",
+              "6443",
+              "179",
+              "10250",
+              "10257",
+              "10259",
+              "9443",
+              "8132",
+              "30000-32767",
+            ],
           },
         ],
         direction: "INGRESS",
