@@ -63,7 +63,7 @@ describe("VmInstanceStack Application", () => {
       name: "test-instance-vpc-allow-inbound-http-ssh",
       direction: "INGRESS",
       source_ranges: ["0.0.0.0/0"],
-      allow: [{ protocol: "tcp", ports: ["80", "443", "22"] }],
+      allow: [{ protocol: "tcp", ports: ["80", "443", "22", "6443"] }],
       log_config: {
         metadata: "INCLUDE_ALL_METADATA",
       },
@@ -75,7 +75,18 @@ describe("VmInstanceStack Application", () => {
       allow: [
         {
           protocol: "tcp",
-          ports: ["2380", "6443", "179", "10250", "9443", "8132"],
+          ports: [
+            "2379",
+            "2380",
+            "6443",
+            "179",
+            "10250",
+            "10257",
+            "10259",
+            "9443",
+            "8132",
+            "30000-32767",
+          ],
         },
       ],
       log_config: {
