@@ -40,6 +40,8 @@ type CreateClusterYmlProperties = {
   enableCloudProvider?: boolean
 }
 
+const extractMinorVersion = (version: string) => version.split(".")[1]
+
 /**
  * Create a ssh node
  */
