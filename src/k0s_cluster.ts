@@ -39,14 +39,15 @@ type CreateClusterYmlProperties = {
   name?: string
   version: string
   hosts: Array<HostNodeProperties>
-  enableCloudProvider?: boolean
-  token: string
+  cloudProvider?: {
+    githubToken: string
+  }
 }
 
 type TagMatcherProperties = {
-  token: string
   owner: string
   repo: string
+  token: string
 }
 
 type SortProperties = {
@@ -155,11 +156,15 @@ const createHostNodes = ({
   const nodes = new YAMLSeq()
   hosts.forEach((prop) => {
     const sshroleNode = createSshWithRoleNode(prop)
-    if (enableCloudProvider && prop.role === "worker") {
-      sshroleNode.set("installFlags", addCloudProvider())
-    }
-    if (url && prop.role === "controller") {
-      nodes.set("files", createGcpFileNode(url))
+    if (enableCloudProvider) {
+      switch (prop.role) {
+        case "worker":
+          sshroleNode.set("installFlags", addCloudProvider())
+          break
+        case "controller":
+          nodes.set("files", createGcpFileNode(url as string))
+          break
+      }
     }
     nodes.add(sshroleNode)
   })
@@ -181,26 +186,30 @@ const createK0sNode = (version: string) => {
  */
 const createClusterYml = async ({
   name = "dictybase-shared-cluster",
-  enableCloudProvider = true,
   version,
   hosts,
-  token,
+  cloudProvider,
 }: CreateClusterYmlProperties) => {
   const spec = new YAMLMap()
-  const tagMatch = new TagMatcher({
-    token,
-    owner: "kubernetes",
-    repo: "cloud-provider-gcp",
-  })
-  const tag = await tagMatch.match_tag(version)
-  if (tag) {
-    const url = await tagMatch.download_url({
-      path: "deploy/packages/default/manifest.yaml",
-      tag,
+  if (cloudProvider) {
+    const tagMatch = new TagMatcher({
+      token: cloudProvider.githubToken,
+      owner: "kubernetes",
+      repo: "cloud-provider-gcp",
     })
-    spec.set("hosts", createHostNodes({ hosts, enableCloudProvider, url }))
+    const tag = await tagMatch.match_tag(version)
+    if (tag) {
+      const url = await tagMatch.download_url({
+        path: "deploy/packages/default/manifest.yaml",
+        tag,
+      })
+      spec.set(
+        "hosts",
+        createHostNodes({ hosts, enableCloudProvider: true, url }),
+      )
+    }
   } else {
-    spec.set("hosts", createHostNodes({ hosts, enableCloudProvider }))
+    spec.set("hosts", createHostNodes({ hosts, enableCloudProvider: false }))
   }
   spec.set("k0s", createK0sNode(version))
   const doc = new Document()
