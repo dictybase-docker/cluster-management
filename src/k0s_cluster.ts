@@ -40,6 +40,7 @@ type CreateClusterYmlProperties = {
   version: string
   hosts: Array<HostNodeProperties>
   enableCloudProvider?: boolean
+  token: string
 }
 
 type TagMatcherProperties = {
@@ -96,8 +97,17 @@ class TagMatcher {
       ref: tag,
     })
     // @ts-ignore
-    return resp.data?.download_url
+    return resp.data.download_url
   }
+}
+
+const createGcpFileNode = (url: string) => {
+  const fileNode = new YAMLMap()
+  fileNode.set("name", "gcp-manifest")
+  fileNode.set("src", url)
+  fileNode.set("dst", "/var/lib/k0s/manifests/gcp")
+  fileNode.set("perm", "0600")
+  return fileNode
 }
 
 /**
@@ -164,6 +174,7 @@ const createClusterYml = ({
   enableCloudProvider = true,
   version,
   hosts,
+  token,
 }: CreateClusterYmlProperties) => {
   const spec = new YAMLMap()
   spec.set("hosts", createHostNodes(hosts, enableCloudProvider))
