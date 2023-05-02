@@ -59,6 +59,12 @@ type DownloadUrlProperties = {
   tag: string
 }
 
+type CreateHostNodesProperties = {
+  hosts: Array<HostNodeProperties>
+  enableCloudProvider: boolean
+  url?: string
+}
+
 const extractMinorVersion = (version: string) => version.split(".")[1]
 
 class TagMatcher {
@@ -141,12 +147,13 @@ const addCloudProvider = () => {
 /**
  * Create a list of host nodes
  */
-const createHostNodes = (
-  properties: Array<HostNodeProperties>,
-  enableCloudProvider: boolean,
-) => {
+const createHostNodes = ({
+  hosts,
+  enableCloudProvider,
+  url,
+}: CreateHostNodesProperties) => {
   const nodes = new YAMLSeq()
-  properties.forEach((prop) => {
+  hosts.forEach((prop) => {
     const sshroleNode = createSshWithRoleNode(prop)
     if (enableCloudProvider && prop.role === "worker") {
       sshroleNode.set("installFlags", addCloudProvider())
@@ -177,7 +184,7 @@ const createClusterYml = ({
   token,
 }: CreateClusterYmlProperties) => {
   const spec = new YAMLMap()
-  spec.set("hosts", createHostNodes(hosts, enableCloudProvider))
+  spec.set("hosts", createHostNodes({ hosts, enableCloudProvider }))
   spec.set("k0s", createK0sNode(version))
   const doc = new Document()
   doc.set("apiVersion", "k0sctl.k0sproject.io/v1beta1")
