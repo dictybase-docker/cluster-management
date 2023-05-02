@@ -1,4 +1,6 @@
 import { Document, Pair, YAMLMap, YAMLSeq } from "yaml"
+import { Octokit } from "@octokit/rest"
+import { readFileSync } from "fs"
 
 /**
  * @typedef {Object} SshNodeProperties
@@ -40,7 +42,63 @@ type CreateClusterYmlProperties = {
   enableCloudProvider?: boolean
 }
 
+type TagMatcherProperties = {
+  token: string
+  owner: string
+  repo: string
+}
+
+type SortProperties = {
+  name: string
+  match: string
+}
+
+type DownloadUrlProperties = {
+  path: string
+  tag: string
+}
+
 const extractMinorVersion = (version: string) => version.split(".")[1]
+
+class TagMatcher {
+  #apiHandler: Octokit
+  #owner: string
+  #repo: string
+  constructor({ token, owner, repo }: TagMatcherProperties) {
+    this.#apiHandler = new Octokit({ auth: readFileSync(token).toString() })
+    this.#owner = owner
+    this.#repo = repo
+  }
+  async match_tag(version: string) {
+    const minor = extractMinorVersion(version)
+    const rgxp = new RegExp(`^ccm\/v(${minor}\.[0-9]+\.[0-9]+)`)
+    const tags = await this.#apiHandler.rest.repos.listTags({
+      owner: this.#owner,
+      repo: this.#repo,
+    })
+    const names = tags.data
+      .filter((t) => rgxp.test(t.name))
+      .map((t) => ({
+        name: t.name,
+        rgxp: rgxp.exec(t.name) as RegExpExecArray,
+      }))
+      .map(({ name, rgxp }) => ({ name, match: rgxp[1] as string }))
+      .sort((a: SortProperties, b: SortProperties) =>
+        a.match < b.match ? 1 : 0,
+      )
+    return names.at(0)?.name
+  }
+  async download_url({ path, tag }: DownloadUrlProperties) {
+    const resp = await this.#apiHandler.rest.repos.getContent({
+      owner: this.#owner,
+      repo: this.#repo,
+      path: path,
+      ref: tag,
+    })
+    // @ts-ignore
+    return resp.data?.download_url
+  }
+}
 
 /**
  * Create a ssh node
