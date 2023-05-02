@@ -158,6 +158,9 @@ const createHostNodes = ({
     if (enableCloudProvider && prop.role === "worker") {
       sshroleNode.set("installFlags", addCloudProvider())
     }
+    if (url && prop.role === "controller") {
+      nodes.set("files", createGcpFileNode(url))
+    }
     nodes.add(sshroleNode)
   })
   return nodes
