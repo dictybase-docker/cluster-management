@@ -176,7 +176,7 @@ const createK0sNode = (version: string) => {
 /**
  * Create a cluster.yml file
  */
-const createClusterYml = ({
+const createClusterYml = async ({
   name = "dictybase-shared-cluster",
   enableCloudProvider = true,
   version,
@@ -184,7 +184,21 @@ const createClusterYml = ({
   token,
 }: CreateClusterYmlProperties) => {
   const spec = new YAMLMap()
-  spec.set("hosts", createHostNodes({ hosts, enableCloudProvider }))
+  const tagMatch = new TagMatcher({
+    token,
+    owner: "kubernetes",
+    repo: "cloud-provider-gcp",
+  })
+  const tag = await tagMatch.match_tag(version)
+  if (tag) {
+    const url = await tagMatch.download_url({
+      path: "deploy/packages/default/manifest.yaml",
+      tag,
+    })
+    spec.set("hosts", createHostNodes({ hosts, enableCloudProvider, url }))
+  } else {
+    spec.set("hosts", createHostNodes({ hosts, enableCloudProvider }))
+  }
   spec.set("k0s", createK0sNode(version))
   const doc = new Document()
   doc.set("apiVersion", "k0sctl.k0sproject.io/v1beta1")
