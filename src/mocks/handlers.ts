@@ -157,7 +157,7 @@ const handlers = [
     )
   }),
   rest.get(
-    "https://api.github.com/repos/ccm/ccm/contents/deploy/packages/default/manifest.yaml?ref=ccm/v26.4.0",
+    "https://api.github.com/repos/ccm/ccm/contents/:path",
     (_, res, ctx) => {
       return res(
         ctx.status(200),
