@@ -1,7 +1,6 @@
 import { createClusterYml, TagMatcher } from "../src/k0s_cluster"
 import { parseDocument, Document, isSeq, isMap } from "yaml"
 import { hosts } from "./cluster_data"
-import { server } from "../src/mocks/server"
 
 describe("createClusterYml", () => {
   let yamlObj: Document
@@ -63,10 +62,6 @@ describe("createClusterYml", () => {
 
 describe("TagMatcher", () => {
   let tagMatcher: TagMatcher
-
-  beforeAll(() => server.listen())
-  afterEach(() => server.resetHandlers())
-  afterAll(() => server.close())
   beforeEach(() => {
     tagMatcher = new TagMatcher({
       token: "4387rq90wufdilfhhdsfydsfids",
