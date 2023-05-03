@@ -1,7 +1,7 @@
 import { rest } from "msw"
 
 const handlers = [
-  rest.get("https://api.github.com/repos/ccm/ccm/tags", (_, res, ctx) => {
+  rest.get("https://api.github.com/repos/:owner/:repos/tags", (_, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json([
@@ -157,7 +157,7 @@ const handlers = [
     )
   }),
   rest.get(
-    "https://api.github.com/repos/ccm/ccm/contents/:path",
+    "https://api.github.com/repos/:owner/:repos/contents/:path",
     (_, res, ctx) => {
       return res(
         ctx.status(200),
