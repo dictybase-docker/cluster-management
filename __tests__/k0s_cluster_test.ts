@@ -78,22 +78,13 @@ describe("TagMatcher", () => {
     const actualTag = await tagMatcher.match_tag("1.26.1")
     expect(actualTag).toEqual("ccm/v26.4.0")
   })
-  /* describe("#download_url", () => {
-    it("should return the download URL for the given path and tag", async () => {
-      const path = "README.md"
-      const tag = "ccm/v1.2.3"
-      // Mock the GitHub API call to get content
-      octokit.rest.repos.getContent.mockResolvedValue({
-        data: {
-          download_url:
-            "https://api.github.com/repos/ccm/ccm/contents/README.md?ref=ccm/v1.2.3",
-        },
-      })
-
-      const actualUrl = await tagMatcher.download_url({ path, tag })
-      expect(actualUrl).to.equal(
-        "https://api.github.com/repos/ccm/ccm/contents/README.md?ref=ccm/v1.2.3",
-      )
+  test("should return the download URL for the given path and tag", async () => {
+    const actualUrl = await tagMatcher.download_url({
+      path: "deploy/packages/default/manifest.yaml",
+      tag: "ccm/v26.4.0",
     })
-  }) */
+    expect(actualUrl).toEqual(
+      "https://raw.githubusercontent.com/kubernetes/cloud-provider-gcp/ccm/v26.4.0/deploy/packages/default/manifest.yaml",
+    )
+  })
 })
