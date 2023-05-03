@@ -1,6 +1,5 @@
 import { Document, Pair, YAMLMap, YAMLSeq } from "yaml"
 import { Octokit } from "@octokit/rest"
-import { readFileSync } from "fs"
 
 /**
  * @typedef {Object} SshNodeProperties
@@ -67,13 +66,25 @@ type CreateHostNodesProperties = {
 }
 
 const extractMinorVersion = (version: string) => version.split(".")[1]
+const semanticVersion = (a: SortProperties, b: SortProperties) => {
+  const [majorA, minorA, patchA] = a.match.split(".").map((v) => Number(v))
+  const [majorB, minorB, patchB] = b.match.split(".").map((v) => Number(v))
+  switch (true) {
+    case majorA !== majorB:
+      return majorB - majorA
+    case minorA !== minorB:
+      return minorB - minorA
+    default:
+      return patchB - patchA
+  }
+}
 
 class TagMatcher {
   #apiHandler: Octokit
   #owner: string
   #repo: string
   constructor({ token, owner, repo }: TagMatcherProperties) {
-    this.#apiHandler = new Octokit({ auth: readFileSync(token).toString() })
+    this.#apiHandler = new Octokit({ auth: token })
     this.#owner = owner
     this.#repo = repo
   }
@@ -91,9 +102,7 @@ class TagMatcher {
         rgxp: rgxp.exec(t.name) as RegExpExecArray,
       }))
       .map(({ name, rgxp }) => ({ name, match: rgxp[1] as string }))
-      .sort((a: SortProperties, b: SortProperties) =>
-        a.match < b.match ? 1 : 0,
-      )
+      .sort(semanticVersion)
     return names.at(0)?.name
   }
   async download_url({ path, tag }: DownloadUrlProperties) {
@@ -220,4 +229,4 @@ const createClusterYml = async ({
   return doc.toString()
 }
 
-export { createClusterYml, type HostNodeProperties }
+export { createClusterYml, type HostNodeProperties, TagMatcher }
