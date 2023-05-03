@@ -171,7 +171,7 @@ const createHostNodes = ({
           sshroleNode.set("installFlags", addCloudProvider())
           break
         case "controller":
-          nodes.set("files", createGcpFileNode(url as string))
+          sshroleNode.set("files", createGcpFileNode(url as string))
           break
       }
     }
