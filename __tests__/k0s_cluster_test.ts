@@ -1,6 +1,7 @@
-import { createClusterYml } from "../src/k0s_cluster"
+import { createClusterYml, TagMatcher } from "../src/k0s_cluster"
 import { parseDocument, Document, isSeq, isMap } from "yaml"
 import { hosts } from "./cluster_data"
+import { server } from "../src/mocks/server"
 
 describe("createClusterYml", () => {
   let yamlObj: Document
@@ -57,5 +58,42 @@ describe("createClusterYml", () => {
         }
       })
     }
+  }) */
+})
+
+describe("TagMatcher", () => {
+  let tagMatcher: TagMatcher
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+  beforeEach(() => {
+    tagMatcher = new TagMatcher({
+      token: "4387rq90wufdilfhhdsfydsfids",
+      owner: "ccm",
+      repo: "ccm",
+    })
+  })
+  test("should return the first tag that matches the given version", async () => {
+    const actualTag = await tagMatcher.match_tag("1.26.1")
+    expect(actualTag).toEqual("ccm/v26.4.0")
+  })
+  /* describe("#download_url", () => {
+    it("should return the download URL for the given path and tag", async () => {
+      const path = "README.md"
+      const tag = "ccm/v1.2.3"
+      // Mock the GitHub API call to get content
+      octokit.rest.repos.getContent.mockResolvedValue({
+        data: {
+          download_url:
+            "https://api.github.com/repos/ccm/ccm/contents/README.md?ref=ccm/v1.2.3",
+        },
+      })
+
+      const actualUrl = await tagMatcher.download_url({ path, tag })
+      expect(actualUrl).to.equal(
+        "https://api.github.com/repos/ccm/ccm/contents/README.md?ref=ccm/v1.2.3",
+      )
+    })
   }) */
 })
