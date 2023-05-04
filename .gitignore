@@ -14,4 +14,4 @@ k8sVM*
 cluster_config.yml
 ip.json
 kubeconfig.yml
-gh_token.txt
+github_token.txt
