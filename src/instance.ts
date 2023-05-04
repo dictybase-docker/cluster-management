@@ -43,6 +43,7 @@ class VmInstance extends Construct {
         "ssh-keys": sshKey,
         "enable-os-config": "TRUE",
       },
+      metadataStartupScript: "dbus-uuidgen > /var/lib/dbus/machine-id",
     })
   }
 }
