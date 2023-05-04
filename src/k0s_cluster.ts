@@ -121,9 +121,11 @@ const createGcpFileNode = (url: string) => {
   const fileNode = new YAMLMap()
   fileNode.set("name", "gcp-manifest")
   fileNode.set("src", url)
-  fileNode.set("dst", "/var/lib/k0s/manifests/gcp")
+  fileNode.set("dstDir", "/var/lib/k0s/manifests/gcp")
   fileNode.set("perm", "0600")
-  return fileNode
+  const fileContainer = new YAMLSeq()
+  fileContainer.add(fileNode)
+  return fileContainer
 }
 
 /**
