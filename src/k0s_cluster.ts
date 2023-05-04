@@ -43,12 +43,23 @@ type CreateClusterYmlProperties = {
   }
 }
 
+/**
+ * @typedef {Object} TagMatcherProperties
+ * @property {string} owner - Owner of the repository
+ * @property {string} repo - Name of the repository
+ * @property {string} token - Github token
+ */
 type TagMatcherProperties = {
   owner: string
   repo: string
   token: string
 }
 
+/**
+ * @typedef {Object} SortProperties
+ * @property {string} name - Name of the tag
+ * @property {string} match - Version of the tag
+ */
 type SortProperties = {
   name: string
   match: string
@@ -79,6 +90,9 @@ const semanticVersion = (a: SortProperties, b: SortProperties) => {
   }
 }
 
+/**
+ * Class for matching tags
+ */
 class TagMatcher {
   #apiHandler: Octokit
   #owner: string
@@ -117,6 +131,9 @@ class TagMatcher {
   }
 }
 
+/**
+ * Create a file node for GCP manifest
+ */
 const createGcpFileNode = (url: string) => {
   const fileNode = new YAMLMap()
   fileNode.set("name", "gcp-manifest")
@@ -149,6 +166,9 @@ const createSshWithRoleNode = ({
   return sshWithRole
 }
 
+/**
+ * Create a list of cloud provider flags
+ */
 const addCloudProvider = () => {
   const cloudFlags = new YAMLSeq()
   cloudFlags.add("--enable-cloud-provider")
