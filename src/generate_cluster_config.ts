@@ -47,7 +47,7 @@ const argv = yargs(process.argv.slice(2))
     t: {
       alias: "token",
       type: "string",
-      default: "github_token.tx",
+      default: "github_token.txt",
       description: "github personal access token to use the API",
     },
   })
