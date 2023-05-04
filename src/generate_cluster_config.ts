@@ -44,6 +44,12 @@ const argv = yargs(process.argv.slice(2))
       description:
         "json output file generated from terraform run containing the public ips of vm instance",
     },
+    t: {
+      alias: "token",
+      type: "string",
+      default: "github_token.tx",
+      description: "github personal access token to use the API",
+    },
   })
   .parseSync()
 
@@ -66,4 +72,13 @@ const hosts = [
     }),
   ),
 ]
-writeFileSync(argv.o, createClusterYml({ version: argv.kv, hosts }))
+writeFileSync(
+  argv.o,
+  await createClusterYml({
+    version: argv.kv,
+    hosts,
+    cloudProvider: {
+      githubToken: readFileSync(argv.t).toString(),
+    },
+  }),
+)
