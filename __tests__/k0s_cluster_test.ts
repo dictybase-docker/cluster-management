@@ -42,22 +42,6 @@ describe("createClusterYml", () => {
       }
     }
   })
-  /* test("it should have install flags for cloud provider", () => {
-    const hosts = yamlObj.getIn(["spec", "hosts"])
-    if (isSeq(hosts)) {
-      hosts.items.slice(1).forEach((h) => {
-        if (isMap(h)) {
-          const flags = h.get("installFlags")
-          if (isSeq(flags)) {
-            expect(flags.get(0)).toBe("--enable-cloud-provider")
-            expect(flags.get(1)).toBe(
-              "--kubelet-extra-args='--cloud-provider=external'",
-            )
-          }
-        }
-      })
-    }
-  }) */
 })
 
 describe("TagMatcher", () => {
@@ -81,5 +65,59 @@ describe("TagMatcher", () => {
     expect(actualUrl).toEqual(
       "https://raw.githubusercontent.com/kubernetes/cloud-provider-gcp/ccm/v26.4.0/deploy/packages/default/manifest.yaml",
     )
+  })
+})
+
+describe("createClusterYml with cloud provider", () => {
+  let yamlObj: Document
+  let actualYaml: string
+  beforeEach(async () => {
+    actualYaml = await createClusterYml({
+      version: "1.26.1",
+      hosts,
+      cloudProvider: {
+        githubToken: "4839qtyweiofhdshfsdy23s",
+      },
+    })
+    yamlObj = parseDocument(actualYaml)
+  })
+
+  test("it should have install flags for cloud provider", () => {
+    const hosts = yamlObj.getIn(["spec", "hosts"])
+    if (isSeq(hosts)) {
+      hosts.items.slice(1).forEach((h) => {
+        if (isMap(h)) {
+          const flags = h.get("installFlags")
+          if (isSeq(flags)) {
+            expect(flags.get(0)).toBe("--enable-cloud-provider")
+            expect(flags.get(1)).toBe(
+              "--kubelet-extra-args='--cloud-provider=external'",
+            )
+          }
+        }
+      })
+    }
+  })
+  test("it should have controller hosts with file node", () => {
+    const hosts = yamlObj.getIn(["spec", "hosts"])
+    if (isSeq(hosts)) {
+      const controllerHost = hosts.items.find(
+        (item) => isMap(item) && item.get("role") === "controller",
+      )
+      if (isMap(controllerHost)) {
+        const files = controllerHost.get("files")
+        if (isSeq(files)) {
+          const fileContent = files.get(0)
+          if (isMap(fileContent)) {
+            expect(fileContent.get("dstDir")).toBe("/var/lib/k0s/manifests/gcp")
+            expect(fileContent.get("name")).toBe("gcp-manifest")
+            expect(fileContent.get("perm")).toBe("0600")
+            expect(fileContent.get("src")).toBe(
+              "https://raw.githubusercontent.com/kubernetes/cloud-provider-gcp/ccm/v26.4.0/deploy/packages/default/manifest.yaml",
+            )
+          }
+        }
+      }
+    }
   })
 })
