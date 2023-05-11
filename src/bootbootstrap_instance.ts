@@ -21,6 +21,7 @@ type BootStrapInstanceStackProperties = {
   ipCidrRange: string
   masterMachineType: string
   masterDiskSize: number
+  image: string
 }
 
 class BootStrapInstanceStack extends TerraformStack {
@@ -44,6 +45,7 @@ class BootStrapInstanceStack extends TerraformStack {
       masterMachineType,
       masterDiskSize,
       sshKeyFile,
+      image,
     } = options
     if (remote) {
       new GcsBackend(this, {
@@ -67,7 +69,7 @@ class BootStrapInstanceStack extends TerraformStack {
       machine: masterMachineType,
       disk: new K8Disk(this, `${id}-disk-bootstrap`, {
         size: masterDiskSize,
-        image: "ubuntu-minimal-2204-jammy-v20230428 ",
+        image: image,
       }).disk,
       network: vpcNetwork.network,
       subnetwork: vpcNetwork.subnetwork,
