@@ -7,7 +7,7 @@ import { VpcNetwork } from "./vpc"
 import { VmInstance } from "./instance"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 
-type BootStrpMicrok8StackProperties = {
+type BootStrapInstanceStackProperties = {
   remote: boolean
   nodes: number
   credentials: string
@@ -23,12 +23,12 @@ type BootStrpMicrok8StackProperties = {
   masterDiskSize: number
 }
 
-class BootStrpMicrok8Stack extends TerraformStack {
+class BootStrapInstanceStack extends TerraformStack {
   public readonly master: ComputeInstance
   constructor(
     scope: Construct,
     id: string,
-    options: BootStrpMicrok8StackProperties,
+    options: BootStrapInstanceStackProperties,
   ) {
     super(scope, id)
     const {
@@ -82,4 +82,4 @@ class BootStrpMicrok8Stack extends TerraformStack {
   }
 }
 
-export { BootStrpMicrok8Stack }
+export { BootStrapInstanceStack }
