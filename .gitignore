@@ -11,3 +11,7 @@ credentials.json
 !jest.config.js
 !setup.js
 k8sVM*
+cluster_config.yml
+ip.json
+kubeconfig.yml
+github_token.txt

@@ -26,10 +26,8 @@ describe("VmInstanceStack Application", () => {
       region: "chain-region",
       ports: ["89"],
       ipCidrRange: "10.0.1.0/28",
-      masterInstanceName: "castle",
       masterMachineType: "2-2033",
       masterDiskSize: 10,
-      nodeInstanceName: "villa",
       nodeMachineType: "4-4011",
       nodeDiskSize: 20,
     })
@@ -54,7 +52,46 @@ describe("VmInstanceStack Application", () => {
   test("check if it has compute firewall", () => {
     expect(Testing.synth(stack)).toHaveResource(ComputeFirewall)
     expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeFirewall, {
-      name: "test-instance-vpc-allow-ssh",
+      name: "test-instance-vpc-allow-outbound",
+      direction: "EGRESS",
+      allow: [{ protocol: "all" }],
+      log_config: {
+        metadata: "INCLUDE_ALL_METADATA",
+      },
+    })
+    expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeFirewall, {
+      name: "test-instance-vpc-allow-inbound-http-ssh",
+      direction: "INGRESS",
+      source_ranges: ["0.0.0.0/0"],
+      allow: [{ protocol: "tcp", ports: ["80", "443", "22", "6443"] }],
+      log_config: {
+        metadata: "INCLUDE_ALL_METADATA",
+      },
+    })
+    expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeFirewall, {
+      name: "test-instance-vpc-allow-inbound-k8s",
+      direction: "INGRESS",
+      source_ranges: ["10.0.1.0/28"],
+      allow: [
+        {
+          protocol: "tcp",
+          ports: [
+            "2379",
+            "2380",
+            "6443",
+            "179",
+            "10250",
+            "10257",
+            "10259",
+            "9443",
+            "8132",
+            "30000-32767",
+          ],
+        },
+      ],
+      log_config: {
+        metadata: "INCLUDE_ALL_METADATA",
+      },
     })
   })
   test("check if it has compute disk for master node", () => {

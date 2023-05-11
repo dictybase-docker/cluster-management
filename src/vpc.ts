@@ -11,7 +11,9 @@ type VpcNetworkOptions = {
 class VpcNetwork extends Construct {
   public readonly network: ComputeNetwork
   public readonly subnetwork: ComputeSubnetwork
-  public readonly firewall: ComputeFirewall
+  public readonly outboundFirewall: ComputeFirewall
+  public readonly inboundK8sFirewall: ComputeFirewall
+  public readonly inboundHttpSshFirewall: ComputeFirewall
   constructor(scope: Construct, id: string, option: VpcNetworkOptions) {
     super(scope, id)
     this.network = new ComputeNetwork(this, `${id}-network`, {
@@ -23,15 +25,59 @@ class VpcNetwork extends Construct {
       ipCidrRange: option.ipCidrRange,
       network: this.network.id,
     })
-    this.firewall = new ComputeFirewall(this, `${id}-allow-ssh`, {
-      name: `${id}-allow-ssh`,
+    this.outboundFirewall = new ComputeFirewall(this, `${id}-allow-outbound`, {
+      name: `${id}-allow-outbound`,
       network: this.network.id,
-      sourceRanges: ["0.0.0.0/0"],
-      allow: [{ protocol: "tcp", ports: ["22"] }],
+      allow: [{ protocol: "all" }],
+      direction: "EGRESS",
       logConfig: {
         metadata: "INCLUDE_ALL_METADATA",
       },
     })
+    this.inboundHttpSshFirewall = new ComputeFirewall(
+      this,
+      `${id}-allow-inbound-http-ssh`,
+      {
+        name: `${id}-allow-inbound-http-ssh`,
+        network: this.network.id,
+        sourceRanges: ["0.0.0.0/0"],
+        allow: [{ protocol: "tcp", ports: ["80", "443", "22", "6443"] }],
+        direction: "INGRESS",
+        logConfig: {
+          metadata: "INCLUDE_ALL_METADATA",
+        },
+      },
+    )
+    this.inboundK8sFirewall = new ComputeFirewall(
+      this,
+      `${id}-allow-inbound-k8s`,
+      {
+        name: `${id}-allow-inbound-k8s`,
+        network: this.network.id,
+        sourceRanges: [option.ipCidrRange],
+        allow: [
+          {
+            protocol: "tcp",
+            ports: [
+              "2379",
+              "2380",
+              "6443",
+              "179",
+              "10250",
+              "10257",
+              "10259",
+              "9443",
+              "8132",
+              "30000-32767",
+            ],
+          },
+        ],
+        direction: "INGRESS",
+        logConfig: {
+          metadata: "INCLUDE_ALL_METADATA",
+        },
+      },
+    )
   }
 }
 
