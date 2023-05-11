@@ -9,7 +9,6 @@ import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 
 type BootStrapInstanceStackProperties = {
   remote: boolean
-  nodes: number
   credentials: string
   bucketName: string
   bucketPrefix: string
