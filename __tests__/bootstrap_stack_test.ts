@@ -61,7 +61,7 @@ describe("BootStrapInstanceStack Application", () => {
       name: "test-instance-bootstrap-vpc-allow-inbound-http-ssh",
       direction: "INGRESS",
       source_ranges: ["0.0.0.0/0"],
-      allow: [{ protocol: "tcp", ports: ["22", "6443"] }],
+      allow: [{ protocol: "tcp", ports: ["22", "16443"] }],
       log_config: {
         metadata: "INCLUDE_ALL_METADATA",
       },
