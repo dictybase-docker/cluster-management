@@ -11,6 +11,7 @@ type VmInstanceProperties = {
   network: ComputeNetwork
   subnetwork: ComputeSubnetwork
   sshKey: string
+  startupScript?: string
 }
 
 class VmInstance extends Construct {
@@ -18,7 +19,8 @@ class VmInstance extends Construct {
   public readonly staticIPaddress: ComputeAddress
   constructor(scope: Construct, id: string, properties: VmInstanceProperties) {
     super(scope, id)
-    const { machine, disk, network, subnetwork, sshKey } = properties
+    const { machine, disk, network, subnetwork, sshKey, startupScript } =
+      properties
     this.staticIPaddress = new ComputeAddress(this, `${id}-static-ip-address`, {
       name: `${id}-static-ip-address`,
     })
@@ -42,7 +44,8 @@ class VmInstance extends Construct {
       metadata: {
         "ssh-keys": sshKey,
         "enable-os-config": "TRUE",
-        "startup-script": "dbus-uuidgen > /var/lib/dbus/machine-id",
+        "startup-script":
+          startupScript ?? "dbus-uuidgen > /var/lib/dbus/machine-id",
       },
     })
   }
