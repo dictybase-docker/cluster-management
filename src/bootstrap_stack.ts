@@ -3,7 +3,7 @@ import { Construct } from "constructs"
 import * as fs from "fs"
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
 import { K8Disk } from "./disk"
-import { VpcNetwork } from "./vpc"
+import { BootstrapVpcNetwork } from "./bootstrap_vpc"
 import { VmInstance } from "./instance"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 
@@ -59,10 +59,14 @@ class BootStrapInstanceStack extends TerraformStack {
       region: region,
       zone: zone,
     })
-    const vpcNetwork = new VpcNetwork(this, `${id}-vpc`, {
-      ports: ports,
-      ipCidrRange: ipCidrRange,
-    })
+    const vpcNetwork = new BootstrapVpcNetwork(
+      this,
+      `${id}-bootstrap-VpcNetworkvpc`,
+      {
+        ports: ports,
+        ipCidrRange: ipCidrRange,
+      },
+    )
     const sshKey = this.#read_key_file(sshKeyFile)
     this.master = new VmInstance(this, `${id}-vm-bootstrap`, {
       machine: masterMachineType,
