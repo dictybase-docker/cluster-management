@@ -1,6 +1,6 @@
 import yargs from "yargs/yargs"
 import { App } from "cdktf"
-import { BootStrapInstanceStack } from "./bootbootstrap_instance"
+import { BootStrapInstanceStack } from "./bootstrap_stack"
 
 const argv = yargs(process.argv.slice(2))
   .options({
@@ -95,7 +95,7 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-new BootStrapInstanceStack(app, "bootstrap_k8s_instance", {
+new BootStrapInstanceStack(app, "microk8s-instance", {
   remote: argv.r,
   credentials: argv.c,
   bucketName: argv.bn,
