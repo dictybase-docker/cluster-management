@@ -1,4 +1,4 @@
-import { TerraformStack, GcsBackend } from "cdktf"
+import { TerraformStack, GcsBackend, TerraformOutput } from "cdktf"
 import { Construct } from "constructs"
 import * as fs from "fs"
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
@@ -74,6 +74,10 @@ class BootStrapInstanceStack extends TerraformStack {
       subnetwork: vpcNetwork.subnetwork,
       sshKey: sshKey,
     }).vmInstance
+
+    new TerraformOutput(this, "master", {
+      value: this.master.networkInterface.get(0).accessConfig.get(0).natIp,
+    })
   }
 
   #read_key_file(file: string) {
