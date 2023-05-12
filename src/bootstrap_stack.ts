@@ -59,14 +59,10 @@ class BootStrapInstanceStack extends TerraformStack {
       region: region,
       zone: zone,
     })
-    const vpcNetwork = new BootstrapVpcNetwork(
-      this,
-      `${id}-bootstrap-VpcNetworkvpc`,
-      {
-        ports: ports,
-        ipCidrRange: ipCidrRange,
-      },
-    )
+    const vpcNetwork = new BootstrapVpcNetwork(this, `${id}-bootstrap-vpc`, {
+      ports: ports,
+      ipCidrRange: ipCidrRange,
+    })
     const sshKey = this.#read_key_file(sshKeyFile)
     this.master = new VmInstance(this, `${id}-vm-bootstrap`, {
       machine: masterMachineType,
