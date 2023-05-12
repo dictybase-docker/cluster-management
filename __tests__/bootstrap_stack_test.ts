@@ -36,7 +36,7 @@ describe("BootStrapInstanceStack Application", () => {
   test("check if it has compute network", () => {
     expect(Testing.synth(stack)).toHaveResource(ComputeNetwork)
     expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeNetwork, {
-      name: "test-instance-vpc-network",
+      name: "test-instance-bootstrap-vpc-network",
     })
     expect(Testing.synth(stack)).toHaveResource(ComputeFirewall)
   })
@@ -44,13 +44,13 @@ describe("BootStrapInstanceStack Application", () => {
     expect(Testing.synth(stack)).toHaveResource(ComputeSubnetwork)
     expect(Testing.synth(stack)).toHaveResourceWithProperties(
       ComputeSubnetwork,
-      { name: "test-instance-vpc-subnetwork" },
+      { name: "test-instance-bootstrap-vpc-subnetwork" },
     )
   })
   test("check if it has compute firewall", () => {
     expect(Testing.synth(stack)).toHaveResource(ComputeFirewall)
     expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeFirewall, {
-      name: "test-instance-vpc-allow-outbound",
+      name: "test-instance-bootstrap-vpc-allow-outbound",
       direction: "EGRESS",
       allow: [{ protocol: "all" }],
       log_config: {
@@ -58,35 +58,10 @@ describe("BootStrapInstanceStack Application", () => {
       },
     })
     expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeFirewall, {
-      name: "test-instance-vpc-allow-inbound-http-ssh",
+      name: "test-instance-bootstrap-vpc-allow-inbound-http-ssh",
       direction: "INGRESS",
       source_ranges: ["0.0.0.0/0"],
-      allow: [{ protocol: "tcp", ports: ["80", "443", "22", "6443"] }],
-      log_config: {
-        metadata: "INCLUDE_ALL_METADATA",
-      },
-    })
-    expect(Testing.synth(stack)).toHaveResourceWithProperties(ComputeFirewall, {
-      name: "test-instance-vpc-allow-inbound-k8s",
-      direction: "INGRESS",
-      source_ranges: ["10.0.1.0/28"],
-      allow: [
-        {
-          protocol: "tcp",
-          ports: [
-            "2379",
-            "2380",
-            "6443",
-            "179",
-            "10250",
-            "10257",
-            "10259",
-            "9443",
-            "8132",
-            "30000-32767",
-          ],
-        },
-      ],
+      allow: [{ protocol: "tcp", ports: ["22", "6443"] }],
       log_config: {
         metadata: "INCLUDE_ALL_METADATA",
       },
