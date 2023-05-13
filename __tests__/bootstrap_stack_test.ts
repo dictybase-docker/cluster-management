@@ -28,6 +28,7 @@ describe("BootStrapInstanceStack Application", () => {
       masterMachineType: "2-2033",
       masterDiskSize: 10,
       image: "bora-bora",
+      startupScript: "test_cred.json",
     })
   })
   test("check if it has google provider", () => {

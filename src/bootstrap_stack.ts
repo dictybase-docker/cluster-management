@@ -21,6 +21,7 @@ type BootStrapInstanceStackProperties = {
   masterMachineType: string
   masterDiskSize: number
   image: string
+  startupScript: string
 }
 
 class BootStrapInstanceStack extends TerraformStack {
@@ -45,6 +46,7 @@ class BootStrapInstanceStack extends TerraformStack {
       masterDiskSize,
       sshKeyFile,
       image,
+      startupScript,
     } = options
     if (remote) {
       new GcsBackend(this, {
@@ -73,6 +75,7 @@ class BootStrapInstanceStack extends TerraformStack {
       network: vpcNetwork.network,
       subnetwork: vpcNetwork.subnetwork,
       sshKey: sshKey,
+      startupScript: fs.readFileSync(startupScript).toString(),
     }).vmInstance
 
     new TerraformOutput(this, "master", {
