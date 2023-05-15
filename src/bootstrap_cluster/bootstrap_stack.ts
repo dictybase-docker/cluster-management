@@ -2,9 +2,9 @@ import { TerraformStack, GcsBackend, TerraformOutput } from "cdktf"
 import { Construct } from "constructs"
 import * as fs from "fs"
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
-import { K8Disk } from "./disk"
+import { K8Disk } from "../construct/disk"
 import { BootstrapVpcNetwork } from "./bootstrap_vpc"
-import { VmInstance } from "./instance"
+import { VmInstance } from "../construct/instance"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 
 type BootStrapInstanceStackProperties = {
@@ -75,7 +75,7 @@ class BootStrapInstanceStack extends TerraformStack {
       network: vpcNetwork.network,
       subnetwork: vpcNetwork.subnetwork,
       sshKey: sshKey,
-      startupScript: fs.readFileSync(startupScript).toString(),
+      startupScript: fs.readFileSync(startupScript).toString().trimEnd(),
     }).vmInstance
 
     new TerraformOutput(this, "master", {
