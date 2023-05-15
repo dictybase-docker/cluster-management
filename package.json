@@ -49,7 +49,7 @@
             ]
         },
         "setupFilesAfterEnv": [
-            "<rootDir>/src/setup_test.ts"
+            "<rootDir>/__tests__/setup.ts"
         ],
         "testRegex": "/__tests__/.*_test\\.ts$"
     }
