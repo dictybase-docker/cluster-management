@@ -45,7 +45,7 @@ class VmInstance extends Construct {
         "ssh-keys": sshKey,
         "enable-os-config": "TRUE",
         "startup-script":
-          startupScript ?? "dbus-uuidgen > /var/lib/dbus/machine-id",
+          "snap install microk8s --classic --channel=1.26/stable",
       },
     })
   }
