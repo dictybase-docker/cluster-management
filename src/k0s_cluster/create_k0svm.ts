@@ -1,10 +1,10 @@
 import { App } from "cdktf"
-import { K8Stack } from "./k8stack"
 import { K0Stack } from "./k0stack"
+import { K0sOutput } from "./k0soutput"
 import { argv } from "./command_options"
 
 const app = new App()
-const stack = new K8Stack(app, "instance", {
+const stack = new K0Stack(app, "instance", {
   remote: argv.r,
   nodes: argv.n,
   credentials: argv.c,
@@ -21,7 +21,7 @@ const stack = new K8Stack(app, "instance", {
   nodeMachineType: argv.nt,
   nodeDiskSize: argv.nd,
 })
-new K0Stack(app, "cluster", {
+new K0sOutput(app, "cluster", {
   master: stack.master,
   workers: stack.workers,
 })

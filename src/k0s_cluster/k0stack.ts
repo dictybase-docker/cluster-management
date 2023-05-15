@@ -2,13 +2,13 @@ import { TerraformStack, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import * as fs from "fs"
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
-import { K8Disk } from "./disk"
-import { VpcNetwork } from "./vpc"
-import { VmInstance } from "./instance"
+import { K8Disk } from "../construct/disk"
+import { VpcNetwork } from "../construct/vpc"
+import { VmInstance } from "../construct/instance"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
-import { numberToText } from "./stack_utils"
+import { numberToText } from "../stack_utils"
 
-type K8StackProperties = {
+type K0StackProperties = {
   remote: boolean
   nodes: number
   credentials: string
@@ -26,10 +26,10 @@ type K8StackProperties = {
   nodeDiskSize: number
 }
 
-class K8Stack extends TerraformStack {
+class K0Stack extends TerraformStack {
   public readonly master: ComputeInstance
   public readonly workers: Array<ComputeInstance>
-  constructor(scope: Construct, id: string, options: K8StackProperties) {
+  constructor(scope: Construct, id: string, options: K0StackProperties) {
     super(scope, id)
     const {
       remote,
@@ -99,4 +99,4 @@ class K8Stack extends TerraformStack {
   }
 }
 
-export { K8Stack }
+export { K0Stack }
