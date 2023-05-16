@@ -1,4 +1,4 @@
-import { createClusterYml, TagMatcher } from "../src/k0s_cluster"
+import { createClusterYml, TagMatcher } from "../src/k0s_cluster/k0scluster"
 import { parseDocument, Document, isSeq, isMap } from "yaml"
 import { hosts } from "./cluster_data"
 
