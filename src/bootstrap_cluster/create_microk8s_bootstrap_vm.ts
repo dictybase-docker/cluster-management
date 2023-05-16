@@ -91,12 +91,6 @@ const argv = yargs(process.argv.slice(2))
       default: "ubuntu-minimal-2204-jammy-v20230428",
       description: "disk image for the vm to boot",
     },
-    ss: {
-      alias: "startup-script",
-      type: "string",
-      default: "bootstrap_microk8s.sh",
-      description: "script to run on vm startup",
-    },
   })
   .parseSync()
 
@@ -115,6 +109,5 @@ new BootStrapInstanceStack(app, "microk8s-instance", {
   masterMachineType: argv.mm,
   masterDiskSize: argv.md,
   image: argv.im,
-  startupScript: argv.ss,
 })
 app.synth()
