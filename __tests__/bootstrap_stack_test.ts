@@ -7,7 +7,7 @@ import { ComputeFirewall } from "@cdktf/provider-google/lib/compute-firewall"
 import { ComputeDisk } from "@cdktf/provider-google/lib/compute-disk"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 import { ComputeAddress } from "@cdktf/provider-google/lib/compute-address"
-import { BootStrapInstanceStack } from "../src/bootstrap_stack"
+import { BootStrapInstanceStack } from "../src/bootstrap_cluster/bootstrap_stack"
 
 describe("BootStrapInstanceStack Application", () => {
   let stack: BootStrapInstanceStack
