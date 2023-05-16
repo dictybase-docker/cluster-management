@@ -7,14 +7,14 @@ import { ComputeFirewall } from "@cdktf/provider-google/lib/compute-firewall"
 import { ComputeDisk } from "@cdktf/provider-google/lib/compute-disk"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 import { ComputeAddress } from "@cdktf/provider-google/lib/compute-address"
-import { K8Stack } from "../src/k8stack"
+import { K0Stack } from "../src/k0s_cluster/k0stack"
 
 describe("VmInstanceStack Application", () => {
-  let stack: K8Stack
+  let stack: K0Stack
   let app: App
   beforeAll(() => {
     app = Testing.app()
-    stack = new K8Stack(app, "test-instance", {
+    stack = new K0Stack(app, "test-instance", {
       remote: false,
       nodes: 3,
       credentials: "test_cred.json",
