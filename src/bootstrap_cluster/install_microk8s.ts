@@ -1,10 +1,20 @@
 import { Client } from "ssh2"
-import { readFileSync, createReadStream, createWriteStream } from "fs"
-import { basename } from "path"
+import {
+  readFileSync,
+  createReadStream,
+  createWriteStream,
+  mkdtempSync,
+} from "fs"
+import { tmpdir } from "os"
+import { randomBytes } from "crypto"
+import { basename, join } from "path"
 import { argv } from "./command_line"
 import { getLogger } from "./log"
 
 const logger = getLogger(argv.l)
+
+const kubeconfigTempFile = () =>
+  join(tmpdir(), mkdtempSync("kube"), randomBytes(8).toString("hex"))
 
 const conn = new Client()
 conn
@@ -35,7 +45,8 @@ conn
               signal,
             )
             const krs = sftp.createReadStream(argv.kc)
-            const kws = createWriteStream(argv.kc)
+            const tmpFile = kubeconfigTempFile()
+            const kws = createWriteStream(tmpFile)
             krs.pipe(kws)
             kws.on("close", () => {
               logger.info("downloaded kubernetes file")
