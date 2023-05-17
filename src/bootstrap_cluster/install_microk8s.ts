@@ -14,11 +14,16 @@ import { parse, stringify } from "yaml"
 import { argv } from "./command_line"
 import { getLogger } from "./log"
 
-const logger = getLogger(argv.l)
-
 const kubeconfigTempFile = () =>
   join(mkdtempSync(tmpdir()), randomBytes(8).toString("hex"))
 
+const parseHost = (input: string) => {
+  const terraformObject = JSON.parse(readFileSync(input).toString())
+  return terraformObject["microk8s-instance"].master
+}
+
+const logger = getLogger(argv.l)
+const host = parseHost(argv.i)
 const conn = new Client()
 conn
   .on("ready", () => {
@@ -58,7 +63,7 @@ conn
               const docs = parse(readFileSync(tmpFile).toString())
               const existSeverURL = urlParse(docs.clusters.at(0).cluster.server)
               const newServerURL = new URL(
-                `${existSeverURL.protocol}//${argv.ho}:${existSeverURL.port}`,
+                `${existSeverURL.protocol}//${host}:${existSeverURL.port}`,
               )
               docs.clusters.at(0).cluster.server = newServerURL.toString()
               writeFileSync(argv.kc, stringify(docs))
@@ -76,7 +81,7 @@ conn
     })
   })
   .connect({
-    host: argv.ho,
+    host: host,
     username: argv.u,
     privateKey: readFileSync(argv.sk).toString(),
   })
