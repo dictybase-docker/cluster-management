@@ -4,10 +4,13 @@ import {
   createReadStream,
   createWriteStream,
   mkdtempSync,
+  writeFileSync,
 } from "fs"
+import { parse as urlParse, URL } from "url"
 import { tmpdir } from "os"
 import { randomBytes } from "crypto"
 import { basename, join } from "path"
+import { parse, stringify } from "yaml"
 import { argv } from "./command_line"
 import { getLogger } from "./log"
 
@@ -52,6 +55,13 @@ conn
               logger.info("downloaded kubernetes file")
               conn.end()
               logger.debug(tmpFile)
+              const docs = parse(readFileSync(tmpFile).toString())
+              const existSeverURL = urlParse(docs.clusters.at(0).cluster.server)
+              const newServerURL = new URL(
+                `${existSeverURL.protocol}//${argv.ho}:${existSeverURL.port}`,
+              )
+              docs.clusters.at(0).cluster.server = newServerURL.toString()
+              writeFileSync(argv.kc, stringify(docs))
             })
           })
           stream.stderr.on("data", (data) => {
