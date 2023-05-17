@@ -1,102 +1,60 @@
-import yargs from "yargs/yargs"
 import { Client } from "ssh2"
-import { readFileSync } from "fs"
-import { createLogger, transports, format } from "winston"
+import { readFileSync, createReadStream, createWriteStream } from "fs"
+import { basename } from "path"
+import { argv } from "./command_line"
+import { getLogger } from "./log"
 
-const argv = yargs(process.argv.slice(2))
-  .options({
-    ho: {
-      alias: "host",
-      type: "string",
-      description: "remote ssh server",
-      demandOption: true,
-    },
-    u: {
-      alias: "user",
-      type: "string",
-      description: "user name for remote server",
-      default: "newman",
-    },
-    sk: {
-      alias: "ssh-key",
-      description: "private ssh key file that will be used for login",
-      type: "string",
-      default: "k8sVM.pub",
-    },
-    ss: {
-      alias: "script",
-      type: "string",
-      default: "bootstrap_microk8s.sh",
-      description: "script to execute on remote server",
-    },
-    l: {
-      alias: "log-level",
-      type: "string",
-      default: "error",
-      description: "logging level, should be one of debug,info,warn,error",
-    },
-  })
-  .parseSync()
-
-const logger = createLogger({
-  level: argv.l,
-  transports: [new transports.Console()],
-  format: format.combine(
-    format.combine(
-      format.timestamp({
-        format: "YYYY-MM-DD HH:mm:ss",
-      }),
-      format.errors({ stack: true }),
-      format.splat(),
-    ),
-    format.timestamp({
-      format: "YYYY-MM-DD HH:mm:ss",
-    }),
-    format.errors({ stack: true }),
-    format.splat(),
-    format.json(),
-  ),
-})
+const logger = getLogger(argv.l)
 
 const conn = new Client()
-conn.connect({
-  host: argv.ho,
-  username: argv.u,
-  privateKey: readFileSync(argv.ss).toString(),
-})
-conn.on("ready", () => {
-  conn.sftp((err, sftp) => {
-    if (err) {
-      logger.error("error in sftp connection %s", err)
-      throw err
-    }
-    sftp.fastPut(argv.ss, "/tmp/", (err) => {
+conn
+  .on("ready", () => {
+    logger.info("client is ready")
+    const file = basename(argv.ss)
+    conn.sftp((err, sftp) => {
       if (err) {
-        logger.error(
-          "error %s in sftping the file %s to /tmp",
-          err,
-          `/tmp/${argv.ss}`,
-        )
+        logger.error("error in sftp connection %s", err)
         throw err
       }
+      logger.info("running sftp")
+      const rs = createReadStream(argv.ss)
+      const ws = sftp.createWriteStream(file)
+      rs.pipe(ws)
+      ws.on("close", () => {
+        logger.info("uploaded file %s", argv.ss)
+        conn.exec(`/usr/bin/sh ${file}`, (err, stream) => {
+          if (err) {
+            logger.error("error executing the file", err.message)
+            throw err
+          }
+          // @ts-ignore
+          stream.on("close", (code, signal) => {
+            logger.info(
+              "closed stream with code %s and signal %s",
+              code,
+              signal,
+            )
+            const krs = sftp.createReadStream(argv.kc)
+            const kws = createWriteStream(argv.kc)
+            krs.pipe(kws)
+            kws.on("close", () => {
+              logger.info("downloaded kubernetes file")
+              conn.end()
+            })
+          })
+          stream.stderr.on("data", (data) => {
+            logger.info("STDERR %s", data)
+          })
+          // @ts-ignore
+          stream.on("data", (data) => {
+            logger.info("STDOUT %s", data)
+          })
+        })
+      })
     })
   })
-  conn.exec(`/bin/sh /tmp/${argv.ss}`, (err, stream) => {
-    if (err) {
-      logger.error("error executing the file %s", err)
-      throw err
-    }
-    // @ts-ignore
-    stream.on("close", (code, signal) => {
-      logger.info("closed stream with code %s and signal %s", code, signal)
-      conn.end()
-    })
-    stream.stderr.on("data", (data) => {
-      logger.info("STDERR %s", data)
-    })
-    // @ts-ignore
-    stream.on("data", (data) => {
-      logger.info("STDOUT %s", data)
-    })
+  .connect({
+    host: argv.ho,
+    username: argv.u,
+    privateKey: readFileSync(argv.sk).toString(),
   })
-})
