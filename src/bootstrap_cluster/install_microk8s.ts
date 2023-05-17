@@ -14,7 +14,7 @@ import { getLogger } from "./log"
 const logger = getLogger(argv.l)
 
 const kubeconfigTempFile = () =>
-  join(tmpdir(), mkdtempSync("kube"), randomBytes(8).toString("hex"))
+  join(mkdtempSync(tmpdir()), randomBytes(8).toString("hex"))
 
 const conn = new Client()
 conn
@@ -39,7 +39,7 @@ conn
           }
           // @ts-ignore
           stream.on("close", (code, signal) => {
-            logger.info(
+            logger.debug(
               "closed stream with code %s and signal %s",
               code,
               signal,
@@ -51,6 +51,7 @@ conn
             kws.on("close", () => {
               logger.info("downloaded kubernetes file")
               conn.end()
+              logger.debug(tmpFile)
             })
           })
           stream.stderr.on("data", (data) => {

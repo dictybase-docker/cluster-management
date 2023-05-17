@@ -5,4 +5,4 @@ fi
 sudo usermod -a -G microk8s $USER
 sudo microk8s status --wait-ready
 sudo microk8s enable dns
-sudo microk8s.config > kubeconfig
+sudo microk8s.config > kubeconfig.yaml
