@@ -2,12 +2,6 @@ import yargs from "yargs/yargs"
 
 const argv = yargs(process.argv.slice(2))
   .options({
-    ho: {
-      alias: "host",
-      type: "string",
-      description: "remote ssh server",
-      demandOption: true,
-    },
     u: {
       alias: "user",
       type: "string",
