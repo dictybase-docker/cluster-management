@@ -23,7 +23,7 @@ const argv = yargs(process.argv.slice(2))
     ss: {
       alias: "script",
       type: "string",
-      default: "bootstrap_microk8s.sh",
+      default: "scripts/bootstrap_microk8s.sh",
       description: "script to execute on remote server",
     },
     l: {
@@ -35,7 +35,7 @@ const argv = yargs(process.argv.slice(2))
     kc: {
       alias: "kubeconfig",
       type: "string",
-      default: "kubeconfig",
+      default: "kubeconfig.yaml",
       description: "kubernetes config file of k8s cluster",
     },
     i: {
