@@ -76,6 +76,13 @@ const install_setup_microk8s = async () => {
       src: tmpTemplate,
       dest: "/var/snap/microk8s/current/certs/csr.conf.template",
     })
+    await uploadFile({
+      client: sftpClient,
+      src: argv.ss,
+      dest: basename(argv.rs),
+      logger,
+    })
+    await commandExec({ client, logger, remoteFile: basename(argv.rs) })
     client.end()
   } catch (err: any) {
     throw err
