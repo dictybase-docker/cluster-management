@@ -39,6 +39,13 @@ const argv = yargs(process.argv.slice(2))
       description:
         "json output file generated from terraform run containing the public ips of vm instance",
     },
+    ct: {
+      alias: "certificate-template",
+      type: "string",
+      default: "templates/csr.conf.template",
+      description:
+        "certificate template file that will be copied to server for ip based kubectl access",
+    },
   })
   .parseSync()
 
