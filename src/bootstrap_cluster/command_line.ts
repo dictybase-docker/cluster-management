@@ -2,6 +2,12 @@ import yargs from "yargs/yargs"
 
 const argv = yargs(process.argv.slice(2))
   .options({
+    rs: {
+      alias: "restart-script",
+      type: "string",
+      description: "script to restart the microk8s server",
+      default: "scripts/restart_microk8s.sh",
+    },
     u: {
       alias: "user",
       type: "string",
