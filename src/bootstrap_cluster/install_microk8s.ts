@@ -14,6 +14,21 @@ import { parse, stringify } from "yaml"
 import { argv } from "./command_line"
 import { getLogger } from "./log"
 
+type updateKubeConfigProperties = {
+  tmpFile: string
+  host: string
+}
+
+const updateKubeConfig = ({ tmpFile, host }: updateKubeConfigProperties) => {
+  const docs = parse(readFileSync(tmpFile).toString())
+  const existSeverURL = urlParse(docs.clusters.at(0).cluster.server)
+  const newServerURL = new URL(
+    `${existSeverURL.protocol}//${host}:${existSeverURL.port}`,
+  )
+  docs.clusters.at(0).cluster.server = newServerURL.toString()
+  writeFileSync(argv.kc, stringify(docs))
+}
+
 const kubeconfigTempFile = () =>
   join(mkdtempSync(tmpdir()), randomBytes(8).toString("hex"))
 
@@ -60,13 +75,7 @@ conn
               logger.info("downloaded kubernetes file")
               conn.end()
               logger.debug(tmpFile)
-              const docs = parse(readFileSync(tmpFile).toString())
-              const existSeverURL = urlParse(docs.clusters.at(0).cluster.server)
-              const newServerURL = new URL(
-                `${existSeverURL.protocol}//${host}:${existSeverURL.port}`,
-              )
-              docs.clusters.at(0).cluster.server = newServerURL.toString()
-              writeFileSync(argv.kc, stringify(docs))
+              updateKubeConfig({ tmpFile, host })
             })
           })
           stream.stderr.on("data", (data) => {
