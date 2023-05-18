@@ -1,18 +1,20 @@
-import { Client } from "ssh2"
-import {
-  readFileSync,
-  createReadStream,
-  createWriteStream,
-  mkdtempSync,
-  writeFileSync,
-} from "fs"
+import { Client, SFTPWrapper } from "ssh2"
+import { readFileSync, mkdtempSync, writeFileSync } from "fs"
 import { parse as urlParse, URL } from "url"
 import { tmpdir } from "os"
 import { randomBytes } from "crypto"
-import { basename, join } from "path"
+import { basename, join as joinPath } from "path"
 import { parse, stringify } from "yaml"
 import { argv } from "./command_line"
 import { getLogger } from "./log"
+import {
+  downloadFile,
+  uploadFile,
+  connectSftp,
+  connectClient,
+  commandExec,
+} from "./remote_ssh_manager"
+import { render, configure } from "Eta"
 
 type updateKubeConfigProperties = {
   tmpFile: string
@@ -29,8 +31,8 @@ const updateKubeConfig = ({ tmpFile, host }: updateKubeConfigProperties) => {
   writeFileSync(argv.kc, stringify(docs))
 }
 
-const kubeconfigTempFile = () =>
-  join(mkdtempSync(tmpdir()), randomBytes(8).toString("hex"))
+const tempy = () =>
+  joinPath(mkdtempSync(tmpdir()), randomBytes(8).toString("hex"))
 
 const parseHost = (input: string) => {
   const terraformObject = JSON.parse(readFileSync(input).toString())
@@ -39,58 +41,45 @@ const parseHost = (input: string) => {
 
 const logger = getLogger(argv.l)
 const host = parseHost(argv.i)
-const conn = new Client()
-conn
-  .on("ready", () => {
-    logger.info("client is ready")
+configure({ autoTrim: false, cache: true })
+
+const install_setup_microk8s = async () => {
+  try {
+    const client = (await connectClient({
+      host,
+      logger,
+      username: argv.u,
+      privateKey: readFileSync(argv.sk).toString(),
+    })) as Client
+    const sftpClient = (await connectSftp({ client, logger })) as SFTPWrapper
     const file = basename(argv.ss)
-    conn.sftp((err, sftp) => {
-      if (err) {
-        logger.error("error in sftp connection %s", err)
-        throw err
-      }
-      logger.info("running sftp")
-      const rs = createReadStream(argv.ss)
-      const ws = sftp.createWriteStream(file)
-      rs.pipe(ws)
-      ws.on("close", () => {
-        logger.info("uploaded file %s", argv.ss)
-        conn.exec(`/usr/bin/sh ${file}`, (err, stream) => {
-          if (err) {
-            logger.error("error executing the file", err.message)
-            throw err
-          }
-          // @ts-ignore
-          stream.on("close", (code, signal) => {
-            logger.debug(
-              "closed stream with code %s and signal %s",
-              code,
-              signal,
-            )
-            const krs = sftp.createReadStream(argv.kc)
-            const tmpFile = kubeconfigTempFile()
-            const kws = createWriteStream(tmpFile)
-            krs.pipe(kws)
-            kws.on("close", () => {
-              logger.info("downloaded kubernetes file")
-              conn.end()
-              logger.debug(tmpFile)
-              updateKubeConfig({ tmpFile, host })
-            })
-          })
-          stream.stderr.on("data", (data) => {
-            logger.info("STDERR %s", data)
-          })
-          // @ts-ignore
-          stream.on("data", (data) => {
-            logger.info("STDOUT %s", data)
-          })
-        })
-      })
+    await uploadFile({ client: sftpClient, src: argv.ss, dest: file, logger })
+    await commandExec({ client, logger, remoteFile: file })
+    const tmpFile = tempy()
+    await downloadFile({
+      client: sftpClient,
+      logger,
+      src: argv.kc,
+      dest: tmpFile,
     })
-  })
-  .connect({
-    host: host,
-    username: argv.u,
-    privateKey: readFileSync(argv.sk).toString(),
-  })
+    updateKubeConfig({ tmpFile, host })
+    const tmpTemplate = tempy()
+    writeFileSync(
+      tmpTemplate,
+      render(readFileSync(argv.ct).toString(), {
+        host: host,
+      }),
+    )
+    await uploadFile({
+      client: sftpClient,
+      logger,
+      src: tmpTemplate,
+      dest: "/var/snap/microk8s/current/certs/csr.conf.template",
+    })
+    client.end()
+  } catch (err: any) {
+    throw err
+  }
+}
+
+await install_setup_microk8s()
