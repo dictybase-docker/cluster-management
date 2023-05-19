@@ -19,8 +19,7 @@ class VmInstance extends Construct {
   public readonly staticIPaddress: ComputeAddress
   constructor(scope: Construct, id: string, properties: VmInstanceProperties) {
     super(scope, id)
-    const { machine, disk, network, subnetwork, sshKey, startupScript } =
-      properties
+    const { machine, disk, network, subnetwork, sshKey } = properties
     this.staticIPaddress = new ComputeAddress(this, `${id}-static-ip-address`, {
       name: `${id}-static-ip-address`,
     })
