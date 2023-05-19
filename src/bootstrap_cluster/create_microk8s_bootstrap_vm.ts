@@ -76,7 +76,7 @@ const argv = yargs(process.argv.slice(2))
     mm: {
       alias: "master-machine-type",
       type: "string",
-      default: "custom-2-2048",
+      default: "custom-2-3072",
       description: "The machine type for kubernetes controller",
     },
     md: {
