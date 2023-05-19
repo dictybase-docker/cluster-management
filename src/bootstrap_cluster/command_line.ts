@@ -2,6 +2,18 @@ import yargs from "yargs/yargs"
 
 const argv = yargs(process.argv.slice(2))
   .options({
+    rms: {
+      alias: "remove-script",
+      type: "string",
+      description: "script to remove microk8s",
+      default: "scripts/remove_microk8s.sh",
+    },
+    rmk: {
+      alias: "remove-microk8s",
+      type: "boolean",
+      description: "whether or not to remove microk8s",
+      default: false,
+    },
     rs: {
       alias: "restart-script",
       type: "string",
