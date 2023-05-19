@@ -26,7 +26,8 @@
 		"stripInternal": true,
 		"target": "ES2022",
 		"incremental": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"allowImportingTsExtensions": true
 	},
 	"include": [
 		"**/*.ts"
