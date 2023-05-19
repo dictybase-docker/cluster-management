@@ -53,6 +53,15 @@ const install_setup_microk8s = async () => {
     })) as Client
     const sftpClient = (await connectSftp({ client, logger })) as SFTPWrapper
     const file = basename(argv.ss)
+    if (argv.rmk) {
+      await uploadFile({
+        client: sftpClient,
+        src: argv.rms,
+        dest: basename(argv.rms),
+        logger,
+      })
+      await commandExec({ client, logger, remoteFile: basename(argv.rms) })
+    }
     await uploadFile({ client: sftpClient, src: argv.ss, dest: file, logger })
     await commandExec({ client, logger, remoteFile: file })
     const tmpFile = tempy()
