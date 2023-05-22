@@ -69,7 +69,7 @@ const argv = yargs(process.argv.slice(2))
     ip: {
       alias: "ip-cidr-range",
       type: "string",
-      default: "10.0.0.0/8",
+      default: "10.0.0.0/28",
       description:
         "The IP range in cidr notation for vpc subnet that will be assigned to nodes",
     },
