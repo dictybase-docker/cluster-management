@@ -1,5 +1,5 @@
 import { Testing } from "cdktf"
-import { server } from "./mocks/server"
+import { server } from "../src/mocks/server"
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())

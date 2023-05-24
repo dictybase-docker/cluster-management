@@ -1,6 +1,6 @@
 import yargs from "yargs/yargs"
 import { writeFileSync, readFileSync } from "fs"
-import { createClusterYml } from "./k0s_cluster"
+import { createClusterYml } from "./k0scluster"
 
 type TerraformOutputProperties = {
   instance: any

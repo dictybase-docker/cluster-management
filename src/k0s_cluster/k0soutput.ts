@@ -2,13 +2,13 @@ import { TerraformStack, TerraformOutput } from "cdktf"
 import { Construct } from "constructs"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 
-type K0StackProperties = {
+type K0sOutputProperties = {
   master: ComputeInstance
   workers: Array<ComputeInstance>
 }
 
-class K0Stack extends TerraformStack {
-  constructor(scope: Construct, id: string, options: K0StackProperties) {
+class K0sOutput extends TerraformStack {
+  constructor(scope: Construct, id: string, options: K0sOutputProperties) {
     super(scope, id)
     const { master, workers } = options
     new TerraformOutput(this, "master", {
@@ -22,4 +22,4 @@ class K0Stack extends TerraformStack {
   }
 }
 
-export { K0Stack }
+export { K0sOutput }

@@ -1,14 +1,16 @@
-import { TerraformStack, GcsBackend, TerraformOutput } from "cdktf"
+import { TerraformStack, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import * as fs from "fs"
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
-import { K8Disk } from "./disk"
-import { BootstrapVpcNetwork } from "./bootstrap_vpc"
-import { VmInstance } from "./instance"
+import { K8Disk } from "../construct/disk"
+import { VpcNetwork } from "../construct/vpc"
+import { VmInstance } from "../construct/instance"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
+import { numberToText } from "../stack_utils"
 
-type BootStrapInstanceStackProperties = {
+type K0StackProperties = {
   remote: boolean
+  nodes: number
   credentials: string
   bucketName: string
   bucketPrefix: string
@@ -20,19 +22,18 @@ type BootStrapInstanceStackProperties = {
   ipCidrRange: string
   masterMachineType: string
   masterDiskSize: number
-  image: string
+  nodeMachineType: string
+  nodeDiskSize: number
 }
 
-class BootStrapInstanceStack extends TerraformStack {
+class K0Stack extends TerraformStack {
   public readonly master: ComputeInstance
-  constructor(
-    scope: Construct,
-    id: string,
-    options: BootStrapInstanceStackProperties,
-  ) {
+  public readonly workers: Array<ComputeInstance>
+  constructor(scope: Construct, id: string, options: K0StackProperties) {
     super(scope, id)
     const {
       remote,
+      nodes,
       credentials,
       bucketName,
       bucketPrefix,
@@ -43,8 +44,9 @@ class BootStrapInstanceStack extends TerraformStack {
       ipCidrRange,
       masterMachineType,
       masterDiskSize,
+      nodeMachineType,
+      nodeDiskSize,
       sshKeyFile,
-      image,
     } = options
     if (remote) {
       new GcsBackend(this, {
@@ -59,25 +61,35 @@ class BootStrapInstanceStack extends TerraformStack {
       region: region,
       zone: zone,
     })
-    const vpcNetwork = new BootstrapVpcNetwork(this, `${id}-bootstrap-vpc`, {
+    const vpcNetwork = new VpcNetwork(this, `${id}-vpc`, {
       ports: ports,
       ipCidrRange: ipCidrRange,
     })
     const sshKey = this.#read_key_file(sshKeyFile)
-    this.master = new VmInstance(this, `${id}-vm-bootstrap`, {
+    this.master = new VmInstance(this, `${id}-vm-master`, {
       machine: masterMachineType,
-      disk: new K8Disk(this, `${id}-disk-bootstrap`, {
+      disk: new K8Disk(this, `${id}-disk-master`, {
         size: masterDiskSize,
-        image: image,
       }).disk,
       network: vpcNetwork.network,
       subnetwork: vpcNetwork.subnetwork,
       sshKey: sshKey,
     }).vmInstance
-
-    new TerraformOutput(this, "master", {
-      value: this.master.networkInterface.get(0).accessConfig.get(0).natIp,
-    })
+    this.workers = [...Array(nodes + 1).keys()]
+      .filter((num) => num !== 0)
+      .map(
+        (num) =>
+          new VmInstance(this, `${id}-vm-node-${numberToText(num)}`, {
+            machine: nodeMachineType,
+            network: vpcNetwork.network,
+            subnetwork: vpcNetwork.subnetwork,
+            sshKey: sshKey,
+            disk: new K8Disk(this, `${id}-disk-node-${numberToText(num)}`, {
+              size: nodeDiskSize,
+            }).disk,
+          }),
+      )
+      .map((w) => w.vmInstance)
   }
 
   #read_key_file(file: string) {
@@ -87,4 +99,4 @@ class BootStrapInstanceStack extends TerraformStack {
   }
 }
 
-export { BootStrapInstanceStack }
+export { K0Stack }

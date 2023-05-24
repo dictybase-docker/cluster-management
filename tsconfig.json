@@ -10,7 +10,7 @@
 			"es2022"
 		],
 		"module": "ES2022",
-		"moduleResolution": "nodenext",
+		"moduleResolution": "node",
 		"esModuleInterop": true,
 		"noEmitOnError": true,
 		"noFallthroughCasesInSwitch": true,
@@ -26,7 +26,8 @@
 		"stripInternal": true,
 		"target": "ES2022",
 		"incremental": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"allowImportingTsExtensions": true
 	},
 	"include": [
 		"**/*.ts"

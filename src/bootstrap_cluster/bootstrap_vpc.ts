@@ -40,7 +40,7 @@ class BootstrapVpcNetwork extends Construct {
         name: `${id}-allow-inbound-http-ssh`,
         network: this.network.id,
         sourceRanges: ["0.0.0.0/0"],
-        allow: [{ protocol: "tcp", ports: ["22", "6443"] }],
+        allow: [{ protocol: "tcp", ports: ["22", "16443"] }],
         direction: "INGRESS",
         logConfig: {
           metadata: "INCLUDE_ALL_METADATA",

@@ -1,6 +1,6 @@
 import yargs from "yargs/yargs"
 import { App } from "cdktf"
-import { BootStrapInstanceStack } from "./bootbootstrap_instance"
+import { BootStrapInstanceStack } from "./bootstrap_stack"
 
 const argv = yargs(process.argv.slice(2))
   .options({
@@ -69,14 +69,14 @@ const argv = yargs(process.argv.slice(2))
     ip: {
       alias: "ip-cidr-range",
       type: "string",
-      default: "10.0.0.8/19",
+      default: "10.0.0.0/28",
       description:
         "The IP range in cidr notation for vpc subnet that will be assigned to nodes",
     },
     mm: {
       alias: "master-machine-type",
       type: "string",
-      default: "custom-2-2048",
+      default: "custom-2-3072",
       description: "The machine type for kubernetes controller",
     },
     md: {
@@ -95,7 +95,7 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-new BootStrapInstanceStack(app, "bootstrap_k8s_instance", {
+new BootStrapInstanceStack(app, "microk8s-instance", {
   remote: argv.r,
   credentials: argv.c,
   bucketName: argv.bn,

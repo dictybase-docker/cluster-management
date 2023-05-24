@@ -7,7 +7,7 @@ import { ComputeFirewall } from "@cdktf/provider-google/lib/compute-firewall"
 import { ComputeDisk } from "@cdktf/provider-google/lib/compute-disk"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 import { ComputeAddress } from "@cdktf/provider-google/lib/compute-address"
-import { BootStrapInstanceStack } from "../src/bootstrap_stack"
+import { BootStrapInstanceStack } from "../src/bootstrap_cluster/bootstrap_stack"
 
 describe("BootStrapInstanceStack Application", () => {
   let stack: BootStrapInstanceStack
@@ -28,6 +28,7 @@ describe("BootStrapInstanceStack Application", () => {
       masterMachineType: "2-2033",
       masterDiskSize: 10,
       image: "bora-bora",
+      startupScript: "test_cred.json",
     })
   })
   test("check if it has google provider", () => {
@@ -61,7 +62,7 @@ describe("BootStrapInstanceStack Application", () => {
       name: "test-instance-bootstrap-vpc-allow-inbound-http-ssh",
       direction: "INGRESS",
       source_ranges: ["0.0.0.0/0"],
-      allow: [{ protocol: "tcp", ports: ["22", "6443"] }],
+      allow: [{ protocol: "tcp", ports: ["22", "16443"] }],
       log_config: {
         metadata: "INCLUDE_ALL_METADATA",
       },
