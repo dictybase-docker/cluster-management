@@ -1,29 +1,7 @@
-import { Logger as LogHandler } from "winston"
 import { exec } from "child_process"
 import { getLogger } from "./log"
 import { argv } from "./command_line"
-
-type runCommandProperties = {
-  logger: LogHandler
-  cmd: string
-}
-
-const runCommand = ({ cmd, logger }: runCommandProperties) => {
-  return new Promise((resolve, reject) => {
-    logger.debug("going to run command %s", cmd)
-    exec(cmd, (err, stdout, stderr) => {
-      if (err) {
-        logger.error("error in running %s", err.message)
-        return reject(err)
-      }
-      if (stderr) {
-        logger.error("unexpected error %s", stderr)
-        return reject(stderr)
-      }
-      resolve(stdout)
-    })
-  })
-}
+import { promisify } from "util"
 
 const runKops = async () => {
   const logger = getLogger(argv.l)
@@ -48,9 +26,18 @@ const runKops = async () => {
       `--node-volume-size=${argv.nvs} `,
       `--node-count=${argv.nc}`,
     ]
-    await runCommand({ cmd: kopsCmd.join(""), logger })
-  } catch (error) {
-    throw error
+    const promisedExec = promisify(exec)
+    const cmd = kopsCmd.join(" ")
+    logger.debug("going to run command %s", cmd)
+    const { stdout, stderr } = await promisedExec(cmd, {
+      maxBuffer: 1024 * 1024 * 1024 * 1024,
+    })
+    if (stderr) {
+      logger.info("stderr output %s", stderr)
+    }
+    logger.info("successful run of command %s", stdout)
+  } catch (err) {
+    logger.error("error in running command %s", err)
   }
 }
 
