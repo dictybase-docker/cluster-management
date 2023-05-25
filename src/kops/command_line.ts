@@ -68,7 +68,7 @@ const argv = yargs(process.argv.slice(2))
     mc: {
       alias: "master-count",
       type: "string",
-      default: 2,
+      default: 1,
       describe: "no of kubernetes master to create",
     },
     mvs: {
@@ -81,13 +81,13 @@ const argv = yargs(process.argv.slice(2))
       alias: "image",
       type: "string",
       description: "compute image to be used for the vm",
-      value: "ubuntu-os-cloud/ubuntu-minimal-2204-jammy-v20230428",
+      default: "ubuntu-os-cloud/ubuntu-minimal-2204-jammy-v20230428",
     },
     kv: {
       alias: "kubernetes-version",
       type: "string",
       describe: "version of kubernetes cluster",
-      value: "1.24.12",
+      default: "1.24.12",
     },
     ns: {
       alias: "node-size",
