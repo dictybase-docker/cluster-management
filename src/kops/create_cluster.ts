@@ -28,7 +28,9 @@ const runCommand = ({ cmd, logger }: runCommandProperties) => {
 const runKops = async () => {
   const logger = getLogger(argv.l)
   try {
-    let kopsCmd: Array<string | number | undefined> = Array.of("kops ")
+    let kopsCmd: Array<string | number | undefined> = Array.of(
+      "kops create cluster ",
+    )
     kopsCmd = [
       ...kopsCmd,
       `--cloud=${argv.cp} `,
