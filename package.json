@@ -4,6 +4,7 @@
     "main": "src/main.ts",
     "types": "src/main.ts",
     "private": true,
+    "type": "module",
     "scripts": {
         "get": "cdktf get",
         "build": "tsc",
