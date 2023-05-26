@@ -2,11 +2,14 @@ import yargs from "yargs/yargs"
 import { KubeConfig, StorageV1Api } from "@kubernetes/client-node"
 import { getLogger } from "../kops/log"
 
-type createStorageClassProperties = {
+type deleteStorageClassProperties = {
   config: string
   name: string
-  diskType: string
   level: string
+}
+
+type createStorageClassProperties = deleteStorageClassProperties & {
+  diskType: string
 }
 
 const listStorage = async (config: string) => {
@@ -15,6 +18,27 @@ const listStorage = async (config: string) => {
   const k8sApi = kubeconfig.makeApiClient(StorageV1Api)
   const res = await k8sApi.listStorageClass()
   return res.body.items.map((sc) => sc.metadata?.name)
+}
+
+const deleteStorageClass = async ({
+  name,
+  config,
+  level,
+}: deleteStorageClassProperties) => {
+  const logger = getLogger(level)
+  try {
+    const storages = await listStorage(config)
+    if (!storages.includes(name)) {
+      logger.warn("storage class %s is not present, cannot be deleted", name)
+      return
+    }
+    const kubeconfig = new KubeConfig()
+    kubeconfig.loadFromFile(config)
+    await kubeconfig.makeApiClient(StorageV1Api).deleteStorageClass(name)
+    logger.info("deleted storage class %s", name)
+  } catch (error) {
+    logger.error(error)
+  }
 }
 
 const createStorageClass = async ({
@@ -104,8 +128,9 @@ yargs(process.argv.slice(2))
         describe: "name of the storage class",
       },
     },
-    (argv) => {
-      console.log(argv.n)
+    async (argv) => {
+      // @ts-ignore
+      await deleteStorageClass({ config: argv.kc, level: argv.l, name: argv.n })
     },
   )
   .options({
