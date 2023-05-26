@@ -26,6 +26,7 @@
     "dependencies": {
         "@cdktf/provider-google": "7.x",
         "@cdktf/provider-local": "^6.0.0",
+        "@kubernetes/client-node": "0.13",
         "@octokit/rest": "^19.0.9",
         "cdktf": "0.16.x",
         "cdktf-cli": "0.16.x",
