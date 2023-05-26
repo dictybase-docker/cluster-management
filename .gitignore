@@ -17,3 +17,6 @@ kubeconfig.yaml
 kubeconfig.yml
 github_token.txt
 .tool-versions
+.envrc
+env/
+*kubeconfig.yaml
