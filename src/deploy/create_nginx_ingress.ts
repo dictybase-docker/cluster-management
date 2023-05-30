@@ -57,22 +57,22 @@ class NginxIngress extends TerraformStack {
 const argv = yargs(process.argv.slice(2))
   .options({
     nm: {
-      describe: "kubernetes namespace where the ingress will be installed",
+      describe: "kubernetes namespace where the chart will be installed",
       type: "string",
       alias: "namespace",
-      default: "ingress-manager",
+      demandOption: true,
     },
     ch: {
       describe: "name of the chart",
       type: "string",
       alias: "chart",
-      default: "ingress-nginx",
+      demandOption: true,
     },
     repo: {
       describe: "helm chart reposotiry location",
       type: "string",
       alias: "repository",
-      default: "https://kubernetes.github.io/ingress-nginx",
+      demandOption: true,
     },
     kc: {
       describe: "kubernetes config file",
