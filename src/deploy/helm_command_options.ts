@@ -2,7 +2,7 @@ import yargs from "yargs/yargs"
 
 const helmArgv = yargs(process.argv.slice(2))
   .options({
-    nm: {
+    ns: {
       describe: "kubernetes namespace where the chart will be installed",
       type: "string",
       alias: "namespace",
