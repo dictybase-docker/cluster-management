@@ -424,6 +424,11 @@
   resolved "https://registry.yarnpkg.com/@cdktf/provider-google/-/provider-google-7.0.7.tgz#e3ffee58c5fd1867e4b8f4404dac44b1bafb174d"
   integrity sha512-83MhkQm9TXxBeDJ64EyFNHYKmtds/liNWylYNwU0cSnB7v2daqdjzkMpjBOWdovepmGtytmEH2L6BZdw4M2wwg==
 
+"@cdktf/provider-helm@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@cdktf/provider-helm/-/provider-helm-6.0.0.tgz#9f7317c73c303a2518cb9d1b57a09b746001e8d1"
+  integrity sha512-hy1pzgxQ4/JM2xTKtUF6UbmM86BxrX4fIeU4ZdNGudPzBxo10gODYS3tUTReKi3gcPSwicAhncC3I1TPM4oGUQ==
+
 "@cdktf/provider-local@^6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@cdktf/provider-local/-/provider-local-6.0.0.tgz#097bf148a6706cd55310b5ce231e95c8f0774b15"
@@ -4828,7 +4833,14 @@ semver-intersect@^1.4.0:
   dependencies:
     semver "^5.0.0"
 
-semver@^5.0.0:
+semver@7.x, semver@^7.3.2, semver@^7.3.5, semver@^7.3.8, semver@^7.4.0:
+  version "7.5.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.0.tgz#ed8c5dc8efb6c629c88b23d41dc9bf40c1d96cd0"
+  integrity sha512-+XC0AD/R7Q2mPSRuy2Id0+CGTZ98+8f+KvwirxOKIEyid+XSx6HbC63p+O4IndTHuX5Z+JxQ0TghCkO5Cg/2HA==
+  dependencies:
+    lru-cache "^6.0.0"
+
+semver@^5.0.0, semver@^5.5.0:
   version "5.7.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.1.tgz#a954f931aeba508d307bbf069eff0c01c96116f7"
   integrity sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==
@@ -4837,13 +4849,6 @@ semver@^6.0.0, semver@^6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
-
-semver@^7.3.2, semver@^7.3.5, semver@^7.3.8, semver@^7.4.0:
-  version "7.5.0"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.0.tgz#ed8c5dc8efb6c629c88b23d41dc9bf40c1d96cd0"
-  integrity sha512-+XC0AD/R7Q2mPSRuy2Id0+CGTZ98+8f+KvwirxOKIEyid+XSx6HbC63p+O4IndTHuX5Z+JxQ0TghCkO5Cg/2HA==
-  dependencies:
-    lru-cache "^6.0.0"
 
 set-blocking@^2.0.0:
   version "2.0.0"
