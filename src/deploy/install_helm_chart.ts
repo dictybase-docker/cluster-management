@@ -15,6 +15,7 @@ type HelmChartProperties = {
   repo: string
   namespace: string
   chart: string
+  name: string
 }
 
 class HelmChart extends TerraformStack {
@@ -29,6 +30,7 @@ class HelmChart extends TerraformStack {
       bucketPrefix,
       config,
       repo,
+      name,
     } = options
     super(scope, id)
     if (remote) {
@@ -44,7 +46,7 @@ class HelmChart extends TerraformStack {
       },
     })
     new Release(this, id, {
-      name: chart,
+      name: name,
       chart: chart,
       repository: repo,
       createNamespace: true,
@@ -55,7 +57,7 @@ class HelmChart extends TerraformStack {
 }
 
 const app = new App()
-new HelmChart(app, argv.ch, {
+new HelmChart(app, argv.nm, {
   config: argv.kc,
   version: argv.v,
   remote: argv.r,
@@ -63,7 +65,8 @@ new HelmChart(app, argv.ch, {
   bucketName: argv.bn,
   bucketPrefix: argv.bp,
   repo: argv.repo,
-  namespace: argv.nm,
+  namespace: argv.ns,
   chart: argv.ch,
+  name: argv.nm,
 })
 app.synth()
