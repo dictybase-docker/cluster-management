@@ -5,7 +5,7 @@ import { HelmProvider } from "@cdktf/provider-helm/lib/provider"
 import { Release } from "@cdktf/provider-helm/lib/release"
 import { readFileSync } from "fs"
 
-type NginxIngressProperties = {
+type HelmChartProperties = {
   config: string
   version: string
   remote: boolean
@@ -17,8 +17,8 @@ type NginxIngressProperties = {
   chart: string
 }
 
-class NginxIngress extends TerraformStack {
-  constructor(scope: Construct, id: string, options: NginxIngressProperties) {
+class HelmChart extends TerraformStack {
+  constructor(scope: Construct, id: string, options: HelmChartProperties) {
     const {
       version,
       chart,
@@ -118,7 +118,7 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-new NginxIngress(app, argv.ch, {
+new HelmChart(app, argv.ch, {
   config: argv.kc,
   version: argv.v,
   remote: argv.r,
