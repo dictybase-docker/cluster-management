@@ -18,7 +18,7 @@ type HelmChartProperties = {
   name: string
 }
 
-class HelmChart extends TerraformStack {
+class HelmChartStack extends TerraformStack {
   constructor(scope: Construct, id: string, options: HelmChartProperties) {
     const {
       version,
@@ -57,7 +57,7 @@ class HelmChart extends TerraformStack {
 }
 
 const app = new App()
-new HelmChart(app, argv.nm, {
+new HelmChartStack(app, argv.nm, {
   config: argv.kc,
   version: argv.v,
   remote: argv.r,
