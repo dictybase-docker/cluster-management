@@ -6,8 +6,8 @@ import { readFileSync } from "fs"
 
 type RedisStandAloneStackProperties = {
   config: string
-  redisVersion: number
-  redisExporterVersion: number
+  redisVersion: string
+  redisExporterVersion: string
   remote: boolean
   credentials: string
   bucketName: string
