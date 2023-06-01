@@ -26,7 +26,7 @@ const argv = yargs(process.argv.slice(2))
       describe: "pgo helm chart reposotiry location",
       type: "string",
       alias: "repository",
-      default: "oci://registry.developers.crunchydata.com/crunchydata/pgo",
+      default: "oci://registry.developers.crunchydata.com/crunchydata",
     },
     kc: {
       describe: "kubernetes config file",
@@ -50,9 +50,9 @@ const argv = yargs(process.argv.slice(2))
     bp: {
       alias: "bucket-prefix",
       type: "string",
-      default: "kops-cluster-cdktf",
       description:
         "GCS bucket folder prefix where terraform remote state is stored.",
+      default: "postgresql-operator",
     },
     r: {
       alias: "remote",
@@ -83,5 +83,6 @@ new HelmChartStack(app, argv.nm, {
   namespace: argv.ns,
   chart: argv.ch,
   name: argv.nm,
+  values: [{ name: "disable_check_for_upgrades", value: "true" }],
 })
 app.synth()
