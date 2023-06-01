@@ -1,7 +1,7 @@
 import { App, TerraformStack, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import { HelmProvider } from "@cdktf/provider-helm/lib/provider"
-import { Release } from "@cdktf/provider-helm/lib/release"
+import { Release, ReleaseSet } from "@cdktf/provider-helm/lib/release"
 import { readFileSync } from "fs"
 import { helmArgv as argv } from "./helm_command_options"
 
@@ -16,6 +16,7 @@ type HelmChartProperties = {
   namespace: string
   chart: string
   name: string
+  values?: Array<ReleaseSet>
 }
 
 class HelmChartStack extends TerraformStack {
@@ -31,6 +32,7 @@ class HelmChartStack extends TerraformStack {
       config,
       repo,
       name,
+      values,
     } = options
     super(scope, id)
     if (remote) {
@@ -52,6 +54,7 @@ class HelmChartStack extends TerraformStack {
       createNamespace: true,
       namespace,
       version,
+      set: values,
     })
   }
 }
