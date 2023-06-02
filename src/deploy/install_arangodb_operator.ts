@@ -84,6 +84,8 @@ new HelmChartStack(app, "kube-arangodb", {
   namespace: argv.ns,
   chart: `kube-arangodb-${argv.v}.tgz`,
   name: "kube-arangodb",
-  values: [{ name: "DeploymentReplication.Create", value: "false" }],
+  values: [
+    { name: "operator.features.deploymentReplications", value: "false" },
+  ],
 })
 app.synth()
