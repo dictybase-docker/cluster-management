@@ -25,6 +25,7 @@ const runKops = async () => {
       `--node-size=${argv.ns} `,
       `--node-volume-size=${argv.nvs} `,
       `--node-count=${argv.nc}`,
+      `--networking cillium-etcd`,
     ]
     const promisedExec = promisify(exec)
     const cmd = kopsCmd.join(" ")
