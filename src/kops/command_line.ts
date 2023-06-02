@@ -62,7 +62,7 @@ const argv = yargs(process.argv.slice(2))
     ms: {
       alias: "master-size",
       type: "string",
-      default: "n1-custom-2-2048",
+      default: "n1-custom-4-8192",
       description: "The machine type for kubernetes master",
     },
     mc: {
