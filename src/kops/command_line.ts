@@ -87,7 +87,7 @@ const argv = yargs(process.argv.slice(2))
       alias: "kubernetes-version",
       type: "string",
       describe: "version of kubernetes cluster",
-      default: "1.24.12",
+      default: process.env.KUBERNETES_VERSION,
     },
     ns: {
       alias: "node-size",
