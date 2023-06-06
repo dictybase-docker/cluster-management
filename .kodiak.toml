@@ -11,3 +11,7 @@ usernames = ["dependabot"]
 # dependabot to update and close stale dependency upgrades.
 [update]
 ignored_usernames = ["dependabot"]
+
+[merge]
+method = "rebase_fast_forward"
+delete_branch_on_merge = true
