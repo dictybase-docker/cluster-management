@@ -21,7 +21,6 @@ const argv = yargs(process.argv.slice(2))
       type: "string",
       demandOption: true,
       alias: "kubeconfig",
-      default: process.env.KUBECONFIG,
     },
     c: {
       alias: "credentials",
@@ -38,7 +37,7 @@ const argv = yargs(process.argv.slice(2))
     bp: {
       alias: "bucket-prefix",
       type: "string",
-      default: "redis-operator",
+      default: "redis",
       description:
         "GCS bucket folder prefix where terraform remote state is stored.",
     },
