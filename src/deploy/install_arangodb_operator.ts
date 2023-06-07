@@ -67,7 +67,7 @@ yargs(process.argv.slice(2))
           "kubernetes namespace where the arangodb operator will be installed",
         type: "string",
         alias: "namespace",
-        default: "operators",
+        demandOption: true,
       },
       repo: {
         describe: "arangodb helm operator chart reposotiry location",
@@ -80,7 +80,6 @@ yargs(process.argv.slice(2))
         type: "string",
         demandOption: true,
         alias: "kubeconfig",
-        default: process.env.KUBECONFIG,
       },
       c: {
         alias: "credentials",
@@ -116,13 +115,13 @@ yargs(process.argv.slice(2))
     },
     (argv) => {
       const app = new App()
-      new HelmChartStack(app, "kube-arangodb", {
+      new HelmChartStack(app, "kube-arangodb".concat("-").concat(argv.ns), {
         config: argv.kc,
         version: argv.v,
         remote: argv.r,
         credentials: argv.c,
         bucketName: argv.bn,
-        bucketPrefix: argv.bp,
+        bucketPrefix: argv.bp.concat("-").concat(argv.ns),
         namespace: argv.ns,
         chart: `${argv.repo}/${argv.v}/kube-arangodb-${argv.v}.tgz`,
         name: "kube-arangodb",
