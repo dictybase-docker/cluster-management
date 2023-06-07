@@ -76,7 +76,7 @@ new ArangodbSingle(app, argv.nm, {
     remote: argv.r,
     credentials: argv.c,
     bucketName: argv.bn,
-    bucketPrefix: argv.nm.concat(argv.ns),
+    bucketPrefix: argv.nm.concat("-").concat(argv.ns),
   },
   resource: {
     namespace: argv.ns,
