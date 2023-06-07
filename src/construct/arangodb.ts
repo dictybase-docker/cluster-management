@@ -50,15 +50,6 @@ class ArangodbSingle extends TerraformStack {
       enabled: true,
       image: `arangodb/arangodb-exporter:${arangodbExporterVersion}`,
     }
-    const annotations = {
-      "prometheus.io/scrape": true,
-      "prometheus.io/port": "9101",
-      "prometheus.io/scrape_interval": "10s",
-    }
-    const image = {
-      image: `arangodb/arangodb:${arangodbVersion}`,
-      imagePullPolicy: "IfNotPresent",
-    }
     const storage = {
       volumeClaimTemplate: {
         spec: {
@@ -74,12 +65,13 @@ class ArangodbSingle extends TerraformStack {
     }
     const spec = {
       metrics,
-      annotations,
-      image,
+      image: `arangodb/arangodb:${arangodbVersion}`,
+      imagePullPolicy: "IfNotPresent",
       mode: "Single",
       environment: "Development",
       single: storage,
       externalAccess: { type: "NodePort" },
+      tls: { caSecretName: "None" },
     }
     const metadata = {
       name: name,
