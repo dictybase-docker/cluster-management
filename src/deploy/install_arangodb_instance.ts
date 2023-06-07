@@ -71,16 +71,20 @@ const argv = yargs(process.argv.slice(2))
 
 const app = new App()
 new ArangodbSingle(app, argv.nm, {
-  config: argv.kc,
-  redisVersion: argv.rv,
-  redisExporterVersion: argv.rxv,
-  remote: argv.r,
-  credentials: argv.c,
-  bucketName: argv.bn,
-  bucketPrefix: argv.bp,
-  namespace: argv.ns,
-  name: argv.nm,
-  storageClass: argv.sc,
-  storageSize: argv.ss,
+  provider: {
+    config: argv.kc,
+    remote: argv.r,
+    credentials: argv.c,
+    bucketName: argv.bn,
+    bucketPrefix: argv.nm.concat(argv.ns),
+  },
+  resource: {
+    namespace: argv.ns,
+    name: argv.nm,
+    storageClass: argv.sc,
+    storageSize: argv.ss,
+    arangodbVersion: argv.av,
+    arangodbExporterVersion: argv.axv,
+  },
 })
 app.synth()
