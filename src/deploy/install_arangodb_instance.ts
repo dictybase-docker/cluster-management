@@ -32,7 +32,7 @@ const argv = yargs(process.argv.slice(2))
       describe: "name of the install",
       alias: "name",
       type: "string",
-      default: "redis",
+      default: "arangodb",
     },
     ns: {
       describe: "kubernetes namespace where the chart will be installed",
