@@ -1,5 +1,5 @@
 import yargs from "yargs/yargs"
-import { ArangodbSingle } from "../construct/arangodb"
+import { ArangodbSingleStack } from "../construct/arangodb"
 import { App } from "cdktf"
 
 const argv = yargs(process.argv.slice(2))
@@ -70,7 +70,7 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-new ArangodbSingle(app, argv.nm, {
+new ArangodbSingleStack(app, argv.nm, {
   provider: {
     config: argv.kc,
     remote: argv.r,
