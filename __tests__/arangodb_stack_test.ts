@@ -5,7 +5,7 @@ import {
   testManifest,
   testTerraform,
   testKubernetesProvider,
-} from "./common_unit"
+} from "../src/common_unit"
 
 describe("ArangodbSingleStack", () => {
   const mockedOptions = {

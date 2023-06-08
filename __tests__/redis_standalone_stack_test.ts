@@ -5,7 +5,7 @@ import {
   testManifest,
   testKubernetesProvider,
   testTerraform,
-} from "./common_unit"
+} from "../src/common_unit"
 
 describe("RedisStandAloneStack", () => {
   const mockedOptions = {

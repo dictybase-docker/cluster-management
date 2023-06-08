@@ -3,7 +3,7 @@ import { HelmProvider } from "@cdktf/provider-helm/lib/provider"
 import { Testing, App } from "cdktf"
 import { Release } from "@cdktf/provider-helm/lib/release"
 import { HelmChartStack } from "../src/construct/helm"
-import { testTerraform } from "./common_unit"
+import { testTerraform } from "../src/common_unit"
 
 describe("HelmChartStack", () => {
   const mockedOptions = {
