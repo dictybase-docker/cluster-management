@@ -1,8 +1,11 @@
 import "cdktf/lib/testing/adapters/jest" // Load types for expect matchers
 import { Testing, App } from "cdktf"
-import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
-import { Manifest } from "@cdktf/provider-kubernetes/lib/manifest"
 import { RedisStandAloneStack } from "../src/construct/redis"
+import {
+  testManifest,
+  testKubernetesProvider,
+  testTerraform,
+} from "./common_unit"
 
 describe("RedisStandAloneStack", () => {
   const mockedOptions = {
@@ -24,13 +27,9 @@ describe("RedisStandAloneStack", () => {
     app = Testing.app()
     stack = new RedisStandAloneStack(app, "test-redis", mockedOptions)
   })
-  test("check if it has kubernetes provider", () => {
-    expect(Testing.synth(stack)).toHaveProvider(KubernetesProvider)
-  })
-  test("check if it has manifest resource", () => {
-    expect(Testing.synth(stack)).toHaveResource(Manifest)
-  })
-  test("check if the produced terraform configuration is valid", () => {
-    expect(Testing.fullSynth(stack)).toBeValidTerraform()
-  })
+  test("check if it has kubernetes provider", () =>
+    testKubernetesProvider(stack))
+  test("check if it has manifest resource", () => testManifest(stack))
+  test("check if the produced terraform configuration is valid", () =>
+    testTerraform(stack))
 })

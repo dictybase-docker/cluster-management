@@ -1,8 +1,11 @@
 import "cdktf/lib/testing/adapters/jest" // Load types for expect matchers
 import { Testing, App } from "cdktf"
-import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
-import { Manifest } from "@cdktf/provider-kubernetes/lib/manifest"
 import { ArangodbSingleStack } from "../src/construct/arangodb"
+import {
+  testManifest,
+  testTerraform,
+  testKubernetesProvider,
+} from "./common_unit"
 
 describe("ArangodbSingleStack", () => {
   const mockedOptions = {
@@ -28,13 +31,9 @@ describe("ArangodbSingleStack", () => {
     app = Testing.app()
     stack = new ArangodbSingleStack(app, "test-arango", mockedOptions)
   })
-  test("check if it has kubernetes provider", () => {
-    expect(Testing.synth(stack)).toHaveProvider(KubernetesProvider)
-  })
-  test("check if it has manifest resource", () => {
-    expect(Testing.synth(stack)).toHaveResource(Manifest)
-  })
-  test("check if the produced terraform configuration is valid", () => {
-    expect(Testing.fullSynth(stack)).toBeValidTerraform()
-  })
+  test("check if it has kubernetes provider", () =>
+    testKubernetesProvider(stack))
+  test("check if it has manifest resource", () => testManifest(stack))
+  test("check if the produced terraform configuration is valid", () =>
+    testTerraform(stack))
 })
