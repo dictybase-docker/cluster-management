@@ -10,8 +10,8 @@ import {
 describe("RedisStandAloneStack", () => {
   const mockedOptions = {
     config: "/path/to/config",
-    redisVersion: 5,
-    redisExporterVersion: 1,
+    redisVersion: "5",
+    redisExporterVersion: "1",
     remote: false,
     credentials: "test_cred.json",
     bucketName: "my-bucket",
