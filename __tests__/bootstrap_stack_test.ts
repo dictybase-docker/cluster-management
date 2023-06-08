@@ -8,6 +8,7 @@ import { ComputeDisk } from "@cdktf/provider-google/lib/compute-disk"
 import { ComputeInstance } from "@cdktf/provider-google/lib/compute-instance"
 import { ComputeAddress } from "@cdktf/provider-google/lib/compute-address"
 import { BootStrapInstanceStack } from "../src/bootstrap_cluster/bootstrap_stack"
+import { testTerraform } from "../src/common_unit"
 
 describe("BootStrapInstanceStack Application", () => {
   let stack: BootStrapInstanceStack
@@ -92,6 +93,6 @@ describe("BootStrapInstanceStack Application", () => {
     })
   })
   test("check if the produced terraform configuration is valid", () => {
-    expect(Testing.fullSynth(stack)).toBeValidTerraform()
+    testTerraform(stack)
   })
 })
