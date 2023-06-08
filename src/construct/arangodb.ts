@@ -19,12 +19,16 @@ type Resource = {
   storageClass: string
   storageSize: number
 }
-type ArangodbSingleProperties = {
+type ArangodbSingleStackProperties = {
   provider: Provider
   resource: Resource
 }
-class ArangodbSingle extends TerraformStack {
-  constructor(scope: Construct, id: string, options: ArangodbSingleProperties) {
+class ArangodbSingleStack extends TerraformStack {
+  constructor(
+    scope: Construct,
+    id: string,
+    options: ArangodbSingleStackProperties,
+  ) {
     const {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
       resource: {
@@ -88,4 +92,4 @@ class ArangodbSingle extends TerraformStack {
   }
 }
 
-export { ArangodbSingle }
+export { ArangodbSingleStack }
