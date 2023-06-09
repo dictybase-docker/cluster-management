@@ -48,7 +48,7 @@ class PostgresStack extends TerraformStack {
       },
     }
     const spec = {
-      image: `registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-${postgresVersion}`,
+      image: `registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-${version}`,
       imagePullPolicy: "IfNotPresent",
       instances: [
         {
