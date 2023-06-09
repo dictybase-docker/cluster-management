@@ -48,6 +48,7 @@ class PostgresStack extends TerraformStack {
       },
     }
     const spec = {
+      postgresVersion,
       image: `registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-${version}`,
       imagePullPolicy: "IfNotPresent",
       instances: [
@@ -62,7 +63,6 @@ class PostgresStack extends TerraformStack {
       manifest: {
         apiVersion: "postgres-operator.crunchydata.com/v1beta1",
         kind: "PostgresCluster",
-        postgresVersion,
         metadata,
         spec,
       },
