@@ -65,13 +65,14 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-new PostgresStack(app, argv.nm, {
+const deployName = argv.nm.concat("-").concat(argv.ns)
+new PostgresStack(app, deployName, {
   provider: {
     config: argv.kc,
     remote: argv.r,
     credentials: argv.c,
     bucketName: argv.bn,
-    bucketPrefix: argv.nm.concat("-").concat(argv.ns),
+    bucketPrefix: deployName,
   },
   resource: {
     namespace: argv.ns,
