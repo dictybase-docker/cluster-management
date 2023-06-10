@@ -424,10 +424,10 @@
   resolved "https://registry.yarnpkg.com/@cdktf/provider-google/-/provider-google-7.0.10.tgz#926a6cc7d2e6e2ba5ee5b4449c5cbf10f1cc87f4"
   integrity sha512-LMcPjy5GeE8K5oO3FuhS/mradk2b8Jr0yTMkOf+qD796EAuWvjSSZ++vIEm7/pQm2kjx3ctF/khVAQeczk9pEw==
 
-"@cdktf/provider-helm@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@cdktf/provider-helm/-/provider-helm-6.0.0.tgz#9f7317c73c303a2518cb9d1b57a09b746001e8d1"
-  integrity sha512-hy1pzgxQ4/JM2xTKtUF6UbmM86BxrX4fIeU4ZdNGudPzBxo10gODYS3tUTReKi3gcPSwicAhncC3I1TPM4oGUQ==
+"@cdktf/provider-helm@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@cdktf/provider-helm/-/provider-helm-6.0.1.tgz#227086aa2f5a09fc9c87e7cb3cbf9efbf472a702"
+  integrity sha512-VLo1NVeqx5VkeIKWc0hRdaPRjEAvYL/cHwgxxcr+7psM93y+z4nzZPygn4tg1SkgQoT77x8xtmRMVxr3yMH2aA==
 
 "@cdktf/provider-kubernetes@^6.0.4":
   version "6.0.4"
