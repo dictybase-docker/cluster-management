@@ -434,10 +434,10 @@
   resolved "https://registry.yarnpkg.com/@cdktf/provider-kubernetes/-/provider-kubernetes-6.0.1.tgz#a8b2cb830e431bcd9c5a855637e3f09075ae6f25"
   integrity sha512-MGQSrkdVpDKFHfQP3mbjQQ9jmJsRf8taj6hpYX96gM6sD8CFkXui/KrYu/8a8GAbJOzdPZA80XE0+Lfvsc1YSA==
 
-"@cdktf/provider-local@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@cdktf/provider-local/-/provider-local-6.0.0.tgz#097bf148a6706cd55310b5ce231e95c8f0774b15"
-  integrity sha512-3qWpqNirtbv2w6qwaJUGZor0yK5mSFJHc6PE0lSiKghz6dclPhWFj4rMG6dmcvE2aqpY35T84fJja0+BgWijnw==
+"@cdktf/provider-local@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@cdktf/provider-local/-/provider-local-6.0.1.tgz#4bb1c5f633bb48eed192e10bac1da8ea3debbb42"
+  integrity sha512-JycafRq7jqHaZmU0cP4qpokGVioUb1W2UblpugQrJ3eFVKui7JId4ySUS1WANI6nCVF0527xaB447plkGJ0xlA==
 
 "@colors/colors@1.5.0":
   version "1.5.0"

@@ -27,7 +27,7 @@
         "@cdktf/provider-google": "7.x",
         "@cdktf/provider-helm": "^6.0.0",
         "@cdktf/provider-kubernetes": "^6.0.1",
-        "@cdktf/provider-local": "^6.0.0",
+        "@cdktf/provider-local": "^6.0.1",
         "@kubernetes/client-node": "0.18",
         "@octokit/rest": "^19.0.11",
         "cdktf": "0.16.x",
