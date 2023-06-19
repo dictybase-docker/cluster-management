@@ -1,8 +1,10 @@
 import { TerraformStack, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
+import { Secret } from "@cdktf/provider-kubernetes/lib/secret"
 import { Manifest } from "@cdktf/provider-kubernetes/lib/manifest"
 import { readFileSync } from "fs"
+import { Buffer } from "buffer"
 
 type Provider = {
   config: string
@@ -22,6 +24,11 @@ type PostgresStackProperties = {
   provider: Provider
   resource: Resource
 }
+type PostgresSecretStackProperties = {
+  provider: Provider
+  resource: { gcsKey: string; namespace: string }
+}
+
 class PostgresStack extends TerraformStack {
   constructor(scope: Construct, id: string, options: PostgresStackProperties) {
     const {
@@ -70,4 +77,44 @@ class PostgresStack extends TerraformStack {
   }
 }
 
-export { PostgresStack }
+class PostgresSecretStack extends TerraformStack {
+  constructor(
+    scope: Construct,
+    id: string,
+    options: PostgresSecretStackProperties,
+  ) {
+    const {
+      provider: { remote, credentials, bucketName, bucketPrefix, config },
+      resource: { gcsKey, namespace },
+    } = options
+    super(scope, id)
+    if (remote) {
+      new GcsBackend(this, {
+        bucket: bucketName,
+        prefix: bucketPrefix,
+        credentials: readFileSync(credentials).toString(),
+      })
+    }
+    new KubernetesProvider(this, id, { configPath: config })
+    const secretName = `${id}-pgbackrest-secret`
+    new Secret(this, secretName, {
+      metadata: {
+        name: secretName,
+        namespace: namespace,
+      },
+      data: {
+        "gcs.conf": Buffer.from(
+          `
+		[global]
+		repo1-gcs-key=/etc/pgbackrest/conf.d/gcs-key.json
+	`,
+        ).toString("base64"),
+        "gcs-key.json": Buffer.from(readFileSync(gcsKey).toString()).toString(
+          "base64",
+        ),
+      },
+    })
+  }
+}
+
+export { PostgresStack, PostgresSecretStack }
