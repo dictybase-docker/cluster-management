@@ -97,21 +97,24 @@ class PostgresSecretStack extends TerraformStack {
     }
     new KubernetesProvider(this, id, { configPath: config })
     const secretName = `${id}-pgbackrest-secret`
-    new Secret(this, secretName, {
-      metadata: {
-        name: secretName,
-        namespace: namespace,
-      },
-      data: {
-        "gcs.conf": Buffer.from(
-          `
+    const metadata = {
+      name: secretName,
+      namespace: namespace,
+    }
+    const gcsConf = Buffer.from(
+      `
 		[global]
 		repo1-gcs-key=/etc/pgbackrest/conf.d/gcs-key.json
 	`,
-        ).toString("base64"),
-        "gcs-key.json": Buffer.from(readFileSync(gcsKey).toString()).toString(
-          "base64",
-        ),
+    ).toString("base64")
+    const gcsKeyJson = Buffer.from(readFileSync(gcsKey).toString()).toString(
+      "base64",
+    )
+    new Secret(this, secretName, {
+      metadata,
+      data: {
+        "gcs.conf": gcsConf,
+        "gcs-key.json": gcsKeyJson,
       },
     })
   }
