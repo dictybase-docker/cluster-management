@@ -76,7 +76,7 @@ const argv = yargs(process.argv.slice(2))
       alias: "gcs-backup-credentials",
       type: "string",
       describe: "gcs credential file for backing up the database",
-      demandOption: true,
+      default: "credentials/pgbackup.json",
     },
     pi: {
       alias: "project-id",
