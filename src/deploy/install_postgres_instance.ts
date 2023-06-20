@@ -68,7 +68,7 @@ const argv = yargs(process.argv.slice(2))
     bc: {
       alias: "gcs-backup-credentials",
       type: "string",
-      describe: "gcs credentials for backing up the database",
+      describe: "gcs credential file for backing up the database",
       demandOption: true,
     },
   })
