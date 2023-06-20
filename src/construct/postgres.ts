@@ -19,6 +19,8 @@ type Resource = {
   version: string
   storageClass: string
   storageSize: number
+  secret: Secret
+  backupBucket: string
 }
 type PostgresStackProperties = {
   provider: Provider
@@ -26,14 +28,25 @@ type PostgresStackProperties = {
 }
 type PostgresSecretStackProperties = {
   provider: Provider
-  resource: { gcsKey: string; namespace: string }
+  resource: {
+    gcsKey: string
+    namespace: string
+  }
 }
 
 class PostgresStack extends TerraformStack {
   constructor(scope: Construct, id: string, options: PostgresStackProperties) {
     const {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
-      resource: { version, name, storageSize, storageClass, namespace },
+      resource: {
+        version,
+        name,
+        storageSize,
+        storageClass,
+        namespace,
+        secret,
+        backupBucket,
+      },
     } = options
     super(scope, id)
     if (remote) {
@@ -54,6 +67,13 @@ class PostgresStack extends TerraformStack {
         },
       },
     }
+    const pgbackrest = {
+      configuration: [{ secret: { name: secret.metadata.name } }],
+      global: {
+        "repo1-path": `/pgbackrest/${namespace}/repo1`,
+      },
+      repos: [{ name: "repo1", gcs: { bucket: backupBucket } }],
+    }
     const spec = {
       postgresVersion,
       image: `registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-${version}`,
@@ -64,6 +84,9 @@ class PostgresStack extends TerraformStack {
           dataVolumeClaimSpec,
         },
       ],
+      backups: {
+        pgbackrest,
+      },
     }
     const metadata = { name, namespace }
     new Manifest(this, `${id}-manifest`, {
