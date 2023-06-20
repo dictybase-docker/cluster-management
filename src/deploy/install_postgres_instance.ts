@@ -84,31 +84,29 @@ const argv = yargs(process.argv.slice(2))
 
 const app = new App()
 const deployName = argv.nm.concat("-").concat(argv.ns)
-const secretStack = new PostgresSecretStack(
-  app,
-  deployName.concat("-gcs-secret"),
-  {
-    provider: {
-      config: argv.kc,
-      remote: argv.r,
-      credentials: argv.c,
-      bucketName: argv.bn,
-      bucketPrefix: deployName,
-    },
-    resource: {
-      gcsKey: argv.bc,
-      namespace: argv.ns,
-      repository: argv.rp,
-    },
-  },
-)
-new PostgresStack(app, deployName.concat("-postgres"), {
+const secretId = deployName.concat("-gcs-secret")
+const secretStack = new PostgresSecretStack(app, secretId, {
   provider: {
     config: argv.kc,
     remote: argv.r,
     credentials: argv.c,
     bucketName: argv.bn,
-    bucketPrefix: deployName,
+    bucketPrefix: secretId,
+  },
+  resource: {
+    gcsKey: argv.bc,
+    namespace: argv.ns,
+    repository: argv.rp,
+  },
+})
+const pgstackId = deployName.concat("-postgres")
+const pgstack = new PostgresStack(app, pgstackId, {
+  provider: {
+    config: argv.kc,
+    remote: argv.r,
+    credentials: argv.c,
+    bucketName: argv.bn,
+    bucketPrefix: pgstackId,
   },
   resource: {
     repository: argv.rp,
@@ -121,4 +119,5 @@ new PostgresStack(app, deployName.concat("-postgres"), {
     version: argv.pv,
   },
 })
+pgstack.addDependency(secretStack)
 app.synth()
