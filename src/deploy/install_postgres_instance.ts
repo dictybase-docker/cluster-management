@@ -12,7 +12,7 @@ const argv = yargs(process.argv.slice(2))
     },
     c: {
       alias: "credentials",
-      description: "service account credentials file for google provider",
+      description: "service account credentials file for gcs backend",
       type: "string",
       default: "credentials/cloud-manager.json",
     },
