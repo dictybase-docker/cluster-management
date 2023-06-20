@@ -58,7 +58,7 @@ class PostgresStack extends TerraformStack {
         credentials: readFileSync(credentials).toString(),
       })
     }
-    new KubernetesProvider(this, id, { configPath: config })
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
     const postgresVersion = version.split(".")[0]
     const dataVolumeClaimSpec = {
       storageClassName: storageClass,
@@ -120,7 +120,7 @@ class PostgresSecretStack extends TerraformStack {
         credentials: readFileSync(credentials).toString(),
       })
     }
-    new KubernetesProvider(this, id, { configPath: config })
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
     const metadata = {
       name: id,
       namespace: namespace,

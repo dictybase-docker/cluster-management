@@ -40,7 +40,7 @@ class BucketStack extends TerraformStack {
         credentials: readFileSync(backend.credentials).toString(),
       })
     }
-    new GoogleProvider(this, `${id}-google-provider`, {
+    new GoogleProvider(this, `${id}-provider`, {
       credentials: readFileSync(provider.credentials).toString(),
       project: provider.projectId,
       region: provider.region,
