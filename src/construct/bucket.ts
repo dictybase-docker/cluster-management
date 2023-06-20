@@ -46,7 +46,7 @@ class BucketStack extends TerraformStack {
       region: provider.region,
       zone: provider.zone,
     })
-    new StorageBucket(this, `${id}-bucket`, {
+    new StorageBucket(this, id, {
       forceDestroy: true,
       name: resource.bucketName,
       location: "US",
