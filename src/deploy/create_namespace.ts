@@ -1,5 +1,8 @@
 import yargs from "yargs/yargs"
-import { NamespaceStack } from "../construct/namespace"
+import {
+  NamespaceStack,
+  NamespaceStackProperties,
+} from "../construct/namespace"
 import { RemoteStack } from "../construct/remote"
 import { App } from "cdktf"
 
@@ -41,14 +44,17 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-const remote = new RemoteStack(app, argv.ns.concat("-remote"), {
-  credentials: argv.c,
-  bucketName: argv.bn,
-  bucketPrefix: argv.ns,
-})
-new NamespaceStack(app, argv.ns, {
+let props: NamespaceStackProperties = {
   config: argv.kc,
-  remote: remote,
   namespace: argv.ns,
-})
+}
+if (argv.r) {
+  const remote = new RemoteStack(app, argv.ns.concat("-remote"), {
+    credentials: argv.c,
+    bucketName: argv.bn,
+    bucketPrefix: argv.ns,
+  })
+  props = { ...props, remote }
+}
+new NamespaceStack(app, argv.ns, props)
 app.synth()
