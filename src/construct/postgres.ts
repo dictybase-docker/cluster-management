@@ -101,6 +101,7 @@ class PostgresStack extends TerraformStack {
 }
 
 class PostgresSecretStack extends TerraformStack {
+  public readonly secret: Secret
   constructor(
     scope: Construct,
     id: string,
@@ -133,7 +134,7 @@ class PostgresSecretStack extends TerraformStack {
     const gcsKeyJson = Buffer.from(readFileSync(gcsKey).toString()).toString(
       "base64",
     )
-    new Secret(this, secretName, {
+    this.secret = new Secret(this, secretName, {
       metadata,
       data: {
         "gcs.conf": gcsConf,
