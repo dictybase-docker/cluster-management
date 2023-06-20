@@ -103,7 +103,7 @@ const argv = yargs(process.argv.slice(2))
 
 const app = new App()
 const deployName = argv.nm.concat("-").concat(argv.ns)
-new BucketStack(app, deployName.concat("-backup"), {
+new BucketStack(app, deployName.concat("-pgbackrest-backup-bucket"), {
   backend: {
     config: argv.kc,
     remote: argv.r,
@@ -121,21 +121,25 @@ new BucketStack(app, deployName.concat("-backup"), {
     bucketName: argv.bb,
   },
 })
-const secretStack = new PostgresSecretStack(app, deployName.concat("-backup"), {
-  provider: {
-    config: argv.kc,
-    remote: argv.r,
-    credentials: argv.c,
-    bucketName: argv.bn,
-    bucketPrefix: deployName,
+const secretStack = new PostgresSecretStack(
+  app,
+  deployName.concat("-gcs-secret"),
+  {
+    provider: {
+      config: argv.kc,
+      remote: argv.r,
+      credentials: argv.c,
+      bucketName: argv.bn,
+      bucketPrefix: deployName,
+    },
+    resource: {
+      gcsKey: argv.bc,
+      namespace: argv.ns,
+      repository: argv.rp,
+    },
   },
-  resource: {
-    gcsKey: argv.bc,
-    namespace: argv.ns,
-    repository: argv.rp,
-  },
-})
-new PostgresStack(app, deployName, {
+)
+new PostgresStack(app, deployName.concat("-postgres"), {
   provider: {
     config: argv.kc,
     remote: argv.r,
