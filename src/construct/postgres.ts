@@ -21,6 +21,7 @@ type Resource = {
   storageSize: number
   secret: Secret
   backupBucket: string
+  repository: string
 }
 type PostgresStackProperties = {
   provider: Provider
@@ -31,9 +32,9 @@ type PostgresSecretStackProperties = {
   resource: {
     gcsKey: string
     namespace: string
+    repository: string
   }
 }
-
 class PostgresStack extends TerraformStack {
   constructor(scope: Construct, id: string, options: PostgresStackProperties) {
     const {
@@ -46,6 +47,7 @@ class PostgresStack extends TerraformStack {
         namespace,
         secret,
         backupBucket,
+        repository,
       },
     } = options
     super(scope, id)
@@ -70,9 +72,9 @@ class PostgresStack extends TerraformStack {
     const pgbackrest = {
       configuration: [{ secret: { name: secret.metadata.name } }],
       global: {
-        "repo1-path": `/pgbackrest/${namespace}/repo1`,
+        [`${repository}-path`]: `/pgbackrest/${namespace}/${repository}`,
       },
-      repos: [{ name: "repo1", gcs: { bucket: backupBucket } }],
+      repos: [{ name: repository, gcs: { bucket: backupBucket } }],
     }
     const spec = {
       postgresVersion,
@@ -99,7 +101,6 @@ class PostgresStack extends TerraformStack {
     })
   }
 }
-
 class PostgresSecretStack extends TerraformStack {
   public readonly secret: Secret
   constructor(
@@ -109,7 +110,7 @@ class PostgresSecretStack extends TerraformStack {
   ) {
     const {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
-      resource: { gcsKey, namespace },
+      resource: { gcsKey, namespace, repository },
     } = options
     super(scope, id)
     if (remote) {
@@ -128,7 +129,7 @@ class PostgresSecretStack extends TerraformStack {
     const gcsConf = Buffer.from(
       `
 		[global]
-		repo1-gcs-key=/etc/pgbackrest/conf.d/gcs-key.json
+		${repository}-gcs-key=/etc/pgbackrest/conf.d/gcs-key.json
 	`,
     ).toString("base64")
     const gcsKeyJson = Buffer.from(readFileSync(gcsKey).toString()).toString(
