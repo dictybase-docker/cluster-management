@@ -5,7 +5,6 @@ import { StorageBucket } from "@cdktf/provider-google/lib/storage-bucket"
 import { GoogleProvider } from "@cdktf/provider-google/lib/provider"
 
 type Backend = {
-  config: string
   remote: boolean
   credentials: string
   bucketName: string
