@@ -91,7 +91,7 @@ class PostgresStack extends TerraformStack {
       },
     }
     const metadata = { name, namespace }
-    new Manifest(this, `${id}-manifest`, {
+    new Manifest(this, id, {
       manifest: {
         apiVersion: "postgres-operator.crunchydata.com/v1beta1",
         kind: "PostgresCluster",
@@ -121,9 +121,8 @@ class PostgresSecretStack extends TerraformStack {
       })
     }
     new KubernetesProvider(this, id, { configPath: config })
-    const secretName = `${id}-pgbackrest-secret`
     const metadata = {
-      name: secretName,
+      name: id,
       namespace: namespace,
     }
     const gcsConf = Buffer.from(
@@ -135,7 +134,7 @@ class PostgresSecretStack extends TerraformStack {
     const gcsKeyJson = Buffer.from(readFileSync(gcsKey).toString()).toString(
       "base64",
     )
-    this.secret = new Secret(this, secretName, {
+    this.secret = new Secret(this, id, {
       metadata,
       data: {
         "gcs.conf": gcsConf,
