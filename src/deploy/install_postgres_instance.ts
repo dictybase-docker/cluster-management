@@ -22,6 +22,12 @@ const argv = yargs(process.argv.slice(2))
       default: "dicty-terraform-state",
       description: "GCS bucket name where terraform remote state is stored.",
     },
+    bb: {
+      alias: "backup-bucket",
+      type: "string",
+      demandOption: true,
+      description: "GCS bucket to store the backup",
+    },
     r: {
       alias: "remote",
       type: "boolean",
@@ -72,7 +78,7 @@ const argv = yargs(process.argv.slice(2))
 
 const app = new App()
 const deployName = argv.nm.concat("-").concat(argv.ns)
-new PostgresSecretStack(app, deployName.concat("-backup"), {
+const secretStack = new PostgresSecretStack(app, deployName.concat("-backup"), {
   provider: {
     config: argv.kc,
     remote: argv.r,
@@ -94,6 +100,8 @@ new PostgresStack(app, deployName, {
     bucketPrefix: deployName,
   },
   resource: {
+    secret: secretStack.secret,
+    backupBucket: argv.bb,
     namespace: argv.ns,
     name: argv.nm,
     storageClass: argv.sc,
