@@ -22,4 +22,4 @@ class NamespaceStack extends TerraformStack {
   }
 }
 
-export { NamespaceStack }
+export { NamespaceStack, type NamespaceStackProperties }
