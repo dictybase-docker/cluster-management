@@ -1,5 +1,5 @@
 import yargs from "yargs/yargs"
-import { PostgresStack } from "../construct/postgres"
+import { PostgresStack, PostgresSecretStack } from "../construct/postgres"
 import { App } from "cdktf"
 
 const argv = yargs(process.argv.slice(2))
@@ -59,6 +59,12 @@ const argv = yargs(process.argv.slice(2))
       describle: "size of the storage in GB",
       default: 30,
     },
+    bc: {
+      alias: "gcs-backup-credentials",
+      type: "string",
+      describe: "gcs credentials for backing up the database",
+      demandOption: true,
+    },
   })
   .help()
   .completion()
@@ -66,6 +72,19 @@ const argv = yargs(process.argv.slice(2))
 
 const app = new App()
 const deployName = argv.nm.concat("-").concat(argv.ns)
+new PostgresSecretStack(app, deployName.concat("-backup"), {
+  provider: {
+    config: argv.kc,
+    remote: argv.r,
+    credentials: argv.c,
+    bucketName: argv.bn,
+    bucketPrefix: deployName,
+  },
+  resource: {
+    gcsKey: argv.bc,
+    namespace: argv.ns,
+  },
+})
 new PostgresStack(app, deployName, {
   provider: {
     config: argv.kc,
