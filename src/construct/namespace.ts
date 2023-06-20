@@ -1,32 +1,22 @@
 import { Construct } from "constructs"
-import { TerraformStack, GcsBackend } from "cdktf"
+import { TerraformStack } from "cdktf"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Namespace } from "@cdktf/provider-kubernetes/lib/namespace"
-import { readFileSync } from "fs"
+import { RemoteStack } from "./remote"
 
 type NamespaceStackProperties = {
   config: string
-  remote: boolean
-  credentials: string
-  bucketName: string
-  bucketPrefix: string
+  remote?: RemoteStack
   namespace: string
 }
 
 class NamespaceStack extends TerraformStack {
   constructor(scope: Construct, id: string, options: NamespaceStackProperties) {
-    const { remote, namespace, credentials, bucketName, bucketPrefix, config } =
-      options
+    const { remote, namespace, config } = options
     super(scope, id)
-    if (remote) {
-      new GcsBackend(this, {
-        bucket: bucketName,
-        prefix: bucketPrefix,
-        credentials: readFileSync(credentials).toString(),
-      })
-    }
-    new KubernetesProvider(this, id, { configPath: config })
-    new Namespace(this, `{$id}-namespace`, {
+    const backend = remote ? remote : this
+    new KubernetesProvider(backend, id, { configPath: config })
+    new Namespace(backend, `{$id}-namespace`, {
       metadata: { name: namespace },
     })
   }
