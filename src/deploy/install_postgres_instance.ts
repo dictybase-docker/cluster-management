@@ -34,6 +34,12 @@ const argv = yargs(process.argv.slice(2))
       default: true,
       description: "whether the remote gcs backend will be used",
     },
+    rp: {
+      alias: "repository",
+      type: "string",
+      default: "repo1",
+      describe: "repository name for backing up the database with pgrest",
+    },
     nm: {
       describe: "name of the install",
       alias: "name",
@@ -89,6 +95,7 @@ const secretStack = new PostgresSecretStack(app, deployName.concat("-backup"), {
   resource: {
     gcsKey: argv.bc,
     namespace: argv.ns,
+    repository: argv.rp,
   },
 })
 new PostgresStack(app, deployName, {
@@ -100,6 +107,7 @@ new PostgresStack(app, deployName, {
     bucketPrefix: deployName,
   },
   resource: {
+    repository: argv.rp,
     secret: secretStack.secret,
     backupBucket: argv.bb,
     namespace: argv.ns,
