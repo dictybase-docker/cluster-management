@@ -1,6 +1,5 @@
 import yargs from "yargs/yargs"
 import { PostgresStack, PostgresSecretStack } from "../construct/postgres"
-import { BucketStack } from "../construct/bucket"
 import { App } from "cdktf"
 
 const argv = yargs(process.argv.slice(2))
@@ -78,24 +77,6 @@ const argv = yargs(process.argv.slice(2))
       describe: "gcs credential file for backing up the database",
       default: "credentials/pgbackup.json",
     },
-    pi: {
-      alias: "project-id",
-      type: "string",
-      demandOption: true,
-      description: "the google cloud project id",
-    },
-    rg: {
-      alias: "region",
-      type: "string",
-      description: "the google cloud region",
-      default: "us-central1",
-    },
-    z: {
-      alias: "zone",
-      type: "string",
-      description: "the google cloud zone",
-      default: "us-central1-c",
-    },
   })
   .help()
   .completion()
@@ -103,24 +84,6 @@ const argv = yargs(process.argv.slice(2))
 
 const app = new App()
 const deployName = argv.nm.concat("-").concat(argv.ns)
-new BucketStack(app, deployName.concat("-pgbackrest-backup-bucket"), {
-  backend: {
-    config: argv.kc,
-    remote: argv.r,
-    credentials: argv.c,
-    bucketName: argv.bn,
-    bucketPrefix: deployName,
-  },
-  provider: {
-    credentials: argv.c,
-    projectId: argv.pi,
-    region: argv.rg,
-    zone: argv.z,
-  },
-  resource: {
-    bucketName: argv.bb,
-  },
-})
 const secretStack = new PostgresSecretStack(
   app,
   deployName.concat("-gcs-secret"),
