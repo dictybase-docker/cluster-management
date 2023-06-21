@@ -81,15 +81,19 @@ class PostgresStack extends TerraformStack {
       ],
       backups: this.#backups(secret, namespace, repository, backupBucket),
     }
-    const metadata = { name, namespace }
-    new Manifest(this, id, {
+    const manifest = {
       manifest: {
         apiVersion: "postgres-operator.crunchydata.com/v1beta1",
         kind: "PostgresCluster",
-        metadata,
+        metadata: this.#metadata(name, namespace),
         spec,
       },
-    })
+    }
+    new Manifest(this, id, manifest)
+  }
+
+  #metadata(name: string, namespace: string) {
+    return { name, namespace }
   }
 
   #backups(
