@@ -35,21 +35,14 @@ type PostgresSecretStackProperties = {
     repository: string
   }
 }
+
 class PostgresStack extends TerraformStack {
   constructor(scope: Construct, id: string, options: PostgresStackProperties) {
     const {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
-      resource: {
-        version,
-        name,
-        storageSize,
-        storageClass,
-        namespace,
-        secret,
-        backupBucket,
-        repository,
-      },
+      resource,
     } = options
+    const { name, namespace } = resource
     super(scope, id)
     if (remote) {
       new GcsBackend(this, {
@@ -59,8 +52,43 @@ class PostgresStack extends TerraformStack {
       })
     }
     new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    const manifest = {
+      apiVersion: "postgres-operator.crunchydata.com/v1beta1",
+      kind: "PostgresCluster",
+      metadata: this.#metadata(name, namespace),
+      spec: this.#spec(resource),
+    }
+    new Manifest(this, id, { manifest })
+  }
+
+  #spec(options: Resource) {
+    const {
+      version,
+      name,
+      storageSize,
+      storageClass,
+      namespace,
+      secret,
+      backupBucket,
+      repository,
+    } = options
     const postgresVersion = version.split(".")[0]
-    const dataVolumeClaimSpec = {
+    return {
+      postgresVersion,
+      image: `registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-${version}`,
+      imagePullPolicy: "IfNotPresent",
+      instances: [
+        {
+          name,
+          dataVolumeClaimSpec: this.#storageSpec(storageClass, storageSize),
+        },
+      ],
+      backups: this.#backups(secret, namespace, repository, backupBucket),
+    }
+  }
+
+  #storageSpec(storageClass: string, storageSize: number) {
+    return {
       storageClassName: storageClass,
       accessModes: ["ReadWriteOnce"],
       resources: {
@@ -69,27 +97,6 @@ class PostgresStack extends TerraformStack {
         },
       },
     }
-    const spec = {
-      postgresVersion,
-      image: `registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-${version}`,
-      imagePullPolicy: "IfNotPresent",
-      instances: [
-        {
-          name,
-          dataVolumeClaimSpec,
-        },
-      ],
-      backups: this.#backups(secret, namespace, repository, backupBucket),
-    }
-    const manifest = {
-      manifest: {
-        apiVersion: "postgres-operator.crunchydata.com/v1beta1",
-        kind: "PostgresCluster",
-        metadata: this.#metadata(name, namespace),
-        spec,
-      },
-    }
-    new Manifest(this, id, manifest)
   }
 
   #metadata(name: string, namespace: string) {
