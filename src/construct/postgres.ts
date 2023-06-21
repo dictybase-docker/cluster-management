@@ -74,7 +74,15 @@ class PostgresStack extends TerraformStack {
       global: {
         [`${repository}-path`]: `/pgbackrest/${namespace}/${repository}`,
       },
-      repos: [{ name: repository, gcs: { bucket: backupBucket } }],
+      repos: [
+        {
+          name: repository,
+          gcs: { bucket: backupBucket },
+          schedules: {
+            differential: "0 0 * * *",
+          },
+        },
+      ],
     }
     const spec = {
       postgresVersion,
