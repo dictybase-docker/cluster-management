@@ -69,28 +69,6 @@ class PostgresStack extends TerraformStack {
         },
       },
     }
-    const pgbackrest = {
-      configuration: [{ secret: { name: secret.metadata.name } }],
-      global: {
-        "archive-async": "y",
-        "compress-type": "zst",
-        [`${repository}-path`]: `/pgbackrest/${namespace}/${repository}`,
-        [`${repository}-retention-full-type`]: "time",
-        [`${repository}-retention-full`]: "30",
-        [`${repository}-retention-diff`]: "30",
-        [`${repository}-retention-archive`]: "30",
-        [`${repository}-retention-archive-type`]: "diff",
-      },
-      repos: [
-        {
-          name: repository,
-          gcs: { bucket: backupBucket },
-          schedules: {
-            differential: "0 0 * * *",
-          },
-        },
-      ],
-    }
     const spec = {
       postgresVersion,
       image: `registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-${version}`,
@@ -101,9 +79,7 @@ class PostgresStack extends TerraformStack {
           dataVolumeClaimSpec,
         },
       ],
-      backups: {
-        pgbackrest,
-      },
+      backups: this.#backups(secret, namespace, repository, backupBucket),
     }
     const metadata = { name, namespace }
     new Manifest(this, id, {
@@ -115,7 +91,40 @@ class PostgresStack extends TerraformStack {
       },
     })
   }
+
+  #backups(
+    secret: Secret,
+    namespace: string,
+    repository: string,
+    backupBucket: string,
+  ) {
+    return {
+      pgbackrest: {
+        configuration: [{ secret: { name: secret.metadata.name } }],
+        global: {
+          "archive-async": "y",
+          "compress-type": "zst",
+          [`${repository}-path`]: `/pgbackrest/${namespace}/${repository}`,
+          [`${repository}-retention-full-type`]: "time",
+          [`${repository}-retention-full`]: "30",
+          [`${repository}-retention-diff`]: "30",
+          [`${repository}-retention-archive`]: "30",
+          [`${repository}-retention-archive-type`]: "diff",
+        },
+        repos: [
+          {
+            name: repository,
+            gcs: { bucket: backupBucket },
+            schedules: {
+              differential: "0 0 * * *",
+            },
+          },
+        ],
+      },
+    }
+  }
 }
+
 class PostgresSecretStack extends TerraformStack {
   public readonly secret: Secret
   constructor(
