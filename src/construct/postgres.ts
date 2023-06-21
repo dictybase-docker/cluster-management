@@ -72,6 +72,8 @@ class PostgresStack extends TerraformStack {
     const pgbackrest = {
       configuration: [{ secret: { name: secret.metadata.name } }],
       global: {
+        "archive-async": "y",
+        "compress-type": "zst",
         [`${repository}-path`]: `/pgbackrest/${namespace}/${repository}`,
         [`${repository}-retention-full-type`]: "time",
         [`${repository}-retention-full`]: "30",
