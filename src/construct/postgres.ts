@@ -84,7 +84,19 @@ class PostgresStack extends TerraformStack {
         },
       ],
       backups: this.#backups(secret, namespace, repository, backupBucket),
+      users: this.#users(),
     }
+  }
+
+  #users() {
+    return [
+      {
+        name: "baserow",
+        databases: ["baserow"],
+        options:
+          "CONNECT SELECT INSERT UPDATE DELETE TRUNCATE REFERENCES TRIGGER CREATE TEMPORARY EXECUTE USAGE",
+      },
+    ]
   }
 
   #storageSpec(storageClass: string, storageSize: number) {
