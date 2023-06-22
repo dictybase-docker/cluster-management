@@ -151,8 +151,7 @@ class PostgresStack extends TerraformStack {
       {
         name: "baserow",
         databases: ["baserow"],
-        options:
-          "CONNECT SELECT INSERT UPDATE DELETE TRUNCATE REFERENCES TRIGGER CREATE TEMPORARY EXECUTE USAGE",
+        options: "CREATEDB",
       },
     ]
   }
