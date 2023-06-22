@@ -34,13 +34,6 @@ const argv = yargs(process.argv.slice(2))
       default: "dicty-terraform-state",
       description: "GCS bucket name where terraform remote state is stored.",
     },
-    bp: {
-      alias: "bucket-prefix",
-      type: "string",
-      default: "redis",
-      description:
-        "GCS bucket folder prefix where terraform remote state is stored.",
-    },
     r: {
       alias: "remote",
       type: "boolean",
@@ -77,14 +70,15 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-new RedisStandAloneStack(app, argv.nm, {
+const deployName = argv.nm.concat("-").concat(argv.ns)
+new RedisStandAloneStack(app, deployName, {
   config: argv.kc,
   redisVersion: argv.rv,
   redisExporterVersion: argv.rxv,
   remote: argv.r,
   credentials: argv.c,
   bucketName: argv.bn,
-  bucketPrefix: argv.bp,
+  bucketPrefix: deployName,
   namespace: argv.ns,
   name: argv.nm,
   storageClass: argv.sc,
