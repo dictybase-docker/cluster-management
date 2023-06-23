@@ -18,7 +18,7 @@ const emailValues = ({ from, user, pass, host }: emailValuesProperties) => [
   },
   {
     name: "backend.config.email.smtp",
-    value: "true",
+    value: "yes",
   },
   {
     name: "backend.config.email.smtpHost",
@@ -34,7 +34,7 @@ const emailValues = ({ from, user, pass, host }: emailValuesProperties) => [
   },
   {
     name: "backend.config.email.smtpUseTls",
-    value: "true",
+    value: "yes",
   },
 ]
 
@@ -96,7 +96,7 @@ const argv = yargs(process.argv.slice(2))
     fr: {
       alias: "from",
       type: "string",
-      default: "curator-tool-manager@mail.dictycr.org",
+      default: "Tool admin<curator-tool-admin@mail.dictycr.org>",
       describe: "email sender id",
     },
     us: {
@@ -115,7 +115,7 @@ const argv = yargs(process.argv.slice(2))
       alias: "smpt-host",
       type: "string",
       default: "smtp.mailgun.org",
-      describe: "smtp host for sening email",
+      describe: "smtp host for sending email",
     },
     nm: {
       describe: "name of the baserow install",
