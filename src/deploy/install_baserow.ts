@@ -1,8 +1,49 @@
 import yargs from "yargs/yargs"
-import { KubeConfig, CoreV1Api } from "@kubernetes/client-node"
+import { KubeConfig, CoreV1Api, V1Secret } from "@kubernetes/client-node"
 import { Buffer } from "buffer"
 import { HelmChartStack } from "../construct/helm"
 import { App } from "cdktf"
+
+const storageValues = (storageClass: string) => [
+  { name: "persistence.enabled", value: "true" },
+  { name: "persistence.storageClassName", value: storageClass },
+]
+
+const redisValues = () => [
+  { name: "redis.enabled", value: "false" },
+  {
+    name: "externalRedis.hostname",
+    value: "redis",
+  },
+  {
+    name: "externalRedis.auth.enabled",
+    value: "false",
+  },
+]
+
+const postgresValues = (secret: V1Secret) => [
+  { name: "postgresql.enabled", value: "false" },
+  {
+    name: "externalPostgresql.auth.database",
+    value: decodeSecretData(secret?.data?.dbname as string),
+  },
+  {
+    name: "externalPostgresql.auth.password",
+    value: decodeSecretData(secret?.data?.password as string),
+  },
+  {
+    name: "externalPostgresql.auth.username",
+    value: decodeSecretData(secret?.data?.user as string),
+  },
+  {
+    name: "externalPostgresql.port",
+    value: decodeSecretData(secret?.data?.port as string),
+  },
+  {
+    name: "externalPostgresql.hostname",
+    value: decodeSecretData(secret?.data?.host as string),
+  },
+]
 
 const decodeSecretData = (value: string) =>
   Buffer.from(value, "base64").toString("utf8")
@@ -104,38 +145,9 @@ new HelmChartStack(app, deployName, {
   chart: argv.ch,
   name: argv.nm,
   values: [
-    { name: "persistence.enabled", value: "true" },
-    { name: "persistence.storageClassName", value: argv.sc },
-    { name: "postgresql.enabled", value: "false" },
-    {
-      name: "externalPostgresql.auth.database",
-      value: decodeSecretData(secret?.data?.dbname as string),
-    },
-    {
-      name: "externalPostgresql.auth.password",
-      value: decodeSecretData(secret?.data?.password as string),
-    },
-    {
-      name: "externalPostgresql.auth.username",
-      value: decodeSecretData(secret?.data?.user as string),
-    },
-    {
-      name: "externalPostgresql.port",
-      value: decodeSecretData(secret?.data?.port as string),
-    },
-    {
-      name: "externalPostgresql.hostname",
-      value: decodeSecretData(secret?.data?.host as string),
-    },
-    { name: "redis.enabled", value: "false" },
-    {
-      name: "externalRedis.hostname",
-      value: "redis",
-    },
-    {
-      name: "externalRedis.auth.enabled",
-      value: "false",
-    },
+    ...storageValues(argv.sc),
+    ...redisValues(),
+    ...postgresValues(secret as V1Secret),
   ],
 })
 app.synth()
