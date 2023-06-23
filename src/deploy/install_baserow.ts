@@ -4,6 +4,40 @@ import { Buffer } from "buffer"
 import { HelmChartStack } from "../construct/helm"
 import { App } from "cdktf"
 
+type emailValuesProperties = {
+  from: string
+  host: string
+  pass: string
+  user: string
+}
+
+const emailValues = ({ from, user, pass, host }: emailValuesProperties) => [
+  {
+    name: "backend.config.email.fromEmail",
+    value: from,
+  },
+  {
+    name: "backend.config.email.smtp",
+    value: "true",
+  },
+  {
+    name: "backend.config.email.smtpHost",
+    value: host,
+  },
+  {
+    name: "backend.config.email.smtpPassword",
+    value: pass,
+  },
+  {
+    name: "backend.config.email.smtpUser",
+    value: user,
+  },
+  {
+    name: "backend.config.email.smtpUseTls",
+    value: "true",
+  },
+]
+
 const storageValues = (storageClass: string) => [
   { name: "persistence.enabled", value: "true" },
   { name: "persistence.storageClassName", value: storageClass },
@@ -59,6 +93,30 @@ const getSecret = async (config: string, secret: string, namespace: string) => {
 
 const argv = yargs(process.argv.slice(2))
   .options({
+    fr: {
+      alias: "from",
+      type: "string",
+      default: "curator-tool-manager@mail.dictycr.org",
+      describe: "email sender id",
+    },
+    us: {
+      alias: "smtp-user",
+      type: "string",
+      demandOption: true,
+      describe: "smtp user for authentication",
+    },
+    sp: {
+      alias: "smtp-pass",
+      type: "string",
+      demandOption: true,
+      describe: "smtp pass for authenticaion",
+    },
+    sh: {
+      alias: "smpt-host",
+      type: "string",
+      default: "smtp.mailgun.org",
+      describe: "smtp host for sening email",
+    },
     nm: {
       describe: "name of the baserow install",
       alias: "name",
@@ -149,6 +207,12 @@ new HelmChartStack(app, deployName, {
     ...storageValues(argv.sc),
     ...redisValues(),
     ...postgresValues(secret as V1Secret),
+    ...emailValues({
+      from: argv.fr,
+      user: argv.us,
+      pass: argv.sp,
+      host: argv.sh,
+    }),
   ],
 })
 app.synth()
