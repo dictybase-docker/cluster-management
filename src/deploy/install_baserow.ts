@@ -51,8 +51,9 @@ const decodeSecretData = (value: string) =>
 const getSecret = async (config: string, secret: string, namespace: string) => {
   const kubeconfig = new KubeConfig()
   kubeconfig.loadFromFile(config)
-  const k8sApi = kubeconfig.makeApiClient(CoreV1Api)
-  const res = await k8sApi.listNamespacedSecret(namespace)
+  const res = await kubeconfig
+    .makeApiClient(CoreV1Api)
+    .listNamespacedSecret(namespace)
   return res.body.items.find((sec) => sec.metadata?.name === secret)
 }
 
