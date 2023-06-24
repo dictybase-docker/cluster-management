@@ -28,6 +28,14 @@ const frontendIngressValues = ({
 }: frontendIngressValuesProperties) => {
   return [
     {
+      name: "frontend.tls[0].secretName",
+      value: secret,
+    },
+    {
+      name: "frontend.tls[0].hosts[0]",
+      value: host,
+    },
+    {
       name: "frontend.ingress.path",
       value: path,
     },
@@ -51,18 +59,22 @@ const frontendIngressValues = ({
       name: "frontend.ingress.path",
       value: "curation",
     },
-    {
-      name: "frontend.ingress.tls",
-      value: [{ secretName: secret, hosts: [host] }],
-    },
   ]
 }
-const backendIngress = ({
-  secret,
+const backendIngressValues = ({
   host,
   issuer,
+  secret,
 }: backendIngressValuesProperties) => {
   return [
+    {
+      name: "backend.tls[0].secretName",
+      value: secret,
+    },
+    {
+      name: "backend.tls[0].hosts[0]",
+      value: host,
+    },
     {
       name: "backend.ingress.hostname",
       value: host,
@@ -78,10 +90,6 @@ const backendIngress = ({
     {
       name: "backend.ingress.enabled",
       value: "yes",
-    },
-    {
-      name: "backend.ingress.tls",
-      value: [{ secretName: secret, hosts: [host] }],
     },
   ]
 }
@@ -299,6 +307,17 @@ new HelmChartStack(app, deployName, {
       user: argv.us,
       pass: argv.sp,
       host: argv.sh,
+    }),
+    ...frontendIngressValues({
+      path: "/curation",
+      host: argv.fh,
+      issuer: argv.is,
+      secret: deployName.concat("-frontend-ingress-tls"),
+    }),
+    ...backendIngressValues({
+      host: argv.bh,
+      issuer: argv.is,
+      secret: deployName.concat("-backend-ingress-tls"),
     }),
   ],
 })
