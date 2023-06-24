@@ -12,20 +12,20 @@ type emailValuesProperties = {
   pass: string
   user: string
 } & baseValueProperties
-type backendIngressProperties = {
+type backendIngressValuesProperties = {
   issuer: string
   secret: string
 } & baseValueProperties
-type frontendIngressProperties = {
+type frontendIngressValuesProperties = {
   path: string
-} & backendIngressProperties
+} & backendIngressValuesProperties
 
-const frontendIngress = ({
+const frontendIngressValues = ({
   issuer,
   path,
   host,
   secret,
-}: frontendIngressProperties) => {
+}: frontendIngressValuesProperties) => {
   return [
     {
       name: "frontend.ingress.path",
@@ -57,7 +57,11 @@ const frontendIngress = ({
     },
   ]
 }
-const backendIngress = ({ secret, host, issuer }: backendIngressProperties) => {
+const backendIngress = ({
+  secret,
+  host,
+  issuer,
+}: backendIngressValuesProperties) => {
   return [
     {
       name: "backend.ingress.hostname",
