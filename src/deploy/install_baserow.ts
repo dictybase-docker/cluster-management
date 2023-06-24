@@ -4,13 +4,83 @@ import { Buffer } from "buffer"
 import { HelmChartStack } from "../construct/helm"
 import { App } from "cdktf"
 
+type baseValueProperties = {
+  host: string
+}
 type emailValuesProperties = {
   from: string
-  host: string
   pass: string
   user: string
-}
+} & baseValueProperties
+type backendIngressProperties = {
+  issuer: string
+  secret: string
+} & baseValueProperties
+type frontendIngressProperties = {
+  path: string
+} & backendIngressProperties
 
+const frontendIngress = ({
+  issuer,
+  path,
+  host,
+  secret,
+}: frontendIngressProperties) => {
+  return [
+    {
+      name: "frontend.ingress.path",
+      value: path,
+    },
+    {
+      name: "frontend.ingress.hostname",
+      value: host,
+    },
+    {
+      name: "frontend.ingress.annotations.cert-manager.io/issuer",
+      value: issuer,
+    },
+    {
+      name: "frontend.ingress.className",
+      value: "nginx",
+    },
+    {
+      name: "frontend.ingress.enabled",
+      value: "yes",
+    },
+    {
+      name: "frontend.ingress.path",
+      value: "curation",
+    },
+    {
+      name: "frontend.ingress.tls",
+      value: [{ secretName: secret, hosts: [host] }],
+    },
+  ]
+}
+const backendIngress = ({ secret, host, issuer }: backendIngressProperties) => {
+  return [
+    {
+      name: "backend.ingress.hostname",
+      value: host,
+    },
+    {
+      name: "backend.ingress.annotations.cert-manager.io/issuer",
+      value: issuer,
+    },
+    {
+      name: "backend.ingress.className",
+      value: "nginx",
+    },
+    {
+      name: "backend.ingress.enabled",
+      value: "yes",
+    },
+    {
+      name: "backend.ingress.tls",
+      value: [{ secretName: secret, hosts: [host] }],
+    },
+  ]
+}
 const emailValues = ({ from, user, pass, host }: emailValuesProperties) => [
   {
     name: "backend.config.email.fromEmail",
@@ -37,12 +107,10 @@ const emailValues = ({ from, user, pass, host }: emailValuesProperties) => [
     value: "yes",
   },
 ]
-
 const storageValues = (storageClass: string) => [
   { name: "persistence.enabled", value: "true" },
   { name: "persistence.storageClassName", value: storageClass },
 ]
-
 const redisValues = () => [
   { name: "redis.enabled", value: "false" },
   {
@@ -54,7 +122,6 @@ const redisValues = () => [
     value: "false",
   },
 ]
-
 const postgresValues = (secret: V1Secret) => [
   { name: "postgresql.enabled", value: "false" },
   {
@@ -78,10 +145,8 @@ const postgresValues = (secret: V1Secret) => [
     value: decodeSecretData(secret?.data?.host as string),
   },
 ]
-
 const decodeSecretData = (value: string) =>
   Buffer.from(value, "base64").toString("utf8")
-
 const getSecret = async (config: string, secret: string, namespace: string) => {
   const kubeconfig = new KubeConfig()
   kubeconfig.loadFromFile(config)
@@ -93,6 +158,24 @@ const getSecret = async (config: string, secret: string, namespace: string) => {
 
 const argv = yargs(process.argv.slice(2))
   .options({
+    bh: {
+      alias: "backend-host",
+      type: "string",
+      describe: "backend host domain",
+      demandOption: true,
+    },
+    fh: {
+      alias: "frontend-host",
+      type: "string",
+      describe: "frontend host domain",
+      demandOption: true,
+    },
+    is: {
+      type: "string",
+      demandOption: true,
+      describe: "cert-manager issuer name",
+      alias: "issuer",
+    },
     fr: {
       alias: "from",
       type: "string",
