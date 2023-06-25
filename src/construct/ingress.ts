@@ -84,14 +84,14 @@ class BaserowIngressStack extends TerraformStack {
           pathType: "Prefix",
           path: "/",
           backend: {
-            service: { name: service, port: { number: 80 } },
+            service: { name: `${service}-wsgi`, port: { number: 8000 } },
           },
         },
         {
           pathType: "Prefix",
           path: "/ws/",
           backend: {
-            service: { name: service, port: { number: 80 } },
+            service: { name: `${service}-asgi`, port: { number: 8000 } },
           },
         },
       ],
