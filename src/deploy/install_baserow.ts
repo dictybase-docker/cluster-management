@@ -3,6 +3,7 @@ import { KubeConfig, CoreV1Api, V1Secret } from "@kubernetes/client-node"
 import { Buffer } from "buffer"
 import { HelmChartStack } from "../construct/helm"
 import { App } from "cdktf"
+import { BaserowIngressStack } from "../construct/ingress"
 
 type baseValueProperties = {
   host: string
@@ -12,87 +13,7 @@ type emailValuesProperties = {
   pass: string
   user: string
 } & baseValueProperties
-type backendIngressValuesProperties = {
-  issuer: string
-  secret: string
-} & baseValueProperties
-type frontendIngressValuesProperties = {
-  path: string
-} & backendIngressValuesProperties
 
-const frontendIngressValues = ({
-  issuer,
-  path,
-  host,
-  secret,
-}: frontendIngressValuesProperties) => {
-  return [
-    {
-      name: "frontend.tls[0].secretName",
-      value: secret,
-    },
-    {
-      name: "frontend.tls[0].hosts[0]",
-      value: host,
-    },
-    {
-      name: "frontend.ingress.path",
-      value: path,
-    },
-    {
-      name: "frontend.ingress.hostname",
-      value: host,
-    },
-    {
-      name: "frontend.ingress.annotations.cert-manager.io/issuer",
-      value: issuer,
-    },
-    {
-      name: "frontend.ingress.className",
-      value: "nginx",
-    },
-    {
-      name: "frontend.ingress.enabled",
-      value: "yes",
-    },
-    {
-      name: "frontend.ingress.path",
-      value: "curation",
-    },
-  ]
-}
-const backendIngressValues = ({
-  host,
-  issuer,
-  secret,
-}: backendIngressValuesProperties) => {
-  return [
-    {
-      name: "backend.tls[0].secretName",
-      value: secret,
-    },
-    {
-      name: "backend.tls[0].hosts[0]",
-      value: host,
-    },
-    {
-      name: "backend.ingress.hostname",
-      value: host,
-    },
-    {
-      name: "backend.ingress.annotations.cert-manager.io/issuer",
-      value: issuer,
-    },
-    {
-      name: "backend.ingress.className",
-      value: "nginx",
-    },
-    {
-      name: "backend.ingress.enabled",
-      value: "yes",
-    },
-  ]
-}
 const emailValues = ({ from, user, pass, host }: emailValuesProperties) => [
   {
     name: "backend.config.email.fromEmail",
@@ -308,17 +229,27 @@ new HelmChartStack(app, deployName, {
       pass: argv.sp,
       host: argv.sh,
     }),
-    ...frontendIngressValues({
-      path: "/curation",
-      host: argv.fh,
-      issuer: argv.is,
-      secret: deployName.concat("-frontend-ingress-tls"),
-    }),
-    ...backendIngressValues({
-      host: argv.bh,
-      issuer: argv.is,
-      secret: deployName.concat("-backend-ingress-tls"),
-    }),
   ],
+})
+
+const ingressDeployName = deployName.concat("-ingress")
+new BaserowIngressStack(app, ingressDeployName, {
+  resource: {
+    name: ingressDeployName,
+    namespace: argv.nm,
+    secret: deployName.concat("-ingress-tls"),
+    issuer: argv.is,
+    frontendHost: argv.fh,
+    backendHost: argv.bh,
+    frontendService: "frontend",
+    backendService: "backend",
+  },
+  provider: {
+    config: argv.kc,
+    remote: argv.r,
+    credentials: argv.c,
+    bucketName: argv.bn,
+    bucketPrefix: ingressDeployName,
+  },
 })
 app.synth()
