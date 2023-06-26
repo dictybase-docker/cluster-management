@@ -71,7 +71,7 @@ class BaserowIngressStack extends TerraformStack {
           pathType: "Prefix",
           path: "/",
           backend: {
-            service: { name: service, port: { number: 80 } },
+            service: { name: service, port: { number: 3000 } },
           },
         },
       ],
@@ -98,23 +98,19 @@ class BaserowIngressStack extends TerraformStack {
     }
   }
   #rules({ backend, frontend }: rulesProperties) {
-    return {
-      rules: [
-        {
-          host: backend.host,
-          http: this.#backendPaths(backend.service),
-        },
-        {
-          host: frontend.host,
-          http: this.#frontendPaths(frontend.service),
-        },
-      ],
-    }
+    return [
+      {
+        host: backend.host,
+        http: this.#backendPaths(backend.service),
+      },
+      {
+        host: frontend.host,
+        http: this.#frontendPaths(frontend.service),
+      },
+    ]
   }
   #tls(secret: string, hosts: Array<string>) {
-    return {
-      tls: [{ secretName: secret, hosts }],
-    }
+    return [{ secretName: secret, hosts }]
   }
   #metadata(name: string, namespace: string, issuer: string) {
     return {
