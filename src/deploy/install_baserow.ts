@@ -187,8 +187,8 @@ const argv = yargs(process.argv.slice(2))
       demandOption: true,
       alias: "kubeconfig",
     },
-    s: {
-      alias: "name",
+    sr: {
+      alias: "postgres-secret",
       type: "string",
       demandOption: true,
       describe:
@@ -205,7 +205,7 @@ const argv = yargs(process.argv.slice(2))
   .completion()
   .parseSync()
 
-const secret = await getSecret(argv.kc, argv.s, argv.ns)
+const secret = await getSecret(argv.kc, argv.sr, argv.ns)
 const app = new App()
 const deployName = argv.nm.concat("-").concat(argv.ns)
 new HelmChartStack(app, deployName, {
@@ -229,6 +229,8 @@ new HelmChartStack(app, deployName, {
       pass: argv.sp,
       host: argv.sh,
     }),
+    { name: "config.publicBackendUrl", value: `https://${argv.bh}` },
+    { name: "config.publicFrontendUrl", value: `https://${argv.fh}` },
   ],
 })
 
@@ -236,13 +238,13 @@ const ingressDeployName = deployName.concat("-ingress")
 new BaserowIngressStack(app, ingressDeployName, {
   resource: {
     name: ingressDeployName,
-    namespace: argv.nm,
-    secret: deployName.concat("-ingress-tls"),
+    namespace: argv.ns,
+    secret: deployName.concat("-ingress-tls-https"),
     issuer: argv.is,
     frontendHost: argv.fh,
     backendHost: argv.bh,
-    frontendService: "frontend",
-    backendService: "backend",
+    frontendService: argv.nm.concat("-frontend"),
+    backendService: argv.nm,
   },
   provider: {
     config: argv.kc,
