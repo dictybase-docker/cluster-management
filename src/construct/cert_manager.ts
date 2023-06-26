@@ -65,7 +65,7 @@ class IssuerStack extends TerraformStack {
     return [
       {
         http01: {
-          ingress: { ingressClassName: "nginx" },
+          ingress: { class: "nginx" },
         },
       },
     ]
