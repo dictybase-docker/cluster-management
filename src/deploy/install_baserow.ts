@@ -41,8 +41,9 @@ const emailValues = ({ from, user, pass, host }: emailValuesProperties) => [
   },
 ]
 const storageValues = (storageClass: string) => [
-  { name: "persistence.enabled", value: "true" },
-  { name: "persistence.storageClassName", value: storageClass },
+  { name: "backend.persistence.enabled", value: "true" },
+  { name: "backend.persistence.storageClassName", value: storageClass },
+  { name: "backend.persistence.resources.requests.storage", value: "40Gi" },
 ]
 const redisValues = () => [
   { name: "redis.enabled", value: "false" },
