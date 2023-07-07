@@ -182,19 +182,24 @@ class PostgresStack extends TerraformStack {
         configuration: [{ secret: { name: secret.metadata.name } }],
         global: {
           "archive-async": "y",
+          "compress-level": 3,
+          "start-fast": "y",
+          "archive-timeout": 10000,
+          "archive-copy": "y",
           [`${repository}-path`]: `/pgbackrest/${namespace}/${repository}`,
           [`${repository}-retention-full-type`]: "time",
           [`${repository}-retention-full`]: "30",
           [`${repository}-retention-diff`]: "30",
           [`${repository}-retention-archive`]: "30",
-          [`${repository}-retention-archive-type`]: "diff",
+          [`${repository}-bundle`]: "y",
         },
         repos: [
           {
             name: repository,
             gcs: { bucket: backupBucket },
             schedules: {
-              differential: "0 0 * * *",
+              // differential: "0 0 * * *",
+              full: "0 0 * * *",
             },
           },
         ],
