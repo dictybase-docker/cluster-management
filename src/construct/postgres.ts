@@ -4,7 +4,6 @@ import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Secret } from "@cdktf/provider-kubernetes/lib/secret"
 import { Manifest } from "@cdktf/provider-kubernetes/lib/manifest"
 import { readFileSync } from "fs"
-import { Buffer } from "buffer"
 
 type Provider = {
   config: string
@@ -183,7 +182,6 @@ class PostgresStack extends TerraformStack {
         configuration: [{ secret: { name: secret.metadata.name } }],
         global: {
           "archive-async": "y",
-          "compress-type": "zst",
           [`${repository}-path`]: `/pgbackrest/${namespace}/${repository}`,
           [`${repository}-retention-full-type`]: "time",
           [`${repository}-retention-full`]: "30",
@@ -229,15 +227,12 @@ class PostgresSecretStack extends TerraformStack {
       name: id,
       namespace: namespace,
     }
-    const gcsConf = Buffer.from(
-      `
-		[global]
-		${repository}-gcs-key=/etc/pgbackrest/conf.d/gcs-key.json
-	`,
-    ).toString("base64")
-    const gcsKeyJson = Buffer.from(readFileSync(gcsKey).toString()).toString(
-      "base64",
-    )
+    const gcsConf = `
+[global]
+${repository}-gcs-key=/etc/pgbackrest/conf.d/gcs-key.json
+
+`
+    const gcsKeyJson = readFileSync(gcsKey).toString()
     this.secret = new Secret(this, id, {
       metadata,
       data: {
