@@ -33,7 +33,7 @@
         "@types/nodemailer": "^6.4.8",
         "cdktf": "0.16.x",
         "cdktf-cli": "0.17.x",
-        "eta": "^2.2.0",
+        "eta": "^3.0.3",
         "nodemailer": "^6.9.3",
         "ssh2": "^1.13.0",
         "winston": "^3.9.0",
