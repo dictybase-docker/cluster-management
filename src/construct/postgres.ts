@@ -197,8 +197,8 @@ class PostgresStack extends TerraformStack {
           {
             name: repository,
             gcs: { bucket: backupBucket },
-            shedules: {
-              differential: "0 0 * * *",
+            schedules: {
+              full: "0 0 * * *",
             },
           },
         ],
