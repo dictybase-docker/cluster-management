@@ -20,3 +20,4 @@ github_token.txt
 .envrc
 env/
 *kubeconfig.yaml
+completions/
