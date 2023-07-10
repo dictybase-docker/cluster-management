@@ -78,7 +78,7 @@ class RepositoryStack extends TerraformStack {
       {
         name,
         image,
-        command: ["restic", "-r", `gs:${bucketName}/`, "init"],
+        command: ["restic", "-r", `gs:${bucketName}:/`, "init"],
         volumeMounts: this.#volumeMounts(`${name}-secret-volume`),
         env: [
           ...this.#env(secretName),
@@ -92,7 +92,6 @@ class RepositoryStack extends TerraformStack {
   }
   #env(secretName: string) {
     return [
-      { name: "RESTIC_REPOSITORY", key: "restic.name" },
       { name: "RESTIC_PASSWORD", key: "restic.password" },
       { name: "GOOGLE_PROJECT_ID", key: "gcs.project" },
     ].map(({ name, key }) => {
