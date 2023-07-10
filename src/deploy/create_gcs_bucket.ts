@@ -16,8 +16,8 @@ const argv = yargs(process.argv.slice(2))
       default: "dicty-terraform-state",
       description: "GCS bucket name where terraform remote state is stored.",
     },
-    bb: {
-      alias: "backup-bucket",
+    gb: {
+      alias: "gcs-bucket",
       type: "string",
       demandOption: true,
       description: "GCS bucket to create",
@@ -58,12 +58,13 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-new BucketStack(app, argv.nm, {
+const deployName = argv.nm.concat("-").concat(argv.gb)
+new BucketStack(app, deployName, {
   backend: {
     remote: argv.r,
     credentials: argv.c,
     bucketName: argv.bn,
-    bucketPrefix: argv.nm,
+    bucketPrefix: deployName,
   },
   provider: {
     credentials: argv.c,
@@ -72,7 +73,7 @@ new BucketStack(app, argv.nm, {
     zone: argv.z,
   },
   resource: {
-    bucketName: argv.bb,
+    bucketName: argv.gb,
   },
 })
 app.synth()
