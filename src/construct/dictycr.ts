@@ -23,7 +23,6 @@ type SecretStackProperties = {
 }
 
 class SecretStack extends TerraformStack {
-  public readonly secret: Secret
   constructor(scope: Construct, id: string, options: SecretStackProperties) {
     const {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
@@ -42,7 +41,7 @@ class SecretStack extends TerraformStack {
       name: id,
       namespace: namespace,
     }
-    this.secret = new Secret(this, id, {
+    new Secret(this, id, {
       metadata,
       data: {
         "gcsbucket.credentials": readFileSync(gcsKey).toString(),
