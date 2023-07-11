@@ -30,6 +30,16 @@ type containersProperties = {
   bucketName: string
   volumeName: string
 }
+
+type backupContainersProperties = {
+  name: string
+  secretName: string
+  image: string
+  bucketName: string
+  volumeName: string
+  pgSecretName: string
+  database: string
+}
 type PostgresBackupStackProperties = {
   provider: Provider
   resource: Resource & {
@@ -188,8 +198,10 @@ class PostgresBackupStack extends TerraformStack {
               name: `${id}-container`,
               bucketName: backupBucketName,
               volumeName: `${id}-volumes`,
+              pgSecretName,
               secretName,
               image,
+              database,
             }),
           },
         },
@@ -199,18 +211,33 @@ class PostgresBackupStack extends TerraformStack {
   #containers({
     name,
     secretName,
+    pgSecretName,
     image,
     bucketName,
     volumeName,
-  }: containersProperties) {
+    database,
+  }: backupContainersProperties) {
     return [
       {
         name,
         image,
-        command: ["restic", "-r", `gs:${bucketName}:/`, "init"],
+        command: [
+          "pg_dump",
+          "-Fc",
+          database,
+          "|",
+          "restic",
+          "-r",
+          `gs:${bucketName}:/`,
+          "backup",
+          "--stdin",
+          "--stdin-filename",
+          database.concat(".dump"),
+        ],
         volumeMount: this.#volumeMounts(volumeName),
         env: [
           ...this.#resticEnv(secretName),
+          ...this.#pgEnv(pgSecretName),
           {
             name: "GOOGLE_APPLICATION_CREDENTIALS",
             value: "/var/secret/credentials.json",
@@ -218,6 +245,23 @@ class PostgresBackupStack extends TerraformStack {
         ],
       },
     ]
+  }
+  #pgEnv(secretName: string) {
+    return ["host", "port", "user", "password"]
+      .map((key) => {
+        return { name: "PG".concat(key.toUpperCase()), key }
+      })
+      .map(({ name, key }) => {
+        return {
+          name,
+          valueFrom: {
+            secretKeyRef: {
+              key,
+              name: secretName,
+            },
+          },
+        }
+      })
   }
   #resticEnv(secretName: string) {
     return [
