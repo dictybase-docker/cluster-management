@@ -28,6 +28,14 @@ type containersProperties = {
   secretName: string
   image: string
   bucketName: string
+  volumeName: string
+}
+type PostgresBackupStackProperties = {
+  provider: Provider
+  resource: Resource & {
+    pgSecretName: string
+    database: string
+  }
 }
 
 class RepositoryStack extends TerraformStack {
@@ -65,6 +73,7 @@ class RepositoryStack extends TerraformStack {
             container: this.#containers({
               name: `${id}-container`,
               bucketName: backupBucketName,
+              volumeName: `${id}-volumes`,
               secretName,
               image,
             }),
@@ -73,13 +82,19 @@ class RepositoryStack extends TerraformStack {
       },
     })
   }
-  #containers({ name, secretName, image, bucketName }: containersProperties) {
+  #containers({
+    name,
+    secretName,
+    image,
+    bucketName,
+    volumeName,
+  }: containersProperties) {
     return [
       {
         name,
         image,
         command: ["restic", "-r", `gs:${bucketName}:/`, "init"],
-        volumeMounts: this.#volumeMounts(`${name}-secret-volume`),
+        volumeMount: this.#volumeMounts(volumeName),
         env: [
           ...this.#env(secretName),
           {
@@ -130,4 +145,118 @@ class RepositoryStack extends TerraformStack {
   }
 }
 
-export { RepositoryStack }
+class PostgresBackupStack extends TerraformStack {
+  constructor(
+    scope: Construct,
+    id: string,
+    options: PostgresBackupStackProperties,
+  ) {
+    const {
+      provider: { remote, credentials, bucketName, bucketPrefix, config },
+      resource: {
+        image,
+        namespace,
+        secretName,
+        backupBucketName,
+        pgSecretName,
+        database,
+      },
+    } = options
+    super(scope, id)
+    if (remote) {
+      new GcsBackend(this, {
+        bucket: bucketName,
+        prefix: bucketPrefix,
+        credentials: readFileSync(credentials).toString(),
+      })
+    }
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    const metadata = {
+      name: id,
+      namespace: namespace,
+    }
+    new Job(this, id, {
+      metadata,
+      spec: {
+        backoffLimit: 0,
+        template: {
+          metadata: this.#template_metadata(`${id}-template`),
+          spec: {
+            volume: this.#volumes(`${id}-volumes`, secretName),
+            restartPolicy: "Never",
+            container: this.#containers({
+              name: `${id}-container`,
+              bucketName: backupBucketName,
+              volumeName: `${id}-volumes`,
+              secretName,
+              image,
+            }),
+          },
+        },
+      },
+    })
+  }
+  #containers({
+    name,
+    secretName,
+    image,
+    bucketName,
+    volumeName,
+  }: containersProperties) {
+    return [
+      {
+        name,
+        image,
+        command: ["restic", "-r", `gs:${bucketName}:/`, "init"],
+        volumeMount: this.#volumeMounts(volumeName),
+        env: [
+          ...this.#resticEnv(secretName),
+          {
+            name: "GOOGLE_APPLICATION_CREDENTIALS",
+            value: "/var/secret/credentials.json",
+          },
+        ],
+      },
+    ]
+  }
+  #resticEnv(secretName: string) {
+    return [
+      { name: "RESTIC_PASSWORD", key: "restic.password" },
+      { name: "GOOGLE_PROJECT_ID", key: "gcs.project" },
+    ].map(({ name, key }) => {
+      return {
+        name,
+        valueFrom: {
+          secretKeyRef: {
+            key,
+            name: secretName,
+          },
+        },
+      }
+    })
+  }
+  #volumeMounts(name: string) {
+    return [{ name, mountPath: "/var/secret" }]
+  }
+  #template_metadata(name: string) {
+    return { name }
+  }
+  #volumes(name: string, secretName: string) {
+    return [
+      {
+        name: name,
+        secret: {
+          secretName,
+          items: [
+            {
+              key: "gcsbucket.credentials",
+              path: "credentials.json",
+            },
+          ],
+        },
+      },
+    ]
+  }
+}
+
+export { RepositoryStack, PostgresBackupStack }
