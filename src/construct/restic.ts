@@ -221,18 +221,29 @@ class PostgresBackupStack extends TerraformStack {
       {
         name,
         image,
-        command: [
-          "pg_dump",
-          "-Fc",
-          database,
-          "|",
-          "restic",
-          "-r",
-          `gs:${bucketName}:/`,
-          "backup",
-          "--stdin",
-          "--stdin-filename",
-          database.concat(".dump"),
+        command: ["/bin/sh", "-c"],
+        args: [
+          "pg_dump"
+            .concat(" ")
+            .concat("-Fc")
+            .concat(" ")
+            .concat(database)
+            .concat(" ")
+            .concat("|")
+            .concat(" ")
+            .concat("restic")
+            .concat(" ")
+            .concat("-r")
+            .concat(" ")
+            .concat(`gs:${bucketName}:/`)
+            .concat(" ")
+            .concat("backup")
+            .concat(" ")
+            .concat("--stdin")
+            .concat(" ")
+            .concat("--stdin-filename")
+            .concat(" ")
+            .concat(database.concat(".dump")),
         ],
         volumeMount: this.#volumeMounts(volumeName),
         env: [
