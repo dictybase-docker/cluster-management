@@ -1,6 +1,7 @@
 import { TerraformStack, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
+import { CronJob } from "@cdktf/provider-kubernetes/lib/cron-job"
 import { Job } from "@cdktf/provider-kubernetes/lib/job"
 import { readFileSync } from "fs"
 
@@ -185,24 +186,29 @@ class PostgresBackupStack extends TerraformStack {
       name: id,
       namespace: namespace,
     }
-    new Job(this, id, {
+    new CronJob(this, id, {
       metadata,
       spec: {
-        backoffLimit: 0,
-        template: {
-          metadata: this.#template_metadata(`${id}-template`),
+        schedule: "30 1 * * *",
+        jobTemplate: {
+          metadata: this.#template_metadata(`${id}-job-template`),
           spec: {
-            volume: this.#volumes(`${id}-volumes`, secretName),
-            restartPolicy: "Never",
-            container: this.#containers({
-              name: `${id}-container`,
-              bucketName: backupBucketName,
-              volumeName: `${id}-volumes`,
-              pgSecretName,
-              secretName,
-              image,
-              database,
-            }),
+            template: {
+              metadata: this.#template_metadata(`${id}-template`),
+              spec: {
+                volume: this.#volumes(`${id}-volumes`, secretName),
+                restartPolicy: "Never",
+                container: this.#containers({
+                  name: `${id}-container`,
+                  bucketName: backupBucketName,
+                  volumeName: `${id}-volumes`,
+                  pgSecretName,
+                  secretName,
+                  image,
+                  database,
+                }),
+              },
+            },
           },
         },
       },
@@ -223,27 +229,7 @@ class PostgresBackupStack extends TerraformStack {
         image,
         command: ["/bin/sh", "-c"],
         args: [
-          "pg_dump"
-            .concat(" ")
-            .concat("-Fc")
-            .concat(" ")
-            .concat(database)
-            .concat(" ")
-            .concat("|")
-            .concat(" ")
-            .concat("restic")
-            .concat(" ")
-            .concat("-r")
-            .concat(" ")
-            .concat(`gs:${bucketName}:/`)
-            .concat(" ")
-            .concat("backup")
-            .concat(" ")
-            .concat("--stdin")
-            .concat(" ")
-            .concat("--stdin-filename")
-            .concat(" ")
-            .concat(database.concat(".dump")),
+          `pg_dump -Fc ${database} | restic -r gs:${bucketName}:/ backup --stdin --stdin-filename ${database}.dump`,
         ],
         volumeMount: this.#volumeMounts(volumeName),
         env: [
