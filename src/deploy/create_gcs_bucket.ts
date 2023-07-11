@@ -28,12 +28,6 @@ const argv = yargs(process.argv.slice(2))
       default: true,
       description: "whether the remote gcs backend will be used",
     },
-    nm: {
-      describe: "name of the install",
-      alias: "name",
-      type: "string",
-      demandOption: true,
-    },
     pi: {
       alias: "project-id",
       type: "string",
@@ -58,13 +52,12 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-const deployName = argv.nm.concat("-").concat(argv.gb)
-new BucketStack(app, deployName, {
+new BucketStack(app, argv.gb, {
   backend: {
     remote: argv.r,
     credentials: argv.c,
     bucketName: argv.bn,
-    bucketPrefix: deployName,
+    bucketPrefix: argv.gb,
   },
   provider: {
     credentials: argv.c,
