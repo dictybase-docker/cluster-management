@@ -64,7 +64,7 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-const deployName = argv.nm.concat("-").concat(argv.ns)
+const deployName = argv.ns.concat("-").concat(argv.nm)
 new RepositoryStack(app, deployName, {
   provider: {
     config: argv.kc,
