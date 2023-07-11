@@ -56,7 +56,7 @@ const argv = yargs(process.argv.slice(2))
       alias: "backup-image",
       describe: "image to use for backup job",
       type: "string",
-      default: "dictybase/resticpg:e9b04a2d3cc4",
+      default: "dictybase/resticpg:develop-393cb4e",
     },
   })
   .help()
