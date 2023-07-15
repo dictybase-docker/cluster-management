@@ -1442,12 +1442,7 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.23.tgz#b6e934fe427eb7081d0015aad070acb3373c3c90"
   integrity sha512-XAMpaw1s1+6zM+jn2tmw8MyaRDIJfXxqmIQIS0HfoGYPuf7dUWeiUKopwq13KFX9lEp1+THGtlaaYx39Nxr58g==
 
-"@types/node@^18.11.17", "@types/node@^18.11.18":
-  version "18.16.18"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.18.tgz#85da09bafb66d4bc14f7c899185336d0c1736390"
-  integrity sha512-/aNaQZD0+iSBAGnvvN2Cx92HqE5sZCPZtx2TsK+4nvV23fFe09jVDvpArXr2j9DnYlzuU9WuoykDDc6wqvpNcw==
-
-"@types/node@~18.16.0":
+"@types/node@^18.11.17", "@types/node@^18.11.18", "@types/node@~18.16.0":
   version "18.16.19"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.16.19.tgz#cb03fca8910fdeb7595b755126a8a78144714eea"
   integrity sha512-IXl7o+R9iti9eBW4Wg2hx1xQDig183jj7YLn8F7udNceyfkbn1ZxmzZXuak20gR40D7pIkIY1kYGx5VIGbaHKA==
@@ -1482,9 +1477,9 @@
     "@types/node" "*"
 
 "@types/ssh2@~1.11.12":
-  version "1.11.12"
-  resolved "https://registry.yarnpkg.com/@types/ssh2/-/ssh2-1.11.12.tgz#f506e8a4dbacd3189391d36d283fcbfeb31ef57b"
-  integrity sha512-uvrvY6oN+3LiFiQmDCnuP65Qlryqvw5sbpKP7oce5cI/Ib3u3yY/DIkxIegT87MaVpnchUfSkEo2g9HeC7mUng==
+  version "1.11.13"
+  resolved "https://registry.yarnpkg.com/@types/ssh2/-/ssh2-1.11.13.tgz#e6224da936abec0541bf26aa826b1cc37ea70d69"
+  integrity sha512-08WbG68HvQ2YVi74n2iSUnYHYpUdFc/s2IsI0BHBdJwaqYJpWlVv9elL0tYShTv60yr0ObdxJR5NrCRiGJ/0CQ==
   dependencies:
     "@types/node" "^18.11.18"
 
