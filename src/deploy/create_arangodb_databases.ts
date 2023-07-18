@@ -3,6 +3,7 @@ import { App } from "cdktf"
 import { DatabaseStack } from "../construct/arangodb"
 
 const argv = yargs(process.argv.slice(2))
+  .command("create-arango-databases", "create arangodb databases and user")
   .options({
     nm: {
       type: "string",
