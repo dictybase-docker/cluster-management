@@ -1,4 +1,5 @@
 import { TerraformStack, GcsBackend } from "cdktf"
+import { Job } from "@cdktf/provider-kubernetes/lib/job"
 import { Construct } from "constructs"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Manifest } from "@cdktf/provider-kubernetes/lib/manifest"
@@ -23,6 +24,23 @@ type ArangodbSingleStackProperties = {
   provider: Provider
   resource: Resource
 }
+type databaseResource = {
+  namespace: string
+  image: string
+  adminUser: string
+  adminPassword: string
+  user: string
+  grant: string
+  databases: Array<string>
+}
+type DatabaseStackProperties = {
+  provider: Provider
+  resource: databaseResource
+}
+type containersProperties = Omit<databaseResource, "namespace"> & {
+  name: string
+}
+
 class ArangodbSingleStack extends TerraformStack {
   constructor(
     scope: Construct,
@@ -92,4 +110,90 @@ class ArangodbSingleStack extends TerraformStack {
   }
 }
 
-export { ArangodbSingleStack }
+class DatabaseStack extends TerraformStack {
+  constructor(scope: Construct, id: string, options: DatabaseStackProperties) {
+    const {
+      provider: { remote, credentials, bucketName, bucketPrefix, config },
+      resource: {
+        namespace,
+        image,
+        adminUser,
+        adminPassword,
+        user,
+        grant,
+        databases,
+      },
+    } = options
+    super(scope, id)
+    if (remote) {
+      new GcsBackend(this, {
+        bucket: bucketName,
+        prefix: bucketPrefix,
+        credentials: readFileSync(credentials).toString(),
+      })
+    }
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    new Job(this, id, {
+      metadata: { name: id, namespace },
+      spec: {
+        backoffLimit: 0,
+        template: {
+          metadata: this.#template_metadata(`${id}-template`),
+          spec: {
+            restartPolicy: "Never",
+            container: this.#containers({
+              name: `${id}-container`,
+              image,
+              adminPassword,
+              adminUser,
+              user,
+              grant,
+              databases,
+            }),
+          },
+        },
+      },
+    })
+  }
+  #containers({
+    name,
+    image,
+    adminUser,
+    adminPassword,
+    user,
+    grant,
+    databases,
+  }: containersProperties) {
+    const dbnames = databases
+      .map((name) => {
+        return ["--database", name]
+      })
+      .flat()
+    return [
+      {
+        name,
+        image,
+        args: [
+          "--log-level",
+          "info",
+          "--is-secure",
+          "create-database",
+          "--admin-user",
+          adminUser,
+          "--admin-password",
+          adminPassword,
+          "--user",
+          user,
+          "--grant",
+          grant,
+          ...dbnames,
+        ],
+      },
+    ]
+  }
+  #template_metadata(name: string) {
+    return { name }
+  }
+}
+
+export { ArangodbSingleStack, DatabaseStack }
