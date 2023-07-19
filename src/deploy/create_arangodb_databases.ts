@@ -58,6 +58,12 @@ const argv = yargs(process.argv.slice(2))
       describe: "arangodb user to be created",
       demandOption: true,
     },
+    pa: {
+      alias: "password",
+      type: "string",
+      describe: "password for the user to be created",
+      demandOption: true,
+    },
     gr: {
       alias: "grant",
       type: "string",
@@ -98,6 +104,7 @@ new DatabaseStack(app, deployName, {
     adminPassword: argv.ap,
     user: argv.us,
     grant: argv.gr,
+    password: argv.pa,
     databases: argv.dbs as Array<string>,
   },
 })
