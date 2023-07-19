@@ -28,7 +28,7 @@ type databaseResource = {
   namespace: string
   image: string
   adminUser: string
-  adminPassword: string
+  adminPassword?: string
   user: string
   grant: string
   databases: Array<string>
@@ -181,7 +181,7 @@ class DatabaseStack extends TerraformStack {
           "--admin-user",
           adminUser,
           "--admin-password",
-          adminPassword,
+          adminPassword ?? "",
           "--user",
           user,
           "--grant",
