@@ -180,7 +180,6 @@ class DatabaseStack extends TerraformStack {
         args: [
           "--log-level",
           "info",
-          "--is-secure",
           "create-database",
           "--admin-user",
           adminUser,
