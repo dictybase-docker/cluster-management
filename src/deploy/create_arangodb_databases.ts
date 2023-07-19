@@ -51,7 +51,6 @@ const argv = yargs(process.argv.slice(2))
       alias: "admin-pass",
       type: "string",
       describe: "arangodb admin user password",
-      demandOption: true,
     },
     us: {
       alias: "user",
