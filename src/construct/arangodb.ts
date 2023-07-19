@@ -30,6 +30,7 @@ type databaseResource = {
   adminUser: string
   adminPassword?: string
   user: string
+  password: string
   grant: string
   databases: Array<string>
 }
@@ -120,6 +121,7 @@ class DatabaseStack extends TerraformStack {
         adminUser,
         adminPassword,
         user,
+        password,
         grant,
         databases,
       },
@@ -147,6 +149,7 @@ class DatabaseStack extends TerraformStack {
               adminPassword,
               adminUser,
               user,
+              password,
               grant,
               databases,
             }),
@@ -161,6 +164,7 @@ class DatabaseStack extends TerraformStack {
     adminUser,
     adminPassword,
     user,
+    password,
     grant,
     databases,
   }: containersProperties) {
@@ -184,6 +188,8 @@ class DatabaseStack extends TerraformStack {
           adminPassword ?? "",
           "--user",
           user,
+          "--password",
+          password,
           "--grant",
           grant,
           ...dbnames,
