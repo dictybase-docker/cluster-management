@@ -21,3 +21,5 @@ github_token.txt
 env/
 *kubeconfig.yaml
 completions/
+dictycontent.dmp
+gke_gcloud_auth_plugin_cache
