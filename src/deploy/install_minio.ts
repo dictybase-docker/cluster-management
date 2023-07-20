@@ -58,6 +58,12 @@ const argv = yargs(process.argv.slice(2))
       describe: "version of the chart to be deployed",
       default: "5.0.13",
     },
+    ds: {
+      alias: "disk-size",
+      type: "string",
+      describe: "initial disk size assigned for storage",
+      default: "75Gi",
+    },
   })
   .help()
   .completion()
@@ -78,7 +84,7 @@ new HelmChartStack(app, deployName, {
   name: argv.nm,
   values: [
     { name: "mode", value: "standalone" },
-    { name: "persistence.size", value: "50Gi" },
+    { name: "persistence.size", value: argv.ds },
     { name: "persistence.storageClass", value: "dictycr-balanced" },
   ],
 })
