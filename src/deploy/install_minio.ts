@@ -64,6 +64,12 @@ const argv = yargs(process.argv.slice(2))
       describe: "initial disk size assigned for storage",
       default: "75Gi",
     },
+    ms: {
+      alias: "minio-secret",
+      type: "string",
+      describe: "secret that contain root credentials for minio",
+      demandOption: true,
+    },
   })
   .help()
   .completion()
@@ -86,6 +92,8 @@ new HelmChartStack(app, deployName, {
     { name: "mode", value: "standalone" },
     { name: "persistence.size", value: argv.ds },
     { name: "persistence.storageClass", value: "dictycr-balanced" },
+    { name: "existingSecret", value: argv.ms },
+    { name: "resources.requests.memory", value: "256Mi" },
   ],
 })
 app.synth()
