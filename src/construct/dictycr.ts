@@ -16,6 +16,8 @@ type Resource = {
   gcsKey: string
   project: string
   resticPassword: string
+  minioUser: string
+  minioPassword: string
 }
 type SecretStackProperties = {
   provider: Provider
@@ -26,7 +28,14 @@ class SecretStack extends TerraformStack {
   constructor(scope: Construct, id: string, options: SecretStackProperties) {
     const {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
-      resource: { gcsKey, project, resticPassword, namespace },
+      resource: {
+        gcsKey,
+        project,
+        resticPassword,
+        namespace,
+        minioUser,
+        minioPassword,
+      },
     } = options
     super(scope, id)
     if (remote) {
@@ -47,6 +56,8 @@ class SecretStack extends TerraformStack {
         "gcsbucket.credentials": readFileSync(gcsKey).toString(),
         "gcs.project": project,
         "restic.password": resticPassword,
+        rootUser: minioUser,
+        rootPassword: minioPassword,
       },
     })
   }
