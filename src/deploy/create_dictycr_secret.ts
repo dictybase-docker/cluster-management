@@ -58,6 +58,18 @@ const argv = yargs(process.argv.slice(2))
       describe: "password of restic repository",
       demandOption: true,
     },
+    mu: {
+      alias: "minio-user",
+      type: "string",
+      describe: "minio user name",
+      default: "dictycr",
+    },
+    mp: {
+      alias: "minio-password",
+      type: "string",
+      describe: "minio password",
+      demandOption: true,
+    },
   })
   .help()
   .completion()
@@ -78,6 +90,8 @@ new SecretStack(app, deployName, {
     gcsKey: argv.bc,
     project: argv.pi,
     resticPassword: argv.rp,
+    minioUser: argv.mu,
+    minioPassword: argv.mp,
   },
 })
 app.synth()
