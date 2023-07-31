@@ -2,6 +2,7 @@ import { TerraformStack, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Secret } from "@cdktf/provider-kubernetes/lib/secret"
+import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
 import { readFileSync } from "fs"
 
 type Provider = {
@@ -22,6 +23,15 @@ type SecretStackResource = {
 type SecretStackProperties = {
   provider: Provider
   resource: SecretStackResource
+}
+type BackendDeploymentResource = {
+  namespace: string
+  image: string
+  tag: string
+}
+type BackendDeploymentProperties = {
+  provider: Provider
+  resource: BackendDeploymentResource
 }
 
 class SecretStack extends TerraformStack {
@@ -64,17 +74,14 @@ class SecretStack extends TerraformStack {
 }
 
 class BackendDeployment extends TerraformStack {
-  constructor(scope: Construct, id: string, options: SecretStackProperties) {
+  constructor(
+    scope: Construct,
+    id: string,
+    options: BackendDeploymentProperties,
+  ) {
     const {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
-      resource: {
-        gcsKey,
-        project,
-        resticPassword,
-        namespace,
-        minioUser,
-        minioPassword,
-      },
+      resource: { namespace },
     } = options
     super(scope, id)
     if (remote) {
@@ -85,20 +92,18 @@ class BackendDeployment extends TerraformStack {
       })
     }
     new KubernetesProvider(this, `${id}-provider`, { configPath: config })
-    const metadata = {
-      name: id,
-      namespace: namespace,
-    }
-    new Secret(this, id, {
-      metadata,
-      data: {
-        "gcsbucket.credentials": readFileSync(gcsKey).toString(),
-        "gcs.project": project,
-        "restic.password": resticPassword,
-        rootUser: minioUser,
-        rootPassword: minioPassword,
-      },
-    })
+  }
+  #metadata(name: string, namespace: string) {
+    return { name, namespace }
+  }
+  #commandArgs() {
+    return []
+  }
+  #env() {
+    return []
+  }
+  #containers() {
+    return []
   }
 }
 
