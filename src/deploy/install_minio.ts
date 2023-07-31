@@ -11,7 +11,7 @@ const argv = yargs(process.argv.slice(2))
       default: "minio",
     },
     ns: {
-      describe: "kubernetes namespace where the pgo operator will be installed",
+      describe: "kubernetes namespace where the minio will be installed",
       type: "string",
       alias: "namespace",
       demandOption: true,
