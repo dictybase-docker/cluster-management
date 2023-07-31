@@ -11,7 +11,7 @@ type Provider = {
   bucketName: string
   bucketPrefix: string
 }
-type Resource = {
+type SecretStackResource = {
   namespace: string
   gcsKey: string
   project: string
@@ -21,7 +21,7 @@ type Resource = {
 }
 type SecretStackProperties = {
   provider: Provider
-  resource: Resource
+  resource: SecretStackResource
 }
 
 class SecretStack extends TerraformStack {
@@ -63,4 +63,43 @@ class SecretStack extends TerraformStack {
   }
 }
 
-export { SecretStack }
+class BackendDeployment extends TerraformStack {
+  constructor(scope: Construct, id: string, options: SecretStackProperties) {
+    const {
+      provider: { remote, credentials, bucketName, bucketPrefix, config },
+      resource: {
+        gcsKey,
+        project,
+        resticPassword,
+        namespace,
+        minioUser,
+        minioPassword,
+      },
+    } = options
+    super(scope, id)
+    if (remote) {
+      new GcsBackend(this, {
+        bucket: bucketName,
+        prefix: bucketPrefix,
+        credentials: readFileSync(credentials).toString(),
+      })
+    }
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    const metadata = {
+      name: id,
+      namespace: namespace,
+    }
+    new Secret(this, id, {
+      metadata,
+      data: {
+        "gcsbucket.credentials": readFileSync(gcsKey).toString(),
+        "gcs.project": project,
+        "restic.password": resticPassword,
+        rootUser: minioUser,
+        rootPassword: minioPassword,
+      },
+    })
+  }
+}
+
+export { SecretStack, BackendDeployment }
