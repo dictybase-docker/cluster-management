@@ -58,6 +58,18 @@ const argv = yargs(process.argv.slice(2))
       describe: "password of restic repository",
       demandOption: true,
     },
+    au: {
+      alias: "arangodb-user",
+      type: "string",
+      describe: "arangodb user name",
+      default: "dictycr",
+    },
+    ap: {
+      alias: "arangodb-password",
+      type: "string",
+      describe: "arangodb password",
+      demandOption: true,
+    },
     mu: {
       alias: "minio-user",
       type: "string",
@@ -92,6 +104,8 @@ new SecretStack(app, deployName, {
     resticPassword: argv.rp,
     minioUser: argv.mu,
     minioPassword: argv.mp,
+    arangodbUser: argv.au,
+    arangodbPassword: argv.ap,
   },
 })
 app.synth()
