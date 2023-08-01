@@ -19,6 +19,8 @@ type SecretStackResource = {
   resticPassword: string
   minioUser: string
   minioPassword: string
+  arangodbUser: string
+  arangodbPassword: string
 }
 type SecretStackProperties = {
   provider: Provider
@@ -45,6 +47,8 @@ class SecretStack extends TerraformStack {
         namespace,
         minioUser,
         minioPassword,
+        arangodbUser,
+        arangodbPassword,
       },
     } = options
     super(scope, id)
@@ -66,6 +70,8 @@ class SecretStack extends TerraformStack {
         "gcsbucket.credentials": readFileSync(gcsKey).toString(),
         "gcs.project": project,
         "restic.password": resticPassword,
+        "arangodb.user": arangodbUser,
+        "arangodb.password": arangodbPassword,
         rootUser: minioUser,
         rootPassword: minioPassword,
       },
@@ -96,13 +102,13 @@ class BackendDeployment extends TerraformStack {
   #metadata(name: string, namespace: string) {
     return { name, namespace }
   }
+  #containers() {
+    return []
+  }
   #commandArgs() {
     return []
   }
   #env() {
-    return []
-  }
-  #containers() {
     return []
   }
 }
