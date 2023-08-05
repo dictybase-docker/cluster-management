@@ -1974,9 +1974,9 @@ cdktf@0.17.1:
     semver "^7.5.3"
 
 cdktf@~0.17.1:
-  version "0.17.2"
-  resolved "https://registry.yarnpkg.com/cdktf/-/cdktf-0.17.2.tgz#7b09b18f071cff53e83c9d4daa40d0efe87e83fd"
-  integrity sha512-nP/QDpysmj7En/u9mdN8ODJa69auTByFx3mgCJjhfAPX83I3fpGuH4WXuLFhJsYCZqZiG7eOp45hJcNbpJO1Kw==
+  version "0.17.3"
+  resolved "https://registry.yarnpkg.com/cdktf/-/cdktf-0.17.3.tgz#8ef8ad34a1946551bcd6f453668552629f2e41f3"
+  integrity sha512-bqAzuuYLc8sy0ZoKw/RnohS6SH6fwAhCsU31vxuEiwu0BVcCaExfjQVZx/iJgmF1TJqk/cu2fMCLUgT3PDAuhQ==
   dependencies:
     archiver "5.3.1"
     json-stable-stringify "^1.0.2"
