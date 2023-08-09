@@ -37,9 +37,8 @@ From [here](https://developer.hashicorp.com/terraform/cdktf)
 
 ## Running commands
 
-The commands are defined in the script field of `package.json` file. The two
-main commands will be `yarn synth` and `yarn deploy`. To get a list of all
-available command line options run `yarn tsx src/main.ts -h`.
+The scripts are kept in the `src/deploy` folder of this repository. The two commands
+`yarn synth` and `yarn deploy` will be used to run those scripts.
 
 ### Deploy with CDK
 
@@ -47,5 +46,5 @@ available command line options run `yarn tsx src/main.ts -h`.
 - `` yarn deploy vm-instance k0s-cluster -a `tsx src/main.ts --pi <google cloud
 project id> ``
 
-  The `deploy` command do run `synth`, however it is easier to verify the command
-  by the `synth` separately.
+The `deploy` command do run `synth`, however it is easier to verify the command
+by the `synth` separately.
