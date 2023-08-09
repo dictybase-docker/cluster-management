@@ -24,15 +24,16 @@ From [here](https://developer.hashicorp.com/terraform/cdktf)
 - IAM,role and permissions from [here](https://cloud.google.com/iam/docs/overview).
 - Service accounts from [here](https://cloud.google.com/iam/docs/service-accounts).
 
-### Service account for running terraform
+### Service account key file for running terraform
 
 - Create a custom **role** from **IAM and Admin** section.
 - The role should have the following [permissions](/documentation/terraform_gcp_permissions.md)
 - Create a GCP `service account`.
 - Assign the above role to the service account.
-- Download the json formatted service account key to this current folder and
-  rename it to `credentials.json`. In case the key file has a different name or
-  resides in a different path, it can be set through command line.
+- Download the json formatted service account key and use it to run `cdktf` scripts.
+- It is recommended to rename the downloaded json file and rename it to something understable.
+- All of the `cdktf` scripts can pick up the service account file
+  by passing it through `[-c|--credentials]` command line option.
 
 ## Running commands
 
