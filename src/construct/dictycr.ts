@@ -31,7 +31,7 @@ type BackendDeploymentResource = {
   namespace: string
   image: string
   tag: string
-  database: string
+  logLevel: string
   secretName: string
   service: string
   port: number
@@ -51,7 +51,7 @@ type BackendServiceProperties = {
 type containerProperties = {
   name: string
   imageWithTag: string
-  database: string
+  logLevel: string
   secretName: string
   service: string
   port: number
@@ -145,7 +145,7 @@ class BackendDeployment extends TerraformStack {
   ) {
     const {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
-      resource: { namespace, image, tag, database, secretName, service, port },
+      resource: { namespace, image, tag, logLevel, secretName, service, port },
     } = options
     super(scope, id)
     if (remote) {
@@ -170,7 +170,7 @@ class BackendDeployment extends TerraformStack {
             container: this.#containers({
               name: `${id}-container`,
               imageWithTag: `${image}:${tag}`,
-              database,
+              logLevel,
               secretName,
               service,
               port,
@@ -186,7 +186,7 @@ class BackendDeployment extends TerraformStack {
   #containers({
     name,
     imageWithTag,
-    database,
+    logLevel,
     secretName,
     service,
     port,
@@ -195,21 +195,21 @@ class BackendDeployment extends TerraformStack {
       {
         name,
         image: imageWithTag,
-        args: this.#commandArgs(database),
+        args: this.#commandArgs(logLevel),
         env: this.#env(secretName),
         ports: this.#ports(service, port),
       },
     ]
   }
-  #commandArgs(database: string) {
+  #commandArgs(logLevel: string) {
     return [
       "start-server",
       "--user",
       "$(ARANGODB_USER)",
       "--pass",
       "$(ARANGODB_PASSWORD)",
-      "--db",
-      database,
+      "--log-level",
+      logLevel,
     ]
   }
   #env(secretName: string) {
