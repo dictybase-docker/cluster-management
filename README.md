@@ -26,54 +26,10 @@ From [here](https://developer.hashicorp.com/terraform/cdktf)
 
 ### Service account for running terraform
 
+- Create a custom **role** from **IAM and Admin** section.
+- The role should have the following [permissions](/documentation/terraform_gcp_permissions.md)
 - Create a GCP `service account`.
-- The service account should have the following iam roles/permissions.
-
-```
-    logging.buckets.create
-    logging.buckets.delete
-    logging.buckets.get
-    logging.buckets.list
-    logging.buckets.undelete
-    logging.buckets.update
-    logging.buckets.write
-    logging.links.create
-    logging.links.delete
-    logging.links.get
-    logging.links.list
-    logging.logMetrics.list
-    logging.logMetrics.update
-    logging.logServiceIndexes.list
-    logging.logServices.list
-    logging.logs.list
-    logging.notificationRules.create
-    logging.notificationRules.delete
-    logging.notificationRules.get
-    logging.notificationRules.list
-    logging.notificationRules.update
-    logging.settings.get
-    logging.settings.update
-    logging.sinks.create
-    logging.sinks.delete
-    logging.sinks.get
-    logging.sinks.list
-    logging.sinks.update
-    logging.views.create
-    logging.views.delete
-    logging.views.get
-    logging.views.update
-    storage.buckets.create
-    storage.buckets.delete
-    storage.buckets.get
-    storage.buckets.list
-    storage.buckets.update
-    storage.objects.create
-    storage.objects.delete
-    storage.objects.get
-    storage.objects.list
-    storage.objects.update
-```
-
+- Assign the above role to the service account.
 - Download the json formatted service account key to this current folder and
   rename it to `credentials.json`. In case the key file has a different name or
   resides in a different path, it can be set through command line.
