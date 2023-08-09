@@ -3,6 +3,7 @@ import { Construct } from "constructs"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Secret } from "@cdktf/provider-kubernetes/lib/secret"
 import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
+import { Service } from "@cdktf/provider-kubernetes/lib/service"
 import { readFileSync } from "fs"
 
 type Provider = {
@@ -39,7 +40,14 @@ type BackendDeploymentProperties = {
   provider: Provider
   resource: BackendDeploymentResource
 }
-
+type BackendServiceProperties = {
+  provider: Provider
+  resource: {
+    namespace: string
+    port: number
+    app: string
+  }
+}
 type containerProperties = {
   name: string
   imageWithTag: string
@@ -92,6 +100,43 @@ class SecretStack extends TerraformStack {
   }
 }
 
+class BackendService extends TerraformStack {
+  constructor(scope: Construct, id: string, options: BackendServiceProperties) {
+    const {
+      provider: { remote, credentials, bucketName, bucketPrefix, config },
+      resource: { namespace, port, app },
+    } = options
+    super(scope, id)
+    if (remote) {
+      new GcsBackend(this, {
+        bucket: bucketName,
+        prefix: bucketPrefix,
+        credentials: readFileSync(credentials).toString(),
+      })
+    }
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    new Service(this, id, {
+      metadata: this.#metadata(id, namespace),
+      spec: {
+        type: "NodePort",
+        selector: {
+          app: app,
+        },
+        port: [
+          {
+            name: id,
+            port: port,
+            targetPort: id,
+          },
+        ],
+      },
+    })
+  }
+  #metadata(name: string, namespace: string) {
+    return { name, namespace }
+  }
+}
+
 class BackendDeployment extends TerraformStack {
   constructor(
     scope: Construct,
@@ -120,7 +165,7 @@ class BackendDeployment extends TerraformStack {
           },
         },
         template: {
-          metadata: { labels: { app: `${id}-template` } },
+          metadata: { labels: { app: id } },
           spec: {
             container: this.#containers({
               name: `${id}-container`,
@@ -194,4 +239,4 @@ class BackendDeployment extends TerraformStack {
   }
 }
 
-export { SecretStack, BackendDeployment }
+export { BackendService, SecretStack, BackendDeployment }
