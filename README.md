@@ -7,7 +7,7 @@
 ![Last commit](https://badgen.net/github/last-commit/dictybase-docker/cluster-management/develop)
 [![Funding](https://badgen.net/badge/Funding/Rex%20L%20Chisholm,dictyBase,DCR/yellow?list=|)](https://reporter.nih.gov/project-details/10024726)
 
-- Manages a kubernetes cluster using [k0s](https://docs.k0sproject.io/)
+- Manages a kubernetes cluster using [kops](https://kops.sigs.k8s.io)
 
 ## Prerequisites
 
