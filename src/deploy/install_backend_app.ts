@@ -1,6 +1,6 @@
 import yargs from "yargs/yargs"
 import { App } from "cdktf"
-import { BackendService, BackendDeployment } from "../construct/dictycr"
+import { BackendService, ArangodbBackendDeployment } from "../construct/dictycr"
 
 const argv = yargs(process.argv.slice(2))
   .options({
@@ -81,7 +81,7 @@ const argv = yargs(process.argv.slice(2))
 const app = new App()
 const deploymentName = argv.nm.concat("api-server")
 const service = argv.nm.concat("api")
-new BackendDeployment(app, deploymentName, {
+new ArangodbBackendDeployment(app, deploymentName, {
   provider: {
     config: argv.kc,
     remote: argv.r,
