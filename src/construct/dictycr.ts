@@ -48,6 +48,10 @@ type BackendServiceProperties = {
     app: string
   }
 }
+type NatsBackendServiceProperties = {
+  provider: Provider
+  resource: Omit<BackendServiceProperties["resource"], "port">
+}
 type containerProperties = {
   name: string
   imageWithTag: string
@@ -97,6 +101,88 @@ class SecretStack extends TerraformStack {
         rootPassword: minioPassword,
       },
     })
+  }
+}
+
+class NatsBackendService extends TerraformStack {
+  constructor(
+    scope: Construct,
+    id: string,
+    options: NatsBackendServiceProperties,
+  ) {
+    const {
+      provider: { remote, credentials, bucketName, bucketPrefix, config },
+      resource: { namespace, app },
+    } = options
+    super(scope, id)
+    if (remote) {
+      new GcsBackend(this, {
+        bucket: bucketName,
+        prefix: bucketPrefix,
+        credentials: readFileSync(credentials).toString(),
+      })
+    }
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    new Service(this, id, {
+      metadata: this.#metadata(id, namespace),
+      spec: {
+        type: "ClusterIP",
+        port: this.#ports(),
+        selector: {
+          "app.kubernetes.io/instance": app,
+          "app.kubernetes.io/name": app,
+        },
+      },
+    })
+  }
+  #metadata(name: string, namespace: string) {
+    return { name, namespace }
+  }
+  #ports() {
+    return [
+      {
+        appProtocol: "tcp",
+        name: "client",
+        port: 4222,
+        protocol: "TCP",
+        targetPort: "4222",
+      },
+      {
+        appProtocol: "tcp",
+        name: "cluster",
+        port: 6222,
+        protocol: "TCP",
+        targetPort: "6222",
+      },
+      {
+        appProtocol: "http",
+        name: "monitor",
+        port: 8222,
+        protocol: "TCP",
+        targetPort: "8222",
+      },
+      {
+        appProtocol: "http",
+        name: "metrics",
+        port: 7777,
+        protocol: "TCP",
+        targetPort: "7777",
+      },
+      {
+        appProtocol: "tcp",
+        name: "leafnodes",
+        port: 7422,
+        protocol: "TCP",
+        targetPort: "7422",
+      },
+      {
+        appProtocol: "tcp",
+        name: "gateways",
+        port: 7522,
+        protocol: "TCP",
+        targetPort: "7522",
+      },
+    ]
   }
 }
 
@@ -239,4 +325,9 @@ class ArangodbBackendDeployment extends TerraformStack {
   }
 }
 
-export { BackendService, SecretStack, ArangodbBackendDeployment }
+export {
+  BackendService,
+  SecretStack,
+  ArangodbBackendDeployment,
+  NatsBackendService,
+}
