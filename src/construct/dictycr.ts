@@ -137,7 +137,7 @@ class BackendService extends TerraformStack {
   }
 }
 
-class BackendDeployment extends TerraformStack {
+class ArangodbBackendDeployment extends TerraformStack {
   constructor(
     scope: Construct,
     id: string,
@@ -239,4 +239,4 @@ class BackendDeployment extends TerraformStack {
   }
 }
 
-export { BackendService, SecretStack, BackendDeployment }
+export { BackendService, SecretStack, ArangodbBackendDeployment }
