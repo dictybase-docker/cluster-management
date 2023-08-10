@@ -1,5 +1,6 @@
 import { App } from "cdktf"
 import { HelmChartStack } from "../construct/helm"
+import { NatsBackendService } from "../construct/dictycr"
 import yargs from "yargs/yargs"
 
 const argv = yargs(process.argv.slice(2))
@@ -86,5 +87,18 @@ new HelmChartStack(app, deployName, {
     { name: "container.image.tag", value: argv.nv },
     { name: "service.enabled", value: "false" },
   ],
+})
+new NatsBackendService(app, argv.nm, {
+  provider: {
+    config: argv.kc,
+    remote: argv.r,
+    credentials: argv.c,
+    bucketName: argv.bn,
+    bucketPrefix: argv.nm.concat("-service-").concat(argv.ns),
+  },
+  resource: {
+    namespace: argv.ns,
+    app: argv.nm,
+  },
 })
 app.synth()
