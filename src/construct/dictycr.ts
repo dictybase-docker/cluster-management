@@ -203,13 +203,13 @@ class ArangodbBackendDeployment extends TerraformStack {
   }
   #commandArgs(logLevel: string) {
     return [
+      "--log-level",
+      logLevel,
       "start-server",
       "--user",
       "$(ARANGODB_USER)",
       "--pass",
       "$(ARANGODB_PASSWORD)",
-      "--log-level",
-      logLevel,
     ]
   }
   #env(secretName: string) {
