@@ -79,8 +79,8 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-const deploymentName = argv.nm.concat("api-server")
-const service = argv.nm.concat("api")
+const deploymentName = argv.nm.concat("-api-server")
+const service = argv.nm.concat("-api")
 new ArangodbBackendDeployment(app, deploymentName, {
   provider: {
     config: argv.kc,
