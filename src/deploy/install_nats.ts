@@ -1,7 +1,16 @@
 import { App } from "cdktf"
 import { HelmChartStack } from "../construct/helm"
+import { KubeConfig, CoreV1Api } from "@kubernetes/client-node"
 import { NatsBackendService } from "../construct/dictycr"
 import yargs from "yargs/yargs"
+
+const listServices = async (config: string, namespace: string) => {
+  const kubeconfig = new KubeConfig()
+  kubeconfig.loadFromFile(config)
+  const k8sApi = kubeconfig.makeApiClient(CoreV1Api)
+  const res = await k8sApi.listNamespacedService(namespace)
+  return res.body.items.map((sc) => sc.metadata?.name)
+}
 
 const argv = yargs(process.argv.slice(2))
   .options({
@@ -65,6 +74,12 @@ const argv = yargs(process.argv.slice(2))
       type: "string",
       describe: "nats version",
       default: "2.9.17-alpine",
+    },
+    l: {
+      describe: "logging level",
+      type: "string",
+      alias: "level",
+      default: "info",
     },
   })
   .help()
