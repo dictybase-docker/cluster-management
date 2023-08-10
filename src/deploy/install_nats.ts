@@ -82,6 +82,9 @@ new HelmChartStack(app, deployName, {
   namespace: argv.ns,
   chart: argv.ch,
   name: argv.nm,
-  values: [{ name: "nats.image.tag", value: argv.nv }],
+  values: [
+    { name: "container.image.tag", value: argv.nv },
+    { name: "service.enabled", value: "false" },
+  ],
 })
 app.synth()
