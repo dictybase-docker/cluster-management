@@ -1,15 +1,48 @@
 import { App } from "cdktf"
 import { HelmChartStack } from "../construct/helm"
-import { KubeConfig, CoreV1Api } from "@kubernetes/client-node"
 import { NatsBackendService } from "../construct/dictycr"
 import yargs from "yargs/yargs"
+import { KubeConfig, CoreV1Api } from "@kubernetes/client-node"
+import { getLogger } from "../kops/log"
 
-const listServices = async (config: string, namespace: string) => {
+type listServicesProperties = {
+  config: string
+  namespace: string
+}
+
+type deleteServicesProperties = listServicesProperties & {
+  name: string
+  level: string
+}
+
+const listServices = async ({ config, namespace }: listServicesProperties) => {
   const kubeconfig = new KubeConfig()
   kubeconfig.loadFromFile(config)
   const k8sApi = kubeconfig.makeApiClient(CoreV1Api)
   const res = await k8sApi.listNamespacedService(namespace)
-  return res.body.items.map((sc) => sc.metadata?.name)
+  return res.body.items.map((item) => item.metadata?.name)
+}
+
+const deleteService = async ({
+  config,
+  namespace,
+  level,
+  name,
+}: deleteServicesProperties) => {
+  const logger = getLogger(level)
+  const services = await listServices({ config, namespace })
+  logger.debug("got services %s", services.join("  "))
+  const serviceRemove = services.find((srv) => srv === name)
+  if (!serviceRemove) {
+    logger.info("service %s is not installed in cluster", name)
+    return
+  }
+  const kubeconfig = new KubeConfig()
+  kubeconfig.loadFromFile(config)
+  const k8sApi = kubeconfig.makeApiClient(CoreV1Api)
+  const output = await k8sApi.deleteNamespacedService(name, namespace)
+  logger.info("service %s deleted", name)
+  logger.debug(output.body.status?.conditions)
 }
 
 const argv = yargs(process.argv.slice(2))
@@ -99,10 +132,13 @@ new HelmChartStack(app, deployName, {
   namespace: argv.ns,
   chart: argv.ch,
   name: argv.nm, // this app name should match the app attributes passed in the service
-  values: [
-    { name: "container.image.tag", value: argv.nv },
-    { name: "service.enabled", value: "false" },
-  ],
+  values: [{ name: "container.image.tag", value: argv.nv }],
+})
+await deleteService({
+  config: argv.kc,
+  namespace: argv.ns,
+  level: argv.l,
+  name: argv.nm,
 })
 new NatsBackendService(app, argv.nm, {
   provider: {
