@@ -6,13 +6,14 @@ import yargs from "yargs/yargs"
 const argv = yargs(process.argv.slice(2))
   .options({
     nm: {
-      describe: "name of the nats install",
+      describe:
+        "name of the nats install. This will be used to name both the deployment and service",
       alias: "name",
       type: "string",
       default: "nats",
     },
     ns: {
-      describe: "kubernetes namespace where the pgo operator will be installed",
+      describe: "kubernetes namespace where the nats will be installed",
       type: "string",
       alias: "namespace",
       demandOption: true,
@@ -82,7 +83,7 @@ new HelmChartStack(app, deployName, {
   repo: argv.repo,
   namespace: argv.ns,
   chart: argv.ch,
-  name: argv.nm,
+  name: argv.nm, // this app name should match the app attributes passed in the service
   values: [
     { name: "container.image.tag", value: argv.nv },
     { name: "service.enabled", value: "false" },
@@ -98,7 +99,7 @@ new NatsBackendService(app, argv.nm, {
   },
   resource: {
     namespace: argv.ns,
-    app: argv.nm,
+    app: argv.nm, // this should match the value of name attribute passed in the helm chart
   },
 })
 app.synth()
