@@ -283,13 +283,13 @@ class ArangodbBackendDeployment extends TerraformStack {
       {
         name,
         image: imageWithTag,
-        args: this.#commandArgs(logLevel),
+        args: this.#commandArgs(logLevel, port),
         env: this.#env(secretName),
         port: this.#ports(service, port),
       },
     ]
   }
-  #commandArgs(logLevel: string) {
+  #commandArgs(logLevel: string, port: number) {
     return [
       "--log-level",
       logLevel,
@@ -298,6 +298,8 @@ class ArangodbBackendDeployment extends TerraformStack {
       "$(ARANGODB_USER)",
       "--pass",
       "$(ARANGODB_PASSWORD)",
+      "--port",
+      port,
     ]
   }
   #env(secretName: string) {
