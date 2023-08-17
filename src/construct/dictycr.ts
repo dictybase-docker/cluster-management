@@ -97,6 +97,8 @@ class SecretStack extends TerraformStack {
         "restic.password": resticPassword,
         "arangodb.user": arangodbUser,
         "arangodb.password": arangodbPassword,
+        "minio.accesskey": minioUser,
+        "minio.secretkey": minioPassword,
         rootUser: minioUser,
         rootPassword: minioPassword,
       },
@@ -283,7 +285,7 @@ class ArangodbBackendDeployment extends TerraformStack {
         image: imageWithTag,
         args: this.#commandArgs(logLevel),
         env: this.#env(secretName),
-        ports: this.#ports(service, port),
+        port: this.#ports(service, port),
       },
     ]
   }
