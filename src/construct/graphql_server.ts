@@ -121,7 +121,7 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
       {
         name: "PUBLICATION_API_ENDPOINT",
         valueFrom: {
-          secretKeyRef: {
+          configMapKeyRef: {
             name: configMapname,
             key: "endpoint.publication",
           },
@@ -130,7 +130,7 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
       {
         name: "ORGANISM_API_ENDPOINT",
         valueFrom: {
-          secretKeyRef: {
+          configMapKeyRef: {
             name: configMapname,
             key: "endpoint.organism",
           },
