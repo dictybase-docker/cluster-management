@@ -95,15 +95,15 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 const app = new App()
-const deploymentName = argv.nm.concat("-api-server")
+const deployment = argv.nm.concat("-api-server")
 const service = argv.nm.concat("-api")
-new GraphqlBackendDeploymentStack(app, deploymentName, {
+new GraphqlBackendDeploymentStack(app, deployment, {
   provider: {
     config: argv.kc,
     remote: argv.r,
     credentials: argv.c,
     bucketName: argv.bn,
-    bucketPrefix: deploymentName.concat("-").concat(argv.ns),
+    bucketPrefix: deployment.concat("-").concat(argv.ns),
   },
   resource: {
     service,
@@ -127,7 +127,7 @@ new BackendService(app, service, {
   resource: {
     namespace: argv.ns,
     port: argv.po as number,
-    app: deploymentName,
+    app: deployment,
   },
 })
 app.synth()
