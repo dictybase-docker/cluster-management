@@ -2,6 +2,7 @@ import { TerraformStack, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Secret } from "@cdktf/provider-kubernetes/lib/secret"
+import { ConfigMap } from "@cdktf/provider-kubernetes/lib/config-map"
 import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
 import { Service } from "@cdktf/provider-kubernetes/lib/service"
 import { readFileSync } from "fs"
@@ -26,6 +27,14 @@ type SecretStackResource = {
 type SecretStackProperties = {
   provider: Provider
   resource: SecretStackResource
+}
+type ConfigMapStackProperties = {
+  provider: Provider
+  resource: {
+    namespace: string
+    publication: string
+    organism: string
+  }
 }
 type BackendDeploymentResource = {
   namespace: string
@@ -59,6 +68,35 @@ type containerProperties = {
   secretName: string
   service: string
   port: number
+}
+
+class ConfigMapStack extends TerraformStack {
+  constructor(scope: Construct, id: string, options: ConfigMapStackProperties) {
+    const {
+      provider: { remote, credentials, bucketName, bucketPrefix, config },
+      resource: { namespace, publication, organism },
+    } = options
+    super(scope, id)
+    if (remote) {
+      new GcsBackend(this, {
+        bucket: bucketName,
+        prefix: bucketPrefix,
+        credentials: readFileSync(credentials).toString(),
+      })
+    }
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    const metadata = {
+      name: id,
+      namespace: namespace,
+    }
+    new ConfigMap(this, id, {
+      metadata,
+      data: {
+        "endpoint.publication": publication,
+        "endpoint.organism": organism,
+      },
+    })
+  }
 }
 
 class SecretStack extends TerraformStack {
@@ -334,4 +372,5 @@ export {
   SecretStack,
   ArangodbBackendDeployment,
   NatsBackendService,
+  ConfigMapStack,
 }
