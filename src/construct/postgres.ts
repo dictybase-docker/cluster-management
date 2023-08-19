@@ -21,6 +21,8 @@ type Resource = {
   secret: Secret
   backupBucket: string
   repository: string
+  user: string
+  databases: Array<string>
 }
 type PostgresStackProperties = {
   provider: Provider
@@ -70,6 +72,8 @@ class PostgresStack extends TerraformStack {
       secret,
       backupBucket,
       repository,
+      user,
+      databases,
     } = options
     const postgresVersion = version.split(".")[0]
     return {
@@ -83,7 +87,7 @@ class PostgresStack extends TerraformStack {
         },
       ],
       backups: this.#backups(secret, namespace, repository, backupBucket),
-      users: this.#users(),
+      users: this.#users(user, databases),
       patroni: this.#dynamicConfiguration(),
     }
   }
@@ -145,11 +149,11 @@ class PostgresStack extends TerraformStack {
     }
   }
 
-  #users() {
+  #users(user: string, databases: Array<string>) {
     return [
       {
-        name: "baserow",
-        databases: ["baserow"],
+        name: user,
+        databases: databases,
         options: "CREATEDB",
       },
     ]
