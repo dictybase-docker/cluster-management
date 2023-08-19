@@ -77,6 +77,18 @@ const argv = yargs(process.argv.slice(2))
       describe: "gcs credential file for backing up the database",
       default: "credentials/pgbackup.json",
     },
+    u: {
+      alias: "user",
+      type: "string",
+      describe: "postgres database user that will be created",
+      default: "baserow",
+    },
+    dbs: {
+      alias: "databases",
+      type: "array",
+      describe: "postgres databases that will be created for that user",
+      default: ["baserow"],
+    },
   })
   .help()
   .completion()
@@ -109,6 +121,8 @@ const pgstack = new PostgresStack(app, pgstackId, {
     bucketPrefix: pgstackId,
   },
   resource: {
+    user: argv.u,
+    databases: argv.dbs as Array<string>,
     repository: argv.rp,
     secret: secretStack.secret,
     backupBucket: argv.bb,
