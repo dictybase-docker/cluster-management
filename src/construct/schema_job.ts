@@ -87,16 +87,8 @@ class PgschemLoadingStack extends TerraformStack {
       {
         name,
         image: `${image}:${tag}`,
-        command: ["goose"],
-        args: [
-          "-dir",
-          "/usr/src/appdata",
-          "postgres",
-          `dbname=${database} `.concat(
-            "user=$(USER) dbname=$(DBNAME) host=$(HOST) port=$(PORT) password=$(PASS) sslmode=disable",
-          ),
-          "up",
-        ],
+        command: ["/usr/local/bin/install_schema.sh"],
+        args: [database],
         env: this.#env(secretName),
       },
     ]
