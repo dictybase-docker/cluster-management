@@ -88,17 +88,22 @@ class PgschemLoadingStack extends TerraformStack {
         name,
         image: `${image}:${tag}`,
         command: ["/usr/local/bin/install_schema.sh"],
-        args: [database],
-        env: this.#env(secretName),
+        env: [
+          ...this.#env(secretName),
+          {
+            name: "PGDATABASE",
+            value: database,
+          },
+        ],
       },
     ]
   }
   #env(secretName: string) {
     return [
-      { name: "USER", key: "user" },
-      { name: "PASS", key: "password" },
-      { name: "HOST", key: "host" },
-      { name: "PORT", key: "port" },
+      { name: "PGUSER", key: "user" },
+      { name: "PGPASSWORD", key: "password" },
+      { name: "PGHOST", key: "host" },
+      { name: "PGPORT", key: "port" },
     ].map(({ name, key }) => {
       return {
         name,
