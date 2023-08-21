@@ -109,7 +109,7 @@ The deployment will become (name)-api-server and the service will be
       database: argv.db,
       apiHost: argv.ah,
       port: argv.po,
-      command: `start-${argv.nm}-server`,
+      command: `start-${bc}-server`,
     },
   })
   new BackendService(app, service, {
