@@ -45,7 +45,7 @@ const argv = yargs(process.argv.slice(2))
       alias: "database",
       describe: "postgres database where the schema will be installed",
       type: "string",
-      value: "authl",
+      default: "authl",
     },
     im: {
       alias: "image",
@@ -69,7 +69,7 @@ const argv = yargs(process.argv.slice(2))
       alias: "port",
       describe: "port number for the service",
       type: "string",
-      value: "9596",
+      default: "9596",
     },
     ah: {
       alias: "api-host",
@@ -106,9 +106,9 @@ The deployment will become (name)-api-server and the service will be
       tag: argv.tg,
       logLevel: argv.ll,
       secretName: argv.ps,
-      database: argv.db as string,
+      database: argv.db,
       apiHost: argv.ah,
-      port: argv.po as string,
+      port: argv.po,
       command: `start-${argv.nm}-server`,
     },
   })
