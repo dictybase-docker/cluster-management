@@ -2,6 +2,7 @@ import { TerraformStack, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
+import { Ingress } from "@cdktf/provider-kubernetes/lib/ingress"
 import { readFileSync } from "fs"
 
 type Provider = {
@@ -10,6 +11,20 @@ type Provider = {
   credentials: string
   bucketName: string
   bucketPrefix: string
+}
+
+type GraphqlIngressResource = {
+  namespace: string
+  name: string
+  secret: string
+  issuer: string
+  service: string
+  backendHosts: Array<string>
+}
+
+type GraphqlIngressStackProperties = {
+  resource: GraphqlIngressResource
+  provider: Provider
 }
 
 type GraphqlBackendDeploymentResource = {
@@ -143,4 +158,69 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
   }
 }
 
-export { GraphqlBackendDeploymentStack }
+class GraphqlIngressStack extends TerraformStack {
+  constructor(
+    scope: Construct,
+    id: string,
+    options: GraphqlIngressStackProperties,
+  ) {
+    const {
+      provider: { remote, credentials, bucketName, bucketPrefix, config },
+      resource,
+    } = options
+    const { name, namespace, issuer } = resource
+    super(scope, id)
+    if (remote) {
+      new GcsBackend(this, {
+        bucket: bucketName,
+        prefix: bucketPrefix,
+        credentials: readFileSync(credentials).toString(),
+      })
+    }
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    new Ingress(this, id, {
+      metadata: this.#metadata(name, namespace, issuer),
+      spec: this.#spec(resource),
+    })
+  }
+  #metadata(name: string, namespace: string, issuer: string) {
+    return {
+      name,
+      namespace,
+      annotations: {
+        "cert-manager.io/issuer": issuer,
+      },
+    }
+  }
+  #spec(options: GraphqlIngressResource) {
+    const { secret, backendHosts, service } = options
+    return {
+      ingressClassName: "nginx",
+      tls: this.#tls(secret, backendHosts),
+      rules: this.#rules(backendHosts, service),
+    }
+  }
+  #tls(secret: string, hosts: Array<string>) {
+    return [{ secretName: secret, hosts }]
+  }
+  #rules(hosts: Array<string>, service: string) {
+    return hosts.map((h) => {
+      return { host: h, http: this.#backendPaths(service) }
+    })
+  }
+  #backendPaths(service: string) {
+    return {
+      paths: [
+        {
+          pathType: "Prefix",
+          path: "/",
+          backend: {
+            service: { name: service, port: { number: 8080 } },
+          },
+        },
+      ],
+    }
+  }
+}
+
+export { GraphqlBackendDeploymentStack, GraphqlIngressStack }
