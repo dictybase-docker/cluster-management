@@ -23,6 +23,7 @@ type SecretStackResource = {
   minioPassword: string
   arangodbUser: string
   arangodbPassword: string
+  emailAPIKey: string
 }
 type SecretStackProperties = {
   provider: Provider
@@ -112,6 +113,7 @@ class SecretStack extends TerraformStack {
         minioPassword,
         arangodbUser,
         arangodbPassword,
+        emailAPIKey,
       },
     } = options
     super(scope, id)
@@ -137,6 +139,7 @@ class SecretStack extends TerraformStack {
         "arangodb.password": arangodbPassword,
         "minio.accesskey": minioUser,
         "minio.secretkey": minioPassword,
+        "eventmessenger.email.apiKey": emailAPIKey,
         rootUser: minioUser,
         rootPassword: minioPassword,
       },
