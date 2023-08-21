@@ -27,7 +27,10 @@ type Provider = {
   bucketPrefix: string
 }
 
-type BackendDeploymentResource = Omit<containerProperties, "imageWithTag"> & {
+type BackendDeploymentResource = Omit<
+  containerProperties,
+  "imageWithTag" | "name"
+> & {
   namespace: string
   image: string
   tag: string
