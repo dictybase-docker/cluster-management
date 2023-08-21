@@ -82,6 +82,12 @@ const argv = yargs(process.argv.slice(2))
       describe: "minio password",
       demandOption: true,
     },
+    ek: {
+      alias: "email-api-key",
+      type: "string",
+      describe: "mailgun email api key",
+      demandOption: true,
+    },
   })
   .help()
   .completion()
@@ -106,6 +112,7 @@ new SecretStack(app, deployName, {
     minioPassword: argv.mp,
     arangodbUser: argv.au,
     arangodbPassword: argv.ap,
+    emailAPIKey: argv.ek,
   },
 })
 app.synth()
