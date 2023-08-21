@@ -2,7 +2,7 @@ import { TerraformStack, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
-import { Ingress } from "@cdktf/provider-kubernetes/lib/ingress"
+import { Manifest } from "@cdktf/provider-kubernetes/lib/manifest"
 import { readFileSync } from "fs"
 
 type Provider = {
@@ -178,10 +178,13 @@ class GraphqlIngressStack extends TerraformStack {
       })
     }
     new KubernetesProvider(this, `${id}-provider`, { configPath: config })
-    new Ingress(this, id, {
+    const manifest = {
+      apiVersion: "networking.k8s.io/v1",
+      kind: "Ingress",
       metadata: this.#metadata(name, namespace, issuer),
       spec: this.#spec(resource),
-    })
+    }
+    new Manifest(this, id, { manifest })
   }
   #metadata(name: string, namespace: string, issuer: string) {
     return {
