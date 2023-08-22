@@ -6,6 +6,7 @@ import { ConfigMap } from "@cdktf/provider-kubernetes/lib/config-map"
 import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
 import { Service } from "@cdktf/provider-kubernetes/lib/service"
 import { readFileSync } from "fs"
+import { backendKubernetesProvider } from "../stack_utils"
 
 type Provider = {
   config: string
@@ -54,6 +55,13 @@ type BackendDeploymentResource = {
   service: string
   port: number
 }
+type FrontendDeploymentStackProperties = {
+  provider: Provider
+  resource: Pick<
+    BackendDeploymentResource,
+    "namespace" | "image" | "tag" | "service" | "port"
+  >
+}
 type BackendDeploymentProperties = {
   provider: Provider
   resource: BackendDeploymentResource
@@ -78,6 +86,11 @@ type containerProperties = {
   service: string
   port: number
 }
+
+type frontendContainerProperties = Pick<
+  containerProperties,
+  "name" | "imageWithTag" | "service" | "port"
+>
 
 class ConfigMapStack extends TerraformStack {
   constructor(scope: Construct, id: string, options: ConfigMapStackProperties) {
@@ -398,10 +411,67 @@ class ArangodbBackendDeployment extends TerraformStack {
   }
 }
 
+class FrontendDeploymentStack extends TerraformStack {
+  constructor(
+    scope: Construct,
+    id: string,
+    options: FrontendDeploymentStackProperties,
+  ) {
+    const {
+      provider,
+      resource: { namespace, image, tag, service, port },
+    } = options
+    super(scope, id)
+    backendKubernetesProvider({ ...provider, id, cls: this })
+    new Deployment(this, id, {
+      metadata: this.#metadata(id, namespace),
+      spec: {
+        selector: {
+          matchLabels: {
+            app: id,
+          },
+        },
+        template: {
+          metadata: { labels: { app: id } },
+          spec: {
+            container: this.#containers({
+              name: `${id}-container`,
+              imageWithTag: `${image}:${tag}`,
+              service,
+              port,
+            }),
+          },
+        },
+      },
+    })
+  }
+  #metadata(name: string, namespace: string) {
+    return { name, namespace }
+  }
+  #containers({
+    name,
+    imageWithTag,
+    service,
+    port,
+  }: frontendContainerProperties) {
+    return [
+      {
+        name,
+        image: imageWithTag,
+        port: this.#ports(service, port),
+      },
+    ]
+  }
+  #ports(service: string, port: number) {
+    return [{ name: service, containerPort: port, protocol: "TCP" }]
+  }
+}
+
 export {
   BackendService,
   SecretStack,
   ArangodbBackendDeployment,
   NatsBackendService,
   ConfigMapStack,
+  FrontendDeploymentStack,
 }
