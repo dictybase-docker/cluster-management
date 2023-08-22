@@ -35,6 +35,11 @@ type ConfigMapStackProperties = {
     namespace: string
     publication: string
     organism: string
+    owner: string
+    sender: string
+    senderName: string
+    domain: string
+    repository: string
   }
 }
 type BackendDeploymentResource = {
@@ -75,7 +80,16 @@ class ConfigMapStack extends TerraformStack {
   constructor(scope: Construct, id: string, options: ConfigMapStackProperties) {
     const {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
-      resource: { namespace, publication, organism },
+      resource: {
+        namespace,
+        publication,
+        organism,
+        domain,
+        sender,
+        senderName,
+        owner,
+        repository,
+      },
     } = options
     super(scope, id)
     if (remote) {
@@ -95,6 +109,11 @@ class ConfigMapStack extends TerraformStack {
       data: {
         "endpoint.publication": publication,
         "endpoint.organism": organism,
+        "eventmessenger.email.domain": domain,
+        "eventmessenger.email.sender": sender,
+        "eventmessenger.email.senderName": senderName,
+        "eventmessenger.github.owner": owner,
+        "eventmessenger.github.repository": repository,
       },
     })
   }
