@@ -1,6 +1,9 @@
 import yargs from "yargs/yargs"
 import { App } from "cdktf"
-import { EmailBackendDeploymentStack } from "../../construct/event/messenger"
+import {
+  EmailBackendDeploymentStack,
+  IssueBackendDeploymentStack,
+} from "../../construct/event/messenger"
 
 const argv = yargs(process.argv.slice(2))
   .options({
@@ -102,4 +105,23 @@ new EmailBackendDeploymentStack(app, emailAppName, {
   },
 })
 
+const issueAppName = argv.nm.concat("-issue")
+new IssueBackendDeploymentStack(app, issueAppName, {
+  provider: {
+    config: argv.kc,
+    remote: argv.r,
+    credentials: argv.c,
+    bucketName: argv.bn,
+    bucketPrefix: issueAppName.concat("-").concat(argv.nm),
+  },
+  resource: {
+    namespace: argv.ns,
+    image: argv.im,
+    tag: argv.tg,
+    logLevel: argv.ll,
+    secretName: argv.sr,
+    configMapName: argv.cm,
+    natsSubject: argv.nt,
+  },
+})
 app.synth()
