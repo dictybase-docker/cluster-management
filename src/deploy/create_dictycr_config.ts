@@ -53,6 +53,36 @@ const argv = yargs(process.argv.slice(2))
       describe: "api endpoint for publication",
       default: "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
     },
+    do: {
+      alias: "domain",
+      type: "string",
+      describe: "domain name for sending email",
+      demandOption: true,
+    },
+    sa: {
+      alias: "sender-address",
+      type: "string",
+      describe: "email sender address",
+      demandOption: true,
+    },
+    sn: {
+      alias: "sender-name",
+      type: "string",
+      describe: "email sender name",
+      demandOption: true,
+    },
+    go: {
+      alias: "github-owner",
+      type: "string",
+      describe: "github owner name",
+      demandOption: true,
+    },
+    gp: {
+      alias: "github-repository",
+      type: "string",
+      describe: "github repository name",
+      demandOption: true,
+    },
   })
   .help()
   .completion()
@@ -72,6 +102,11 @@ new ConfigMapStack(app, argv.nm, {
     namespace: argv.ns,
     publication: argv.pa,
     organism: argv.oa,
+    sender: argv.sa,
+    senderName: argv.sn,
+    domain: argv.do,
+    repository: argv.gp,
+    owner: argv.go,
   },
 })
 app.synth()
