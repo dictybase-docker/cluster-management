@@ -83,6 +83,12 @@ const argv = yargs(process.argv.slice(2))
       describe: "github repository name",
       demandOption: true,
     },
+    cc: {
+      alias: "cc-email",
+      type: "string",
+      describe: "cc email address",
+      demandOption: true,
+    },
   })
   .help()
   .completion()
@@ -107,6 +113,7 @@ new ConfigMapStack(app, argv.nm, {
     domain: argv.do,
     repository: argv.gp,
     owner: argv.go,
+    senderCc: argv.cc,
   },
 })
 app.synth()
