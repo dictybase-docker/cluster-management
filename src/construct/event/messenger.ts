@@ -34,6 +34,8 @@ type EmailDeploymentProperties = {
   resource: EmailDeploymentResource
 }
 
+type IssueBackendDeploymentProperties = EmailDeploymentProperties
+
 class EmailBackendDeploymentStack extends TerraformStack {
   constructor(
     scope: Construct,
@@ -153,4 +155,115 @@ class EmailBackendDeploymentStack extends TerraformStack {
   }
 }
 
-export { EmailBackendDeploymentStack }
+class IssueBackendDeploymentStack extends TerraformStack {
+  constructor(
+    scope: Construct,
+    id: string,
+    options: IssueBackendDeploymentProperties,
+  ) {
+    const {
+      provider,
+      resource: {
+        namespace,
+        image,
+        tag,
+        logLevel,
+        secretName,
+        configMapName,
+        natsSubject,
+      },
+    } = options
+    super(scope, id)
+    backendKubernetesProvider({ ...provider, id, cls: this })
+    new Deployment(this, id, {
+      metadata: this.#metadata(id, namespace),
+      spec: {
+        selector: {
+          matchLabels: {
+            app: id,
+          },
+        },
+        template: {
+          metadata: { labels: { app: id } },
+          spec: {
+            container: this.#containers({
+              name: `${id}-container`,
+              imageWithTag: `${image}:${tag}`,
+              logLevel,
+              secretName,
+              configMapName,
+              natsSubject,
+            }),
+          },
+        },
+      },
+    })
+  }
+  #metadata(name: string, namespace: string) {
+    return { name, namespace }
+  }
+  #containers({
+    name,
+    imageWithTag,
+    logLevel,
+    secretName,
+    configMapName,
+    natsSubject,
+  }: containerProperties) {
+    return [
+      {
+        name,
+        image: imageWithTag,
+        args: this.#commandArgs(logLevel, natsSubject),
+        env: this.#env(secretName, configMapName),
+      },
+    ]
+  }
+  #commandArgs(logLevel: string, natsSubject: string) {
+    return [
+      "--log-level",
+      logLevel,
+      "gh-issue",
+      "--subject",
+      natsSubject,
+      "--token",
+      "$(GITHUB_TOKEN)",
+      "--repository",
+      "$(GITHUB_REPOSITORY)",
+      "--owner",
+      "$(GITHUB_OWNER)",
+    ]
+  }
+  #env(secretName: string, configMapName: string) {
+    const secretEnvs = [
+      { name: "GITHUB_TOKEN", key: "eventmessenger.github.token" },
+    ].map(({ name, key }) => {
+      return {
+        name,
+        valueFrom: {
+          secretKeyRef: {
+            key,
+            name: secretName,
+          },
+        },
+      }
+    })
+    const configEnvs = [
+      { name: "GITHUB_OWNER", key: "eventmessenger.github.owner" },
+      { name: "GITHUB_REPOSITORY", key: "eventmessenger.github.repository" },
+    ].map(({ name, key }) => {
+      return {
+        name,
+        valueFrom: {
+          configMapKeyRef: {
+            key,
+            name: configMapName,
+          },
+        },
+      }
+    })
+    return [...secretEnvs, ...configEnvs]
+  }
+}
+
+export { IssueBackendDeploymentStack, EmailBackendDeploymentStack }
