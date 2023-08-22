@@ -1,8 +1,7 @@
-import { TerraformStack, GcsBackend } from "cdktf"
+import { TerraformStack } from "cdktf"
 import { Construct } from "constructs"
-import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
-import { readFileSync } from "fs"
+import { backendKubernetesProvider } from "../../stack_utils"
 
 type containerProperties = {
   name: string
@@ -33,27 +32,6 @@ type EmailDeploymentResource = Omit<
 type EmailDeploymentProperties = {
   provider: Provider
   resource: EmailDeploymentResource
-}
-
-type backendProviderProperties = Provider & { cls: TerraformStack; id: string }
-
-const backendKubernetesProvider = ({
-  remote,
-  credentials,
-  bucketName,
-  bucketPrefix,
-  config,
-  cls,
-  id,
-}: backendProviderProperties) => {
-  if (remote) {
-    new GcsBackend(cls, {
-      bucket: bucketName,
-      prefix: bucketPrefix,
-      credentials: readFileSync(credentials).toString(),
-    })
-  }
-  new KubernetesProvider(cls, `${id}-provider`, { configPath: config })
 }
 
 class EmailBackendDeploymentStack extends TerraformStack {
