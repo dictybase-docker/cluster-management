@@ -41,6 +41,7 @@ type ConfigMapStackProperties = {
     senderName: string
     domain: string
     repository: string
+    senderCc: string
   }
 }
 type BackendDeploymentResource = {
@@ -90,6 +91,7 @@ class ConfigMapStack extends TerraformStack {
         senderName,
         owner,
         repository,
+        senderCc,
       },
     } = options
     super(scope, id)
@@ -115,6 +117,7 @@ class ConfigMapStack extends TerraformStack {
         "eventmessenger.email.senderName": senderName,
         "eventmessenger.github.owner": owner,
         "eventmessenger.github.repository": repository,
+        "eventmessenger.email.cc": senderCc,
       },
     })
   }
