@@ -47,7 +47,7 @@ const argv = yargs(process.argv.slice(2))
       default:
         "https://raw.githubusercontent.com/dictyBase/migration-data/master/downloads/organisms-with-citations.staging.json",
     },
-    gp: {
+    gl: {
       alias: "grapqhl-publication-api",
       type: "string",
       describe: "graphql api endpoint for publication",
@@ -120,7 +120,7 @@ new ConfigMapStack(app, argv.nm, {
     repository: argv.gp,
     owner: argv.go,
     senderCc: argv.cc,
-    graphlEndpoint: argv.gp,
+    graphlEndpoint: argv.gl,
   },
 })
 app.synth()
