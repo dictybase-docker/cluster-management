@@ -140,6 +140,10 @@ class EmailBackendDeploymentStack extends TerraformStack {
       { name: "EMAIL_SENDER_NAME", key: "eventmessenger.email.senderName" },
       { name: "EMAIL_SENDER", key: "eventmessenger.email.sender" },
       { name: "EMAIL_CC", key: "eventmessenger.email.cc" },
+      {
+        name: "PUBLICATION_API_ENDPOINT",
+        key: "eventmessenger.endpoint.publication",
+      },
     ].map(({ name, key }) => {
       return {
         name,
