@@ -1,3 +1,36 @@
+import { TerraformStack, GcsBackend } from "cdktf"
+import { readFileSync } from "fs"
+import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
+
+type Provider = {
+  config: string
+  remote: boolean
+  credentials: string
+  bucketName: string
+  bucketPrefix: string
+}
+
+type backendProviderProperties = Provider & { cls: TerraformStack; id: string }
+
+const backendKubernetesProvider = ({
+  remote,
+  credentials,
+  bucketName,
+  bucketPrefix,
+  config,
+  cls,
+  id,
+}: backendProviderProperties) => {
+  if (remote) {
+    new GcsBackend(cls, {
+      bucket: bucketName,
+      prefix: bucketPrefix,
+      credentials: readFileSync(credentials).toString(),
+    })
+  }
+  new KubernetesProvider(cls, `${id}-provider`, { configPath: config })
+}
+
 const getOnes = () => [
   "one",
   "two",
@@ -55,4 +88,10 @@ const times = (n: number, callback: () => void) => {
   times(n - 1, callback)
 }
 
-export { times, numberToText }
+export {
+  times,
+  numberToText,
+  backendKubernetesProvider,
+  type backendProviderProperties,
+  type Provider,
+}
