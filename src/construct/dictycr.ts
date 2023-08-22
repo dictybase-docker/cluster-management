@@ -42,6 +42,7 @@ type ConfigMapStackProperties = {
     domain: string
     repository: string
     senderCc: string
+    graphlEndpoint: string
   }
 }
 type BackendDeploymentResource = {
@@ -92,6 +93,7 @@ class ConfigMapStack extends TerraformStack {
         owner,
         repository,
         senderCc,
+        graphlEndpoint,
       },
     } = options
     super(scope, id)
@@ -112,6 +114,7 @@ class ConfigMapStack extends TerraformStack {
       data: {
         "endpoint.publication": publication,
         "endpoint.organism": organism,
+        "eventmessenger.endpoint.publication": graphlEndpoint,
         "eventmessenger.email.domain": domain,
         "eventmessenger.email.sender": sender,
         "eventmessenger.email.senderName": senderName,
