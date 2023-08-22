@@ -88,6 +88,12 @@ const argv = yargs(process.argv.slice(2))
       describe: "mailgun email api key",
       demandOption: true,
     },
+    tk: {
+      alias: "github-token",
+      type: "string",
+      describe: "github token for creating issues",
+      demandOption: true,
+    },
   })
   .help()
   .completion()
@@ -113,6 +119,7 @@ new SecretStack(app, deployName, {
     arangodbUser: argv.au,
     arangodbPassword: argv.ap,
     emailAPIKey: argv.ek,
+    token: argv.tk,
   },
 })
 app.synth()
