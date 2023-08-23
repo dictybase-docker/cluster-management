@@ -87,6 +87,7 @@ const argv = yargs(process.argv.slice(2))
         "https://*.dictycr.org",
         "https://dictybase.dev",
         "https://*.dictybase.dev",
+        "https://dictybase.dev*",
       ],
     },
   })
