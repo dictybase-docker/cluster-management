@@ -62,7 +62,7 @@ const argv = yargs(process.argv.slice(2))
       alias: "port",
       describe: "port number for the service",
       type: "number",
-      default: 8000,
+      default: 3000,
     },
   })
   .help()
