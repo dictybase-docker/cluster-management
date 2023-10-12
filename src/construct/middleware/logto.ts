@@ -17,7 +17,8 @@ type LogtoBackendDeploymentResource = {
   image: string
   tag: string
   configMapname: string
-  service: string
+  adminService: string
+  apiService: string
   adminPort: number
   apiPort: number
   origins: Array<string>
@@ -30,7 +31,7 @@ type LogtoBackendDeploymentProperties = {
 
 type portPropterties = Pick<
   LogtoBackendDeploymentResource,
-  "service" | "apiPort" | "adminPort"
+  "apiService" | "adminService" | "apiPort" | "adminPort"
 >
 
 type containerProperties = portPropterties & {
@@ -53,7 +54,8 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         image,
         tag,
         configMapname,
-        service,
+        adminService,
+        apiService,
         adminPort,
         apiPort,
       },
@@ -83,7 +85,8 @@ class LogtoBackendDeploymentStack extends TerraformStack {
               image,
               tag,
               configMapname,
-              service,
+              adminService,
+              apiService,
               adminPort,
               apiPort,
             }),
@@ -99,7 +102,8 @@ class LogtoBackendDeploymentStack extends TerraformStack {
     name,
     image,
     configMapname,
-    service,
+    adminService,
+    apiService,
     adminPort,
     apiPort,
     tag,
@@ -114,7 +118,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
           `npm run alteration deploy ${tag} && npm run cli db seed -- --swe && npm start`,
         ],
         env: this.#env(configMapname),
-        port: this.#ports({ service, adminPort, apiPort }),
+        port: this.#ports({ adminService, apiService, adminPort, apiPort }),
       },
     ]
   }
@@ -140,10 +144,10 @@ class LogtoBackendDeploymentStack extends TerraformStack {
       },
     ]
   }
-  #ports({ service, adminPort, apiPort }: portPropterties) {
+  #ports({ adminService, apiService, adminPort, apiPort }: portPropterties) {
     return [
-      { name: `${service}-admin`, containerPort: adminPort, protocol: "TCP" },
-      { name: `${service}-api`, containerPort: apiPort, protocol: "TCP" },
+      { name: adminService, containerPort: adminPort, protocol: "TCP" },
+      { name: apiService, containerPort: apiPort, protocol: "TCP" },
     ]
   }
 }
