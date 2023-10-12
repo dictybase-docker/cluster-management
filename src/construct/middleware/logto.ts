@@ -3,6 +3,7 @@ import { Construct } from "constructs"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
 import { readFileSync } from "fs"
+import { V1Secret } from "@kubernetes/client-node"
 
 type Provider = {
   config: string
@@ -16,7 +17,7 @@ type LogtoBackendDeploymentResource = {
   namespace: string
   image: string
   tag: string
-  configMapname: string
+  secret: V1Secret
   adminService: string
   apiService: string
   adminPort: number
@@ -36,7 +37,7 @@ type portPropterties = Pick<
 
 type containerProperties = portPropterties & {
   name: string
-  configMapname: string
+  secret: V1Secret
   image: string
   tag: string
 }
@@ -53,7 +54,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         namespace,
         image,
         tag,
-        configMapname,
+        secret,
         adminService,
         apiService,
         adminPort,
@@ -84,7 +85,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
               name: `${id}-container`,
               image,
               tag,
-              configMapname,
+              secret,
               adminService,
               apiService,
               adminPort,
@@ -101,7 +102,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
   #containers({
     name,
     image,
-    configMapname,
+    secret,
     adminService,
     apiService,
     adminPort,
@@ -117,30 +118,25 @@ class LogtoBackendDeploymentStack extends TerraformStack {
           "-c",
           `npm run alteration deploy ${tag} && npm run cli db seed -- --swe && npm start`,
         ],
-        env: this.#env(configMapname),
+        env: this.#env(secret),
         port: this.#ports({ adminService, apiService, adminPort, apiPort }),
       },
     ]
   }
-  #env(configMapname: string) {
+  #env(secret: V1Secret) {
     return [
       {
-        name: "PUBLICATION_API_ENDPOINT",
-        valueFrom: {
-          configMapKeyRef: {
-            name: configMapname,
-            key: "endpoint.publication",
-          },
-        },
-      },
-      {
-        name: "ORGANISM_API_ENDPOINT",
-        valueFrom: {
-          configMapKeyRef: {
-            name: configMapname,
-            key: "endpoint.organism",
-          },
-        },
+        name: "DB_URL",
+        value: "postgresql://"
+          .concat(secret?.data?.user as string)
+          .concat(":")
+          .concat(secret?.data?.password as string)
+          .concat("@")
+          .concat(secret?.data?.host as string)
+          .concat(":")
+          .concat(secret?.data?.port as string)
+          .concat("/")
+          .concat(secret?.data?.dbname as string),
       },
     ]
   }
