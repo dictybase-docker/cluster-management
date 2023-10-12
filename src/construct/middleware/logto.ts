@@ -2,6 +2,7 @@ import { TerraformStack, GcsBackend } from "cdktf"
 import { Construct } from "constructs"
 import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
+import { PersistentVolumeClaim } from "@cdktf/provider-kubernetes/lib/persistent-volume-claim"
 import { readFileSync } from "fs"
 import { V1Secret } from "@kubernetes/client-node"
 
@@ -40,6 +41,49 @@ type containerProperties = portPropterties & {
   secret: V1Secret
   image: string
   tag: string
+}
+
+type LogtoPersistentVolumeClaimStackProperties = {
+  provider: Provider
+  resource: {
+    namespace: string
+    storageClass: string
+    diskSize: string
+  }
+}
+
+class LogtoPersistentVolumeClaimStack extends TerraformStack {
+  constructor(
+    scope: Construct,
+    id: string,
+    options: LogtoPersistentVolumeClaimStackProperties,
+  ) {
+    const {
+      provider: { remote, credentials, bucketName, bucketPrefix, config },
+      resource: { namespace, diskSize, storageClass },
+    } = options
+    super(scope, id)
+    if (remote) {
+      new GcsBackend(this, {
+        bucket: bucketName,
+        prefix: bucketPrefix,
+        credentials: readFileSync(credentials).toString(),
+      })
+    }
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    new PersistentVolumeClaim(this, id, {
+      metadata: { name: id, namespace },
+      spec: {
+        storageClassName: storageClass,
+        accessModes: ["ReadWrieOnce"],
+        resources: {
+          requests: {
+            storage: diskSize,
+          },
+        },
+      },
+    })
+  }
 }
 
 class LogtoBackendDeploymentStack extends TerraformStack {
@@ -148,4 +192,4 @@ class LogtoBackendDeploymentStack extends TerraformStack {
   }
 }
 
-export { LogtoBackendDeploymentStack }
+export { LogtoBackendDeploymentStack, LogtoPersistentVolumeClaimStack }
