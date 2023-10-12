@@ -1,9 +1,9 @@
 import yargs from "yargs/yargs"
-import { KubeConfig, CoreV1Api, V1Secret } from "@kubernetes/client-node"
-import { Buffer } from "buffer"
-import { HelmChartStack } from "../construct/helm"
+import { V1Secret } from "@kubernetes/client-node"
 import { App } from "cdktf"
+import { HelmChartStack } from "../construct/helm"
 import { BaserowIngressStack } from "../construct/ingress"
+import { decodeSecretData, getSecret } from "../k8s"
 
 type baseValueProperties = {
   host: string
@@ -79,16 +79,6 @@ const postgresValues = (secret: V1Secret) => [
     value: decodeSecretData(secret?.data?.host as string),
   },
 ]
-const decodeSecretData = (value: string) =>
-  Buffer.from(value, "base64").toString("utf8")
-const getSecret = async (config: string, secret: string, namespace: string) => {
-  const kubeconfig = new KubeConfig()
-  kubeconfig.loadFromFile(config)
-  const res = await kubeconfig
-    .makeApiClient(CoreV1Api)
-    .listNamespacedSecret(namespace)
-  return res.body.items.find((sec) => sec.metadata?.name === secret)
-}
 
 const argv = yargs(process.argv.slice(2))
   .options({
