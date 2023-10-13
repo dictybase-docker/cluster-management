@@ -55,7 +55,7 @@ type LogtoPersistentVolumeClaimStackProperties = {
   resource: {
     namespace: string
     storageClass: string
-    diskSize: string
+    diskSize: number
   }
 }
 
@@ -85,7 +85,7 @@ class LogtoPersistentVolumeClaimStack extends TerraformStack {
         accessModes: ["ReadWrieOnce"],
         resources: {
           requests: {
-            storage: diskSize,
+            storage: `${diskSize}Gi`,
           },
         },
       },
