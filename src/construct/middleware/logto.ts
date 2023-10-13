@@ -24,7 +24,6 @@ type LogtoBackendDeploymentResource = {
   apiService: string
   adminPort: number
   apiPort: number
-  origins: Array<string>
   claim: string
 }
 
