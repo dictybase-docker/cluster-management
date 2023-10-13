@@ -88,6 +88,12 @@ const argv = yargs(process.argv.slice(2))
       default: 3001,
       describe: "port where logto will be listening",
     },
+    db: {
+      alias: "database",
+      type: "string",
+      default: "logto",
+      describe: "name of logto database",
+    },
   })
   .help()
   .completion()
@@ -118,6 +124,7 @@ new LogtoBackendDeploymentStack(app, argv.nm, {
     bucketPrefix: argv.nm.concat(argv.ns),
   },
   resource: {
+    database: argv.db,
     namespace: argv.ns,
     image: argv.im,
     tag: argv.tg,
