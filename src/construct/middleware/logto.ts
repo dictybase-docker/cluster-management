@@ -24,6 +24,7 @@ type LogtoBackendDeploymentResource = {
   adminPort: number
   apiPort: number
   origins: Array<string>
+  claim: string
 }
 
 type LogtoBackendDeploymentProperties = {
@@ -41,6 +42,7 @@ type containerProperties = portPropterties & {
   secret: V1Secret
   image: string
   tag: string
+  volumeName: string
 }
 
 type LogtoPersistentVolumeClaimStackProperties = {
@@ -103,6 +105,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         apiService,
         adminPort,
         apiPort,
+        claim,
       },
     } = options
     super(scope, id)
@@ -114,6 +117,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
       })
     }
     new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    const volumeName = `${id}-volume`
     new Deployment(this, id, {
       metadata: this.#metadata(id, namespace),
       spec: {
@@ -134,7 +138,16 @@ class LogtoBackendDeploymentStack extends TerraformStack {
               apiService,
               adminPort,
               apiPort,
+              volumeName,
             }),
+            volume: [
+              {
+                name: volumeName,
+                persistentVolumeClaim: {
+                  claimName: claim,
+                },
+              },
+            ],
           },
         },
       },
@@ -144,6 +157,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
     return { name, namespace }
   }
   #containers({
+    volumeName,
     name,
     image,
     secret,
@@ -164,6 +178,13 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         ],
         env: this.#env(secret),
         port: this.#ports({ adminService, apiService, adminPort, apiPort }),
+        volumeMount: [
+          {
+            name: volumeName,
+            mountPath: "/etc/logto/packages/core/connectors",
+            readOnly: true,
+          },
+        ],
       },
     ]
   }
