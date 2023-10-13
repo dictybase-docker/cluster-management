@@ -25,6 +25,7 @@ type LogtoBackendDeploymentResource = {
   adminPort: number
   apiPort: number
   claim: string
+  database: string
 }
 
 type LogtoBackendDeploymentProperties = {
@@ -43,6 +44,7 @@ type containerProperties = portPropterties & {
   image: string
   tag: string
   volumeName: string
+  database: string
 }
 
 type initContainerProperties = Pick<
@@ -111,6 +113,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         adminPort,
         apiPort,
         claim,
+        database,
       },
     } = options
     super(scope, id)
@@ -150,6 +153,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
               adminPort,
               apiPort,
               volumeName,
+              database,
             }),
             volume: [
               {
@@ -189,6 +193,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
     adminPort,
     apiPort,
     tag,
+    database,
   }: containerProperties) {
     return Array.of({
       name,
@@ -198,7 +203,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         "-c",
         `npm run alteration deploy ${tag} && npm run cli db seed -- --swe && npm start`,
       ),
-      env: this.#env(secret),
+      env: this.#env(secret, database),
       port: this.#ports({ adminService, apiService, adminPort, apiPort }),
       volumeMount: Array.of({
         name: volumeName,
@@ -207,7 +212,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
       }),
     })
   }
-  #env(secret: V1Secret) {
+  #env(secret: V1Secret, database: string) {
     return Array.of({
       name: "DB_URL",
       value: "postgresql://"
@@ -219,7 +224,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         .concat(":")
         .concat(decodeSecretData(secret?.data?.port as string))
         .concat("/")
-        .concat(decodeSecretData(secret?.data?.dbname as string)),
+        .concat(database),
     })
   }
   #ports({ adminService, apiService, adminPort, apiPort }: portPropterties) {
