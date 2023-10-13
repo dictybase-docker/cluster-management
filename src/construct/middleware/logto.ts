@@ -190,49 +190,43 @@ class LogtoBackendDeploymentStack extends TerraformStack {
     apiPort,
     tag,
   }: containerProperties) {
-    return [
-      {
-        name,
-        image: `${image}:${tag}`,
-        command: ["/bin/sh"],
-        args: [
-          "-c",
-          `npm run alteration deploy ${tag} && npm run cli db seed -- --swe && npm start`,
-        ],
-        env: this.#env(secret),
-        port: this.#ports({ adminService, apiService, adminPort, apiPort }),
-        volumeMount: [
-          {
-            name: volumeName,
-            mountPath: "/etc/logto/packages/core/connectors",
-            readOnly: true,
-          },
-        ],
-      },
-    ]
+    return Array.of({
+      name,
+      image: `${image}:${tag}`,
+      command: ["/bin/sh"],
+      args: Array.of(
+        "-c",
+        `npm run alteration deploy ${tag} && npm run cli db seed -- --swe && npm start`,
+      ),
+      env: this.#env(secret),
+      port: this.#ports({ adminService, apiService, adminPort, apiPort }),
+      volumeMount: Array.of({
+        name: volumeName,
+        mountPath: "/etc/logto/packages/core/connectors",
+        readOnly: true,
+      }),
+    })
   }
   #env(secret: V1Secret) {
-    return [
-      {
-        name: "DB_URL",
-        value: "postgresql://"
-          .concat(secret?.data?.user as string)
-          .concat(":")
-          .concat(secret?.data?.password as string)
-          .concat("@")
-          .concat(secret?.data?.host as string)
-          .concat(":")
-          .concat(secret?.data?.port as string)
-          .concat("/")
-          .concat(secret?.data?.dbname as string),
-      },
-    ]
+    return Array.of({
+      name: "DB_URL",
+      value: "postgresql://"
+        .concat(secret?.data?.user as string)
+        .concat(":")
+        .concat(secret?.data?.password as string)
+        .concat("@")
+        .concat(secret?.data?.host as string)
+        .concat(":")
+        .concat(secret?.data?.port as string)
+        .concat("/")
+        .concat(secret?.data?.dbname as string),
+    })
   }
   #ports({ adminService, apiService, adminPort, apiPort }: portPropterties) {
-    return [
+    return Array.of(
       { name: adminService, containerPort: adminPort, protocol: "TCP" },
       { name: apiService, containerPort: apiPort, protocol: "TCP" },
-    ]
+    )
   }
 }
 
