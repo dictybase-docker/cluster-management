@@ -5,6 +5,7 @@ import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
 import { PersistentVolumeClaim } from "@cdktf/provider-kubernetes/lib/persistent-volume-claim"
 import { readFileSync } from "fs"
 import { V1Secret } from "@kubernetes/client-node"
+import { decodeSecretData } from "../../k8s"
 
 type Provider = {
   config: string
@@ -211,15 +212,15 @@ class LogtoBackendDeploymentStack extends TerraformStack {
     return Array.of({
       name: "DB_URL",
       value: "postgresql://"
-        .concat(secret?.data?.user as string)
+        .concat(decodeSecretData(secret?.data?.user as string))
         .concat(":")
-        .concat(secret?.data?.password as string)
+        .concat(decodeSecretData(secret?.data?.password as string))
         .concat("@")
-        .concat(secret?.data?.host as string)
+        .concat(decodeSecretData(secret?.data?.host as string))
         .concat(":")
-        .concat(secret?.data?.port as string)
+        .concat(decodeSecretData(secret?.data?.port as string))
         .concat("/")
-        .concat(secret?.data?.dbname as string),
+        .concat(decodeSecretData(secret?.data?.dbname as string)),
     })
   }
   #ports({ adminService, apiService, adminPort, apiPort }: portPropterties) {
