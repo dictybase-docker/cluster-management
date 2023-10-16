@@ -26,6 +26,7 @@ type LogtoBackendDeploymentResource = {
   apiPort: number
   claim: string
   database: string
+  endpoint: string
 }
 
 type LogtoBackendDeploymentProperties = {
@@ -45,6 +46,7 @@ type containerProperties = portPropterties & {
   tag: string
   volumeName: string
   database: string
+  endpoint: string
 }
 
 type initContainerProperties = Pick<
@@ -114,6 +116,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         apiPort,
         claim,
         database,
+        endpoint,
       },
     } = options
     super(scope, id)
@@ -154,6 +157,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
               apiPort,
               volumeName,
               database,
+              endpoint,
             }),
             volume: [
               {
@@ -194,6 +198,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
     apiPort,
     tag,
     database,
+    endpoint,
   }: containerProperties) {
     return Array.of({
       name,
@@ -203,7 +208,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         "-c",
         `npm run alteration deploy ${tag} && npm run cli db seed -- --swe && npm start`,
       ),
-      env: this.#env(secret, database),
+      env: this.#env(secret, database, endpoint),
       port: this.#ports({ adminService, apiService, adminPort, apiPort }),
       volumeMount: Array.of({
         name: volumeName,
@@ -212,20 +217,23 @@ class LogtoBackendDeploymentStack extends TerraformStack {
       }),
     })
   }
-  #env(secret: V1Secret, database: string) {
-    return Array.of({
-      name: "DB_URL",
-      value: "postgresql://"
-        .concat(decodeSecretData(secret?.data?.user as string))
-        .concat(":")
-        .concat(decodeSecretData(secret?.data?.password as string))
-        .concat("@")
-        .concat(decodeSecretData(secret?.data?.host as string))
-        .concat(":")
-        .concat(decodeSecretData(secret?.data?.port as string))
-        .concat("/")
-        .concat(database),
-    })
+  #env(secret: V1Secret, database: string, endpoint: string) {
+    return Array.of(
+      {
+        name: "DB_URL",
+        value: "postgresql://"
+          .concat(decodeSecretData(secret?.data?.user as string))
+          .concat(":")
+          .concat(decodeSecretData(secret?.data?.password as string))
+          .concat("@")
+          .concat(decodeSecretData(secret?.data?.host as string))
+          .concat(":")
+          .concat(decodeSecretData(secret?.data?.port as string))
+          .concat("/")
+          .concat(database),
+      },
+      { name: "ENDPOINT", value: endpoint },
+    )
   }
   #ports({ adminService, apiService, adminPort, apiPort }: portPropterties) {
     return Array.of(
