@@ -94,6 +94,12 @@ const argv = yargs(process.argv.slice(2))
       default: "logto",
       describe: "name of logto database",
     },
+    ep: {
+      alias: "endpoint",
+      type: "string",
+      describe: "http endpoint for logto backend api service",
+      demandOption: true,
+    },
   })
   .help()
   .completion()
@@ -134,6 +140,7 @@ new LogtoBackendDeploymentStack(app, argv.nm, {
     claim: argv.nm,
     adminPort: argv.adp,
     apiPort: argv.ap,
+    endpoint: argv.ep,
   },
 })
 app.synth()
