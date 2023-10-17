@@ -107,13 +107,14 @@ const argv = yargs(process.argv.slice(2))
 
 const secret = await getSecret(argv.kc, argv.sr, argv.ns)
 const app = new App()
-new LogtoPersistentVolumeClaimStack(app, argv.nm, {
+const pvc = argv.nm.concat("-claim")
+new LogtoPersistentVolumeClaimStack(app, pvc, {
   provider: {
     config: argv.kc,
     remote: argv.r,
     credentials: argv.c,
     bucketName: argv.bn,
-    bucketPrefix: argv.nm.concat("-volume-claim-").concat(argv.ns),
+    bucketPrefix: pvc.concat(argv.ns),
   },
   resource: {
     namespace: argv.ns,
@@ -137,7 +138,7 @@ new LogtoBackendDeploymentStack(app, argv.nm, {
     secret: secret as V1Secret,
     adminService: argv.nm.concat("-admin"),
     apiService: argv.nm.concat("-api"),
-    claim: argv.nm,
+    claim: pvc,
     adminPort: argv.adp,
     apiPort: argv.ap,
     endpoint: argv.ep,
