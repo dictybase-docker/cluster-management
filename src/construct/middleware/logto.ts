@@ -204,10 +204,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
       name,
       image: `${image}:${tag}`,
       command: ["/bin/sh"],
-      args: Array.of(
-        "-c",
-        `npm run alteration deploy ${tag} && npm run cli db seed -- --swe && npm start`,
-      ),
+      args: Array.of("-c", `npm run cli db seed -- --swe && npm start`),
       env: this.#env(secret, database, endpoint),
       port: this.#ports({ adminService, apiService, adminPort, apiPort }),
       volumeMount: Array.of({
@@ -223,14 +220,17 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         name: "DB_URL",
         value: "postgresql://"
           .concat(decodeSecretData(secret?.data?.user as string))
-          .concat(":")
-          .concat(decodeSecretData(secret?.data?.password as string))
           .concat("@")
           .concat(decodeSecretData(secret?.data?.host as string))
           .concat(":")
           .concat(decodeSecretData(secret?.data?.port as string))
           .concat("/")
-          .concat(database),
+          .concat(database)
+          .concat("?sslmode=no-verify"),
+      },
+      {
+        name: "PGPASSWORD",
+        value: decodeSecretData(secret?.data?.password as string),
       },
       { name: "ENDPOINT", value: endpoint },
     )
