@@ -154,7 +154,7 @@ class PostgresStack extends TerraformStack {
       {
         name: user,
         databases: databases,
-        options: "CREATEDB",
+        options: "CREATEDB CREATEROLE",
       },
     ]
   }
