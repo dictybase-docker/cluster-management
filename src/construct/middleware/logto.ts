@@ -86,7 +86,7 @@ class LogtoPersistentVolumeClaimStack extends TerraformStack {
       metadata: { name: id, namespace },
       spec: {
         storageClassName: storageClass,
-        accessModes: ["ReadWrieOnce"],
+        accessModes: ["ReadWriteOnce"],
         resources: {
           requests: {
             storage: `${diskSize}Gi`,
