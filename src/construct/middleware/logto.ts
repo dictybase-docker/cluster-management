@@ -4,8 +4,9 @@ import { KubernetesProvider } from "@cdktf/provider-kubernetes/lib/provider"
 import { Deployment } from "@cdktf/provider-kubernetes/lib/deployment"
 import { PersistentVolumeClaim } from "@cdktf/provider-kubernetes/lib/persistent-volume-claim"
 import { readFileSync } from "fs"
-import { V1Secret } from "@kubernetes/client-node"
+import { V1Secret, V1Service, V1ServicePort } from "@kubernetes/client-node"
 import { decodeSecretData } from "../../k8s"
+import { Manifest } from "@cdktf/provider-kubernetes/lib/manifest"
 
 type Provider = {
   config: string
@@ -60,6 +61,92 @@ type LogtoPersistentVolumeClaimStackProperties = {
     namespace: string
     storageClass: string
     diskSize: number
+  }
+}
+
+type LogtoIngressResourceProperties = {
+  name: string
+  namespace: string
+  issuer: string
+  secret: string
+  service: V1Service
+  backendHosts: Array<string>
+}
+
+type LogtoIngressStackProperties = {
+  provider: Provider
+  resource: LogtoIngressResourceProperties
+}
+
+class LogtoIngressStack extends TerraformStack {
+  constructor(
+    scope: Construct,
+    id: string,
+    options: LogtoIngressStackProperties,
+  ) {
+    const {
+      provider: { remote, credentials, bucketName, bucketPrefix, config },
+      resource,
+    } = options
+    const { name, namespace, issuer } = resource
+    super(scope, id)
+    if (remote) {
+      new GcsBackend(this, {
+        bucket: bucketName,
+        prefix: bucketPrefix,
+        credentials: readFileSync(credentials).toString(),
+      })
+    }
+    new KubernetesProvider(this, `${id}-provider`, { configPath: config })
+    const manifest = {
+      apiVersion: "networking.k8s.io/v1",
+      kind: "Ingress",
+      metadata: this.#metadata(name, namespace, issuer),
+      spec: this.#spec(resource),
+    }
+    new Manifest(this, id, { manifest })
+  }
+  #metadata(name: string, namespace: string, issuer: string) {
+    return {
+      name,
+      namespace,
+      annotations: {
+        "cert-manager.io/issuer": issuer,
+      },
+    }
+  }
+  #spec(options: LogtoIngressResourceProperties) {
+    const { secret, backendHosts, service } = options
+    return {
+      ingressClassName: "nginx",
+      tls: this.#tls(secret, backendHosts),
+      rules: this.#rules(backendHosts, service),
+    }
+  }
+  #tls(secret: string, hosts: Array<string>) {
+    return [{ secretName: secret, hosts }]
+  }
+  #rules(hosts: Array<string>, service: V1Service) {
+    return hosts.map((h) => {
+      return { host: h, http: this.#backendPaths(service) }
+    })
+  }
+  #backendPaths(service: V1Service) {
+    const allPorts = service.spec?.ports as Array<V1ServicePort>
+    return {
+      paths: [
+        {
+          pathType: "Prefix",
+          path: "/",
+          backend: {
+            service: {
+              name: service.metadata?.name as string,
+              port: { number: allPorts[0].port },
+            },
+          },
+        },
+      ],
+    }
   }
 }
 
@@ -243,4 +330,8 @@ class LogtoBackendDeploymentStack extends TerraformStack {
   }
 }
 
-export { LogtoBackendDeploymentStack, LogtoPersistentVolumeClaimStack }
+export {
+  LogtoBackendDeploymentStack,
+  LogtoPersistentVolumeClaimStack,
+  LogtoIngressStack,
+}
