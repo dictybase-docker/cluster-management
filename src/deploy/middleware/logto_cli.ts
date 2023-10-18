@@ -105,7 +105,11 @@ const adminService = (argv: logtoArgvProperties) => argv.nm.concat("-admin")
 const apiService = (argv: logtoArgvProperties) => argv.nm.concat("-api")
 const pvc = (argv: logtoArgvProperties) => argv.nm.concat("-claim")
 
-const logtoServiceOptions = (argv: logtoArgvProperties, service: string) => {
+const logtoServiceOptions = (
+  argv: logtoArgvProperties,
+  service: string,
+  port: number,
+) => {
   return {
     provider: {
       config: argv.kc,
@@ -116,7 +120,7 @@ const logtoServiceOptions = (argv: logtoArgvProperties, service: string) => {
     },
     resource: {
       namespace: argv.ns,
-      port: argv.adp,
+      port: port,
       app: argv.nm,
     },
   }
