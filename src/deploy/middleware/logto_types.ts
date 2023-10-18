@@ -5,7 +5,7 @@ type logtoIngressArgvProperties = providerArgvProperties &
     sr: string
     sc: string
     is: string
-    hs: Array<string> | Array<number>
+    hs: (string | number)[]
   }
 
 type logtoArgvProperties = providerArgvProperties &
