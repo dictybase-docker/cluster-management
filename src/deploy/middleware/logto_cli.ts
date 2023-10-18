@@ -35,7 +35,7 @@ const process_logto_ingress_cmdline = (): logtoIngressArgvProperties =>
       nm: {
         type: "string",
         alias: "name",
-        default: "logto",
+        default: "logto-ingress",
         describe: "name of the this install",
       },
       ns: {
@@ -47,13 +47,13 @@ const process_logto_ingress_cmdline = (): logtoIngressArgvProperties =>
       sr: {
         alias: "service",
         type: "string",
-        default: "graphql-api",
+        default: "logto-api",
         description: "name of graphql service",
       },
       sc: {
         alias: "secret",
         type: "string",
-        default: "graphql-ingress-tls",
+        default: "logto-ingress-tls",
       },
       is: {
         alias: "issuer",
