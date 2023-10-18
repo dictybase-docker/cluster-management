@@ -9,8 +9,20 @@ const getSecret = async (config: string, secret: string, namespace: string) => {
   kubeconfig.loadFromFile(config)
   const res = await kubeconfig
     .makeApiClient(CoreV1Api)
-    .listNamespacedSecret(namespace)
-  return res.body.items.find((sec) => sec.metadata?.name === secret)
+    .readNamespacedSecret(secret, namespace)
+  return res.body
+}
+const getService = async (
+  config: string,
+  service: string,
+  namespace: string,
+) => {
+  const kubeconfig = new KubeConfig()
+  kubeconfig.loadFromFile(config)
+  const res = await kubeconfig
+    .makeApiClient(CoreV1Api)
+    .readNamespacedService(service, namespace)
+  return res.body
 }
 
-export { decodeSecretData, getSecret }
+export { decodeSecretData, getSecret, getService }
