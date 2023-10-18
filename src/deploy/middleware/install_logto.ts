@@ -91,7 +91,7 @@ const argv = yargs(process.argv.slice(2))
     db: {
       alias: "database",
       type: "string",
-      default: "logto",
+      default: "dictycr_auth",
       describe: "name of logto database",
     },
     ep: {
