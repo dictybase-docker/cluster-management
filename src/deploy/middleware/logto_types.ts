@@ -1,5 +1,13 @@
 import { type providerArgvProperties, basicArgvProperties } from "../argv_types"
 
+type logtoIngressArgvProperties = providerArgvProperties &
+  basicArgvProperties & {
+    sr: string
+    sc: string
+    is: string
+    hs: Array<string>
+  }
+
 type logtoArgvProperties = providerArgvProperties &
   basicArgvProperties & {
     im: string
@@ -13,4 +21,4 @@ type logtoArgvProperties = providerArgvProperties &
     ep: string
   }
 
-export { type logtoArgvProperties }
+export { type logtoArgvProperties, logtoIngressArgvProperties }
