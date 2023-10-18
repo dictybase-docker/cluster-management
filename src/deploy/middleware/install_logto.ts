@@ -28,11 +28,11 @@ new LogtoBackendDeploymentStack(
 new BackendService(
   app,
   adminService(argv),
-  logtoServiceOptions(argv, adminService(argv)),
+  logtoServiceOptions(argv, adminService(argv), argv.adp),
 )
 new BackendService(
   app,
   apiService(argv),
-  logtoServiceOptions(argv, apiService(argv)),
+  logtoServiceOptions(argv, apiService(argv), argv.ap),
 )
 app.synth()
