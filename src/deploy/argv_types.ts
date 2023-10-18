@@ -6,8 +6,10 @@ type providerArgvProperties = {
 }
 
 type basicArgvProperties = {
+  [x: string]: unknown
   nm: string
   ns: string
+  _: (string | number)[]
 }
 
 export { type providerArgvProperties, basicArgvProperties }
