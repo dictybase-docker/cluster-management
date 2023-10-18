@@ -6,6 +6,7 @@ import {
   LogtoBackendDeploymentStack,
 } from "../../construct/middleware/logto"
 import { getSecret } from "../../k8s"
+import { BackendService } from "../../construct/dictycr"
 
 const argv = yargs(process.argv.slice(2))
   .options({
@@ -122,6 +123,8 @@ new LogtoPersistentVolumeClaimStack(app, pvc, {
     storageClass: argv.sc,
   },
 })
+const adminService = argv.nm.concat("-admin")
+const apiService = argv.nm.concat("-api")
 new LogtoBackendDeploymentStack(app, argv.nm, {
   provider: {
     config: argv.kc,
@@ -136,12 +139,40 @@ new LogtoBackendDeploymentStack(app, argv.nm, {
     image: argv.im,
     tag: argv.tg,
     secret: secret as V1Secret,
-    adminService: argv.nm.concat("-admin"),
-    apiService: argv.nm.concat("-api"),
+    adminService: adminService,
+    apiService: apiService,
     claim: pvc,
     adminPort: argv.adp,
     apiPort: argv.ap,
     endpoint: argv.ep,
+  },
+})
+new BackendService(app, adminService, {
+  provider: {
+    config: argv.kc,
+    remote: argv.r,
+    credentials: argv.c,
+    bucketName: argv.bn,
+    bucketPrefix: adminService.concat("-").concat(argv.ns),
+  },
+  resource: {
+    namespace: argv.ns,
+    port: argv.adp,
+    app: argv.nm,
+  },
+})
+new BackendService(app, apiService, {
+  provider: {
+    config: argv.kc,
+    remote: argv.r,
+    credentials: argv.c,
+    bucketName: argv.bn,
+    bucketPrefix: apiService.concat("-").concat(argv.ns),
+  },
+  resource: {
+    namespace: argv.ns,
+    port: argv.adp,
+    app: argv.nm,
   },
 })
 app.synth()
