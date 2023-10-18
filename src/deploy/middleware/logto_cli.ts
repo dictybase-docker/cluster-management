@@ -1,6 +1,76 @@
 import yargs from "yargs/yargs"
-import { type logtoArgvProperties } from "./logto_types"
-import { V1Secret } from "@kubernetes/client-node"
+import {
+  type logtoArgvProperties,
+  logtoIngressArgvProperties,
+} from "./logto_types"
+import { V1Secret, V1Service } from "@kubernetes/client-node"
+
+const process_logto_ingress_cmdline = (): logtoIngressArgvProperties =>
+  yargs(process.argv.slice(2))
+    .options({
+      kc: {
+        describe: "kubernetes config file",
+        type: "string",
+        demandOption: true,
+        alias: "kubeconfig",
+      },
+      c: {
+        alias: "credentials",
+        description: "service account credentials file for gcs backend",
+        type: "string",
+        default: "credentials/cloud-manager.json",
+      },
+      bn: {
+        alias: "bucket-name",
+        type: "string",
+        default: "dicty-terraform-state",
+        description: "GCS bucket name where terraform remote state is stored.",
+      },
+      r: {
+        alias: "remote",
+        type: "boolean",
+        default: true,
+        description: "whether the remote gcs backend will be used",
+      },
+      nm: {
+        type: "string",
+        alias: "name",
+        default: "logto",
+        describe: "name of the this install",
+      },
+      ns: {
+        describe: "kubernetes namespace to install",
+        type: "string",
+        alias: "namespace",
+        demandOption: true,
+      },
+      sr: {
+        alias: "service",
+        type: "string",
+        default: "graphql-api",
+        description: "name of graphql service",
+      },
+      sc: {
+        alias: "secret",
+        type: "string",
+        default: "graphql-ingress-tls",
+      },
+      is: {
+        alias: "issuer",
+        type: "string",
+        demandOption: true,
+        describe: "name of the cert-manager issuer",
+      },
+      hs: {
+        alias: "hosts",
+        type: "array",
+        describe: "list of hosts for ingress to map",
+        demandOption: true,
+      },
+    })
+    .help()
+    .completion()
+    .parseSync()
 
 const process_logto_cmdline = (): logtoArgvProperties =>
   yargs(process.argv.slice(2))
@@ -101,6 +171,32 @@ const process_logto_cmdline = (): logtoArgvProperties =>
     .completion()
     .parseSync()
 
+const ingress_deployment = (argv: logtoIngressArgvProperties) =>
+  argv.nm.concat("-").concat(argv.ns)
+
+const logtoIngressOptions = (
+  argv: logtoIngressArgvProperties,
+  service: V1Service,
+) => {
+  return {
+    provider: {
+      config: argv.kc,
+      remote: argv.r,
+      credentials: argv.c,
+      bucketName: argv.bn,
+      bucketPrefix: ingress_deployment(argv),
+    },
+    resource: {
+      name: argv.nm,
+      namespace: argv.ns,
+      secret: argv.sc,
+      service: service,
+      issuer: argv.is,
+      backendHosts: argv.hs as Array<string>,
+    },
+  }
+}
+
 const adminService = (argv: logtoArgvProperties) => argv.nm.concat("-admin")
 const apiService = (argv: logtoArgvProperties) => argv.nm.concat("-api")
 const pvc = (argv: logtoArgvProperties) => argv.nm.concat("-claim")
@@ -177,7 +273,10 @@ export {
   apiService,
   adminService,
   process_logto_cmdline,
+  process_logto_ingress_cmdline,
+  ingress_deployment,
   logtoPvcStackOptions,
   logtoBackendDeploymentOptions,
   logtoServiceOptions,
+  logtoIngressOptions,
 }
