@@ -17,15 +17,25 @@ type Provider = {
 }
 type SecretStackResource = {
   namespace: string
-  gcsKey: string
-  project: string
-  resticPassword: string
-  minioUser: string
-  minioPassword: string
-  arangodbUser: string
-  arangodbPassword: string
-  emailAPIKey: string
-  token: string
+  cloud: {
+    gcsKey: string
+    project: string
+  }
+  backup: {
+    resticPassword: string
+  }
+  storage: {
+    minioUser: string
+    minioPassword: string
+  }
+  database: {
+    arangodbUser: string
+    arangodbPassword: string
+  }
+  email: {
+    APIKey: string
+    token: string
+  }
 }
 type SecretStackProperties = {
   provider: Provider
@@ -149,16 +159,12 @@ class SecretStack extends TerraformStack {
     const {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
       resource: {
-        gcsKey,
-        project,
-        resticPassword,
         namespace,
-        minioUser,
-        minioPassword,
-        arangodbUser,
-        arangodbPassword,
-        emailAPIKey,
-        token,
+        cloud: { gcsKey, project },
+        backup: { resticPassword },
+        storage: { minioUser, minioPassword },
+        database: { arangodbUser, arangodbPassword },
+        email: { APIKey, token },
       },
     } = options
     super(scope, id)
@@ -184,7 +190,7 @@ class SecretStack extends TerraformStack {
         "arangodb.password": arangodbPassword,
         "minio.accesskey": minioUser,
         "minio.secretkey": minioPassword,
-        "eventmessenger.email.apiKey": emailAPIKey,
+        "eventmessenger.email.apiKey": APIKey,
         "eventmessenger.github.token": token,
         rootUser: minioUser,
         rootPassword: minioPassword,
