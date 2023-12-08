@@ -46,11 +46,6 @@ type EmailProperties = {
 }
 type AuthProperties = {
   endpoint: string
-  appId: string
-  appSecret: string
-  jwksURI: string
-  jwtIssuer: string
-  jwtAudience: string
 }
 type ConfigMapStackProperties = {
   provider: Provider
@@ -115,7 +110,7 @@ class ConfigMapStack extends TerraformStack {
         namespace,
         graphql: { publication, graphlEndpoint, organism },
         email: { domain, sender, senderName, owner, repository, senderCc },
-        auth: { endpoint, appId, appSecret, jwksURI, jwtIssuer, jwtAudience },
+        auth: { endpoint },
       },
     } = options
     super(scope, id)
