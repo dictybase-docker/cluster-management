@@ -53,6 +53,12 @@ const argv = yargs(process.argv.slice(2))
       describe: "graphql api endpoint for publication",
       demandOption: true,
     },
+    ae: {
+      alias: "auth-api-endpoint",
+      type: "string",
+      demandOption: true,
+      describe: "api endpoint for authentication server",
+    },
     pa: {
       alias: "publication-api",
       type: "string",
