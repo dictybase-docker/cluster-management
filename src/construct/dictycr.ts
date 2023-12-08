@@ -31,19 +31,34 @@ type SecretStackProperties = {
   provider: Provider
   resource: SecretStackResource
 }
+type GraphqlProperties = {
+  publication: string
+  organism: string
+  graphlEndpoint: string
+}
+type EmailProperties = {
+  owner: string
+  sender: string
+  senderName: string
+  domain: string
+  repository: string
+  senderCc: string
+}
+type AuthProperties = {
+  endpoint: string
+  appId: string
+  appSecret: string
+  jwksURI: string
+  jwtIssuer: string
+  jwtAudience: string
+}
 type ConfigMapStackProperties = {
   provider: Provider
   resource: {
     namespace: string
-    publication: string
-    organism: string
-    owner: string
-    sender: string
-    senderName: string
-    domain: string
-    repository: string
-    senderCc: string
-    graphlEndpoint: string
+    graphql: GraphqlProperties
+    email: EmailProperties
+    auth: AuthProperties
   }
 }
 type BackendDeploymentResource = {
