@@ -113,15 +113,9 @@ class ConfigMapStack extends TerraformStack {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
       resource: {
         namespace,
-        publication,
-        organism,
-        domain,
-        sender,
-        senderName,
-        owner,
-        repository,
-        senderCc,
-        graphlEndpoint,
+        graphql: { publication, graphlEndpoint, organism },
+        email: { domain, sender, senderName, owner, repository, senderCc },
+        auth: { endpoint, appId, appSecret, jwksURI, jwtIssuer, jwtAudience },
       },
     } = options
     super(scope, id)
