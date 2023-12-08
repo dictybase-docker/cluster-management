@@ -44,7 +44,7 @@ type EmailProperties = {
   repository: string
   senderCc: string
 }
-type AuthProperties = {
+type AuthConfigProperties = {
   endpoint: string
 }
 type ConfigMapStackProperties = {
@@ -53,7 +53,7 @@ type ConfigMapStackProperties = {
     namespace: string
     graphql: GraphqlProperties
     email: EmailProperties
-    auth: AuthProperties
+    auth: AuthConfigProperties
   }
 }
 type BackendDeploymentResource = {
@@ -138,6 +138,7 @@ class ConfigMapStack extends TerraformStack {
         "eventmessenger.github.owner": owner,
         "eventmessenger.github.repository": repository,
         "eventmessenger.email.cc": senderCc,
+        "auth.endpoint": endpoint,
       },
     })
   }
