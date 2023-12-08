@@ -54,16 +54,13 @@ type EmailProperties = {
   repository: string
   senderCc: string
 }
-type AuthConfigProperties = {
-  endpoint: string
-}
 type ConfigMapStackProperties = {
   provider: Provider
   resource: {
     namespace: string
     graphql: GraphqlProperties
     email: EmailProperties
-    auth: AuthConfigProperties
+    auth: { endpoint: string }
   }
 }
 type BackendDeploymentResource = {
