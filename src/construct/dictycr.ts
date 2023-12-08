@@ -370,7 +370,7 @@ class ArangodbBackendDeployment extends TerraformStack {
       {
         name,
         image: imageWithTag,
-        args: this.#commandArgs(logLevel, port),
+        args: this.#commandArgs(logLevel, port) as Array<string>,
         env: this.#env(secretName),
         port: this.#ports(service, port),
       },
