@@ -15,6 +15,13 @@ type Provider = {
   bucketName: string
   bucketPrefix: string
 }
+type AuthSecretProperties = {
+  appId: string
+  appSecret: string
+  JwksURI: string
+  JwtIssuer: string
+  JwtAudience: string
+}
 type SecretStackResource = {
   namespace: string
   cloud: {
@@ -36,6 +43,7 @@ type SecretStackResource = {
     APIKey: string
     token: string
   }
+  auth: AuthSecretProperties
 }
 type SecretStackProperties = {
   provider: Provider
@@ -162,6 +170,7 @@ class SecretStack extends TerraformStack {
         storage: { minioUser, minioPassword },
         database: { arangodbUser, arangodbPassword },
         email: { APIKey, token },
+        auth: { appId, appSecret, JwksURI, JwtIssuer, JwtAudience },
       },
     } = options
     super(scope, id)
@@ -180,6 +189,11 @@ class SecretStack extends TerraformStack {
     new Secret(this, id, {
       metadata,
       data: {
+        "auth:appId": appId,
+        "auth:appSecret": appSecret,
+        "auth.JwksURI": JwksURI,
+        "auth.JwtAudience": JwtAudience,
+        "auth.JwtIssuer": JwtIssuer,
         "gcsbucket.credentials": readFileSync(gcsKey).toString(),
         "gcs.project": project,
         "restic.password": resticPassword,
