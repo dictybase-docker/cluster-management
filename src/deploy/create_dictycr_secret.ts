@@ -111,15 +111,25 @@ new SecretStack(app, deployName, {
   },
   resource: {
     namespace: argv.ns,
-    gcsKey: argv.bc,
-    project: argv.pi,
-    resticPassword: argv.rp,
-    minioUser: argv.mu,
-    minioPassword: argv.mp,
-    arangodbUser: argv.au,
-    arangodbPassword: argv.ap,
-    emailAPIKey: argv.ek,
-    token: argv.tk,
+    cloud: {
+      gcsKey: argv.bc,
+      project: argv.pi,
+    },
+    backup: {
+      resticPassword: argv.rp,
+    },
+    storage: {
+      minioUser: argv.mu,
+      minioPassword: argv.mp,
+    },
+    database: {
+      arangodbUser: argv.au,
+      arangodbPassword: argv.ap,
+    },
+    email: {
+      APIKey: argv.ek,
+      token: argv.tk,
+    },
   },
 })
 app.synth()
