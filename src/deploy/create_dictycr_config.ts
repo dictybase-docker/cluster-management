@@ -118,15 +118,20 @@ new ConfigMapStack(app, argv.nm, {
   },
   resource: {
     namespace: argv.ns,
-    publication: argv.pa,
-    organism: argv.oa,
-    sender: argv.sa,
-    senderName: argv.sn,
-    domain: argv.do,
-    repository: argv.gp,
-    owner: argv.go,
-    senderCc: argv.cc,
-    graphlEndpoint: argv.gl,
+    graphql: {
+      publication: argv.pa,
+      organism: argv.oa,
+      graphlEndpoint: argv.gl,
+    },
+    email: {
+      sender: argv.sa,
+      senderName: argv.sn,
+      domain: argv.do,
+      repository: argv.gp,
+      owner: argv.go,
+      senderCc: argv.cc,
+    },
+    auth: { endpoint: argv.ae },
   },
 })
 app.synth()
