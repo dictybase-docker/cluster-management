@@ -94,6 +94,36 @@ const argv = yargs(process.argv.slice(2))
       describe: "github token for creating issues",
       demandOption: true,
     },
+    aid: {
+      alias: "app-id",
+      type: "string",
+      describe: "appliction id of the authentication client",
+      demandOption: true,
+    },
+    asr: {
+      alias: "app-secret",
+      type: "string",
+      describe: "secret to access the authentication api",
+      demandOption: true,
+    },
+    ju: {
+      alias: "jwks-uri",
+      type: "string",
+      describe: "url to retrieve JWK public key set",
+      demandOption: true,
+    },
+    ji: {
+      alias: "jwt-issuer",
+      type: "string",
+      describe: "jwt issuer of the token",
+      demandOption: true,
+    },
+    jd: {
+      alias: "jwt-audience",
+      type: "string",
+      describe: "jwt audience of the token",
+      demandOption: true,
+    },
   })
   .help()
   .completion()
@@ -129,6 +159,13 @@ new SecretStack(app, deployName, {
     email: {
       APIKey: argv.ek,
       token: argv.tk,
+    },
+    auth: {
+      appId: argv.aid,
+      appSecret: argv.asr,
+      JwksURI: argv.ju,
+      JwtIssuer: argv.ji,
+      JwtAudience: argv.jd,
     },
   },
 })
