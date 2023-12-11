@@ -44,6 +44,13 @@ const argv = yargs(process.argv.slice(2))
       alias: "namespace",
       demandOption: true,
     },
+    sr: {
+      alias: "secret",
+      describe:
+        "dictycr secret name that contains all authentication credentials",
+      type: "string",
+      default: "dictycr-secret",
+    },
     cm: {
       alias: "config-map",
       describe:
@@ -108,6 +115,7 @@ new GraphqlBackendDeploymentStack(app, deployment, {
   },
   resource: {
     service,
+    secretName: argv.sr.concat("-").concat(argv.nm),
     namespace: argv.ns,
     image: argv.im,
     tag: argv.tg,
