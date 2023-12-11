@@ -143,6 +143,15 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
         },
       },
       {
+        name: "AUTH_ENDPOINT",
+        valueFrom: {
+          configMapKeyRef: {
+            name: configMapname,
+            key: "auth.endpoint",
+          },
+        },
+      },
+      {
         name: "ORGANISM_API_ENDPOINT",
         valueFrom: {
           configMapKeyRef: {
