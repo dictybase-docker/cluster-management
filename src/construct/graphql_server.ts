@@ -33,6 +33,7 @@ type GraphqlBackendDeploymentResource = {
   tag: string
   logLevel: string
   configMapname: string
+  secretName: string
   service: string
   port: number
   origins: Array<string>
@@ -42,6 +43,7 @@ type GraphqlBackendDeploymentProperties = {
   resource: GraphqlBackendDeploymentResource
 }
 type containerProperties = {
+  secretName: string
   name: string
   imageWithTag: string
   logLevel: string
@@ -68,6 +70,7 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
         service,
         port,
         origins,
+        secretName,
       },
     } = options
     super(scope, id)
@@ -98,6 +101,7 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
               service,
               port,
               origins,
+              secretName,
             }),
           },
         },
@@ -115,13 +119,14 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
     service,
     port,
     origins,
+    secretName,
   }: containerProperties) {
     return [
       {
         name,
         image: imageWithTag,
         args: this.#commandArgs(logLevel, origins),
-        env: this.#env(configMapname),
+        env: this.#env(configMapname, secretName),
         port: this.#ports(service, port),
       },
     ]
@@ -131,7 +136,7 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
       ...origins.map((o) => ["allowed-origin", o]),
     )
   }
-  #env(configMapname: string) {
+  #env(configMapname: string, secretName: string) {
     return [
       {
         name: "PUBLICATION_API_ENDPOINT",
@@ -157,6 +162,51 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
           configMapKeyRef: {
             name: configMapname,
             key: "endpoint.organism",
+          },
+        },
+      },
+      {
+        name: "JWT_AUDIENCE",
+        valueFrom: {
+          secretKeyRef: {
+            name: secretName,
+            key: "auth.JwtAudience",
+          },
+        },
+      },
+      {
+        name: "JWT_ISSUER",
+        valueFrom: {
+          secretKeyRef: {
+            name: secretName,
+            key: "auth.JwtIssuer",
+          },
+        },
+      },
+      {
+        name: "JWKS_PUBLIC_URI",
+        valueFrom: {
+          secretKeyRef: {
+            name: secretName,
+            key: "auth.JwksURI",
+          },
+        },
+      },
+      {
+        name: "APPLICATION_SECRET",
+        valueFrom: {
+          secretKeyRef: {
+            name: secretName,
+            key: "auth.appSecret",
+          },
+        },
+      },
+      {
+        name: "APPLICATION_ID",
+        valueFrom: {
+          secretKeyRef: {
+            name: secretName,
+            key: "auth.appId",
           },
         },
       },
