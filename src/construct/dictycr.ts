@@ -189,8 +189,8 @@ class SecretStack extends TerraformStack {
     new Secret(this, id, {
       metadata,
       data: {
-        "auth:appId": appId,
-        "auth:appSecret": appSecret,
+        "auth.appId": appId,
+        "auth.appSecret": appSecret,
         "auth.JwksURI": JwksURI,
         "auth.JwtAudience": JwtAudience,
         "auth.JwtIssuer": JwtIssuer,
