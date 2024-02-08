@@ -115,7 +115,7 @@ new GraphqlBackendDeploymentStack(app, deployment, {
   },
   resource: {
     service,
-    secretName: argv.sr.concat("-").concat(argv.nm),
+    secretName: argv.sr.concat("-").concat(argv.ns),
     namespace: argv.ns,
     image: argv.im,
     tag: argv.tg,
