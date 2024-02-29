@@ -53,6 +53,7 @@ class HelmChartStack extends TerraformStack {
       },
     })
     new Release(this, id, {
+      timeout: 1555,
       name: name,
       chart: chart,
       repository: repo,
