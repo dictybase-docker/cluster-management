@@ -15,9 +15,9 @@ type HelmChartProperties = {
   credentials: string
   bucketName: string
   bucketPrefix: string
-  repo: string
   namespace: string
-  chart: string
+  location?: string
+  repo?: string
   name: string
   values?: Array<ReleaseSet>
   listValues?: Array<ReleaseSetListStruct>
@@ -27,7 +27,6 @@ class HelmChartStack extends TerraformStack {
   constructor(scope: Construct, id: string, options: HelmChartProperties) {
     const {
       version,
-      chart,
       remote,
       namespace,
       credentials,
@@ -35,6 +34,7 @@ class HelmChartStack extends TerraformStack {
       bucketPrefix,
       config,
       repo,
+      location,
       name,
       values,
       listValues,
@@ -52,17 +52,30 @@ class HelmChartStack extends TerraformStack {
         configPath: config,
       },
     })
-    new Release(this, id, {
-      timeout: 1555,
+    let releaseConfig = {
       name: name,
-      chart: chart,
-      repository: repo,
       createNamespace: true,
       namespace,
       version,
       set: values,
       setList: listValues,
-    })
+    }
+    if (location) {
+      new Release(
+        this,
+        id,
+        Object.assign({}, releaseConfig, { chart: location }),
+      )
+    } else {
+      new Release(
+        this,
+        id,
+        Object.assign({}, releaseConfig, {
+          repository: repo,
+          chart: name,
+        }),
+      )
+    }
   }
 }
 
