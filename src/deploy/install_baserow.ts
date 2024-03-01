@@ -136,17 +136,11 @@ const argv = yargs(process.argv.slice(2))
       alias: "namespace",
       demandOption: true,
     },
-    ch: {
-      describe: "name of the chart",
+    lc: {
+      describe: "local path of the chart",
       type: "string",
-      alias: "chart",
-      default: "baserow",
-    },
-    repo: {
-      describe: "baserow helm chart reposotiry location",
-      type: "string",
-      alias: "repository",
-      default: "https://christianknell.github.io/helm-charts",
+      alias: "local",
+      demandOption: true,
     },
     c: {
       alias: "credentials",
@@ -206,9 +200,8 @@ new HelmChartStack(app, deployName, {
   credentials: argv.c,
   bucketName: argv.bn,
   bucketPrefix: deployName,
-  repo: argv.repo,
+  location: argv.lc,
   namespace: argv.ns,
-  chart: argv.ch,
   name: argv.nm,
   values: [
     ...storageValues(argv.sc),
