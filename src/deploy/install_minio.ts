@@ -16,12 +16,6 @@ const argv = yargs(process.argv.slice(2))
       alias: "namespace",
       demandOption: true,
     },
-    ch: {
-      describe: "name of the chart",
-      type: "string",
-      alias: "chart",
-      default: "minio",
-    },
     repo: {
       describe: "minio helm chart reposotiry location",
       type: "string",
@@ -103,7 +97,6 @@ new HelmChartStack(app, deployName, {
   bucketPrefix: deployName,
   repo: argv.repo,
   namespace: argv.ns,
-  chart: argv.ch,
   name: argv.nm,
   values: [
     { name: "mode", value: "standalone" },
