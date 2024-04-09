@@ -23,7 +23,7 @@ const argv = yargs(process.argv.slice(2))
       default: "minio",
     },
     repo: {
-      describe: "nats helm chart reposotiry location",
+      describe: "minio helm chart reposotiry location",
       type: "string",
       alias: "repository",
       default: "https://charts.min.io",
@@ -70,6 +70,23 @@ const argv = yargs(process.argv.slice(2))
       describe: "secret that contain root credentials for minio",
       demandOption: true,
     },
+    is: {
+      type: "string",
+      demandOption: true,
+      describe: "cert-manager issuer name",
+      alias: "issuer",
+    },
+    sc: {
+      alias: "ingress-secret",
+      type: "string",
+      default: "minio-ingress-tls",
+    },
+    hs: {
+      alias: "hosts",
+      type: "string",
+      describe: "minio host name",
+      demandOption: true,
+    },
   })
   .help()
   .completion()
@@ -94,6 +111,15 @@ new HelmChartStack(app, deployName, {
     { name: "persistence.storageClass", value: "dictycr-balanced" },
     { name: "existingSecret", value: argv.ms },
     { name: "resources.requests.memory", value: "256Mi" },
+    { name: "ingress.enable", value: "true" },
+    { name: "ingress.ingressClassName", value: "nginx" },
+    { name: "ingress.annotations.cert-manager.io/issuer", value: argv.is },
+    { name: "ingress.path", value: "/" },
+    { name: "ingress.tls[0].secretName", value: argv.sc },
+  ],
+  listValues: [
+    { name: "ingress.hosts", value: [argv.hs] },
+    { name: "ingress.tls[0].hosts", value: [argv.hs] },
   ],
 })
 app.synth()
