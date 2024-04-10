@@ -37,6 +37,8 @@ type GraphqlBackendDeploymentResource = {
   service: string
   port: number
   origins: Array<string>
+  bucket: string
+  bucketPath: string
 }
 type GraphqlBackendDeploymentProperties = {
   provider: Provider
@@ -51,6 +53,8 @@ type containerProperties = {
   service: string
   port: number
   origins: Array<string>
+  bucket: string
+  bucketPath: string
 }
 
 class GraphqlBackendDeploymentStack extends TerraformStack {
@@ -71,6 +75,8 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
         port,
         origins,
         secretName,
+        bucket,
+        bucketPath,
       },
     } = options
     super(scope, id)
@@ -102,6 +108,8 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
               port,
               origins,
               secretName,
+              bucket,
+              bucketPath,
             }),
           },
         },
@@ -120,20 +128,31 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
     port,
     origins,
     secretName,
+    bucket,
+    bucketPath,
   }: containerProperties) {
     return [
       {
         name,
         image: imageWithTag,
-        args: this.#commandArgs(logLevel, origins),
+        args: this.#commandArgs(logLevel, origins, bucket, bucketPath),
         env: this.#env(configMapname, secretName),
         port: this.#ports(service, port),
       },
     ]
   }
-  #commandArgs(logLevel: string, origins: Array<string>) {
+  #commandArgs(
+    logLevel: string,
+    origins: Array<string>,
+    bucket: string,
+    bucketPath: string,
+  ) {
     return ["--log-level", logLevel, "start-server"].concat(
-      ...origins.map((o) => ["allowed-origin", o]),
+      ...origins.map((o) => ["--allowed-origin", o]),
+      "--s3-bucket",
+      bucket,
+      "--s3-bucket-path",
+      bucketPath,
     )
   }
   #env(configMapname: string, secretName: string) {
@@ -144,6 +163,15 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
           configMapKeyRef: {
             name: configMapname,
             key: "endpoint.publication",
+          },
+        },
+      },
+      {
+        name: "S3_STORAGE_ENDPOINT",
+        valueFrom: {
+          configMapKeyRef: {
+            name: configMapname,
+            key: "endpoint.storage",
           },
         },
       },
@@ -162,6 +190,24 @@ class GraphqlBackendDeploymentStack extends TerraformStack {
           configMapKeyRef: {
             name: configMapname,
             key: "endpoint.organism",
+          },
+        },
+      },
+      {
+        name: "SECRET_KEY",
+        valueFrom: {
+          secretKeyRef: {
+            name: secretName,
+            key: "minio.secretkey",
+          },
+        },
+      },
+      {
+        name: "ACCESS_KEY",
+        valueFrom: {
+          secretKeyRef: {
+            name: secretName,
+            key: "minio.accesskey",
           },
         },
       },
