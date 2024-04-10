@@ -80,7 +80,7 @@ const argv = yargs(process.argv.slice(2))
       alias: "port",
       describe: "port number for the service",
       type: "number",
-      value: 8080,
+      default: 8080,
     },
     or: {
       alias: "origins",
@@ -96,6 +96,18 @@ const argv = yargs(process.argv.slice(2))
         "https://*.dictybase.dev",
         "https://dictybase.dev*",
       ],
+    },
+    sb: {
+      alias: "s3-bucket",
+      describe: "s3 bucket where files will be uploaded",
+      type: "string",
+      default: "editor",
+    },
+    sp: {
+      alias: "s3-bucket-path",
+      describe: "path inside bucket where file will be uploaded",
+      type: "string",
+      default: "assets",
     },
   })
   .help()
@@ -120,9 +132,11 @@ new GraphqlBackendDeploymentStack(app, deployment, {
     image: argv.im,
     tag: argv.tg,
     logLevel: argv.ll,
-    port: argv.po as number,
+    port: argv.po,
     configMapname: argv.cm,
     origins: argv.or as Array<string>,
+    bucket: argv.sb,
+    bucketPath: argv.sp,
   },
 })
 new BackendService(app, service, {
