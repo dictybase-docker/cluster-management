@@ -53,6 +53,7 @@ type GraphqlProperties = {
   publication: string
   organism: string
   graphlEndpoint: string
+  storage: string
 }
 type EmailProperties = {
   owner: string
@@ -123,7 +124,7 @@ class ConfigMapStack extends TerraformStack {
       provider: { remote, credentials, bucketName, bucketPrefix, config },
       resource: {
         namespace,
-        graphql: { publication, graphlEndpoint, organism },
+        graphql: { publication, graphlEndpoint, organism, storage },
         email: { domain, sender, senderName, owner, repository, senderCc },
         auth: { endpoint },
       },
@@ -146,6 +147,7 @@ class ConfigMapStack extends TerraformStack {
       data: {
         "endpoint.publication": publication,
         "endpoint.organism": organism,
+        "endpoint.storage": storage,
         "eventmessenger.endpoint.publication": graphlEndpoint,
         "eventmessenger.email.domain": domain,
         "eventmessenger.email.sender": sender,
