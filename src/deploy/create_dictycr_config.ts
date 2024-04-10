@@ -53,6 +53,12 @@ const argv = yargs(process.argv.slice(2))
       describe: "graphql api endpoint for publication",
       demandOption: true,
     },
+    se: {
+      alias: "storage-api-endpoint",
+      type: "string",
+      demandOption: true,
+      describe: "api endpoint for authentication server",
+    },
     ae: {
       alias: "auth-api-endpoint",
       type: "string",
@@ -122,6 +128,7 @@ new ConfigMapStack(app, argv.nm, {
       publication: argv.pa,
       organism: argv.oa,
       graphlEndpoint: argv.gl,
+      storage: argv.se,
     },
     email: {
       sender: argv.sa,
