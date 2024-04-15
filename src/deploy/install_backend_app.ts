@@ -87,7 +87,7 @@ new ArangodbBackendDeployment(app, deploymentName, {
     remote: argv.r,
     credentials: argv.c,
     bucketName: argv.bn,
-    bucketPrefix: deploymentName,
+    bucketPrefix: deploymentName.concat("-").concat(argv.ns),
   },
   resource: {
     service,
@@ -105,7 +105,7 @@ new BackendService(app, service, {
     remote: argv.r,
     credentials: argv.c,
     bucketName: argv.bn,
-    bucketPrefix: service,
+    bucketPrefix: service.concat("-").concat(argv.ns),
   },
   resource: {
     namespace: argv.ns,
