@@ -130,7 +130,6 @@ new HelmChartStack(app, deployName, {
   bucketPrefix: deployName,
   repo: argv.repo,
   namespace: argv.ns,
-  chart: argv.ch,
   name: argv.nm, // this app name should match the app attributes passed in the service
   values: [{ name: "container.image.tag", value: argv.nv }],
 })

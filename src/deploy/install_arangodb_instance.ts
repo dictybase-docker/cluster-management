@@ -43,7 +43,7 @@ const argv = yargs(process.argv.slice(2))
     av: {
       alias: "arangodb-version",
       type: "string",
-      describe: "redis version to install",
+      describe: "arangodb version to install",
       default: "3.10.6",
     },
     axv: {
