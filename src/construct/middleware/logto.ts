@@ -287,17 +287,20 @@ class LogtoBackendDeploymentStack extends TerraformStack {
     database,
     endpoint,
   }: containerProperties) {
+    const script = `npm run cli db seed -- --swe &&`
+      .concat(`npm run cli db alteration deploy ${tag} &&`)
+      .concat(`npm run cli connector link &&`)
+      .concat(`npm start`)
     return Array.of({
       name,
       image: `${image}:${tag}`,
       command: ["/bin/sh"],
-      args: Array.of("-c", `npm run cli db seed -- --swe && npm start`),
+      args: Array.of("-c", script),
       env: this.#env(secret, database, endpoint),
       port: this.#ports({ adminService, apiService, adminPort, apiPort }),
       volumeMount: Array.of({
         name: volumeName,
         mountPath: "/etc/logto/packages/core/connectors",
-        readOnly: true,
       }),
     })
   }
