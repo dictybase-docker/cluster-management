@@ -50,10 +50,10 @@ type containerProperties = portPropterties & {
   endpoint: string
 }
 
-type initContainerProperties = Pick<
-  containerProperties,
-  "name" | "image" | "volumeName" | "tag"
->
+// type initContainerProperties = Pick<
+//   containerProperties,
+//   "name" | "image" | "volumeName" | "tag"
+// >
 
 type LogtoPersistentVolumeClaimStackProperties = {
   provider: Provider
@@ -227,12 +227,12 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         template: {
           metadata: { labels: { app: id } },
           spec: {
-            initContainer: this.#initcontainer({
-              name: `${id}-init-container`,
-              image,
-              tag,
-              volumeName,
-            }),
+            // initContainer: this.#initcontainer({
+            //   name: `${id}-init-container`,
+            //   image,
+            //   tag,
+            //   volumeName,
+            // }),
             container: this.#containers({
               name: `${id}-container`,
               image,
@@ -262,18 +262,18 @@ class LogtoBackendDeploymentStack extends TerraformStack {
   #metadata(name: string, namespace: string) {
     return { name, namespace }
   }
-  #initcontainer({ name, image, tag, volumeName }: initContainerProperties) {
-    return Array.of({
-      name,
-      image: `${image}:${tag}`,
-      command: Array.of("/bin/sh"),
-      args: Array.of("-c", "npm run cli connector add -- --official"),
-      volumeMount: Array.of({
-        name: volumeName,
-        mountPath: "/etc/logto/packages/core/connectors",
-      }),
-    })
-  }
+  // #initcontainer({ name, image, tag, volumeName }: initContainerProperties) {
+  //   return Array.of({
+  //     name,
+  //     image: `${image}:${tag}`,
+  //     command: Array.of("/bin/sh"),
+  //     args: Array.of("-c", "npm run cli connector add -- --official"),
+  //     volumeMount: Array.of({
+  //       name: volumeName,
+  //       mountPath: "/etc/logto/packages/core/connectors",
+  //     }),
+  //   })
+  // }
   #containers({
     volumeName,
     name,
