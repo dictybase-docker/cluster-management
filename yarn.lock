@@ -2106,10 +2106,19 @@ cdktf-cli@^0.20.6:
     yoga-layout-prebuilt "1.10.0"
     zod "3.22.4"
 
-cdktf@0.20.6, cdktf@^0.20.6:
+cdktf@0.20.6:
   version "0.20.6"
   resolved "https://registry.yarnpkg.com/cdktf/-/cdktf-0.20.6.tgz#1c18731c5bae26ce1f5f33773702900a571a8244"
   integrity sha512-WoEpZu29SYIDdAPIyCyjz6mvw7L+2XBul5NEC3W/B7PLdg/OvfJqWoGkCJibqTEGy9r69R5u+BptAbmCGGf3iQ==
+  dependencies:
+    archiver "6.0.2"
+    json-stable-stringify "1.1.1"
+    semver "7.6.0"
+
+cdktf@^0.20.6:
+  version "0.20.7"
+  resolved "https://registry.yarnpkg.com/cdktf/-/cdktf-0.20.7.tgz#7944dc73f40c2b97e445fd0284ae21f0ab5e8f0a"
+  integrity sha512-7za8QQYM1G0/6JUCYY+5smwNfNfbiZVPCMD7SeX2rTYmOLaGEkHZtMvuUTEKSqsE56fKudnfVd2J2edz2CETFg==
   dependencies:
     archiver "6.0.2"
     json-stable-stringify "1.1.1"
