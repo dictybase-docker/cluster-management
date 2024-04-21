@@ -107,6 +107,10 @@ new HelmChartStack(app, deployName, {
     { name: "ingress.enabled", value: "true" },
     { name: "ingress.ingressClassName", value: "nginx" },
     { name: "ingress.annotations.cert-manager\\.io/issuer", value: argv.is },
+    {
+      name: "ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/proxy-body-size",
+      value: "100m",
+    },
     { name: "ingress.path", value: "/" },
     { name: "ingress.tls[0].secretName", value: argv.sc },
   ],
