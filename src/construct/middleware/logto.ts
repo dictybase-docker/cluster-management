@@ -323,6 +323,7 @@ class LogtoBackendDeploymentStack extends TerraformStack {
         value: decodeSecretData(secret?.data?.password as string),
       },
       { name: "ENDPOINT", value: endpoint },
+      { name: "TRUST_PROXY_HEADER", value: "1" },
     )
   }
   #ports({ adminService, apiService, adminPort, apiPort }: portPropterties) {
