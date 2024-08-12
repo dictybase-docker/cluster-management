@@ -53,7 +53,6 @@ const process_logto_ingress_cmdline = (): logtoIngressArgvProperties =>
       sc: {
         alias: "secret",
         type: "string",
-        describe: "name of logto ingress secret",
         default: "logto-ingress-tls",
       },
       is: {
